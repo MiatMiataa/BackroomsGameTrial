@@ -1,0 +1,98 @@
+package GameTrial;
+
+import javax.swing.*;
+import java.awt.*;
+import java.awt.event.KeyAdapter;
+import java.awt.event.KeyEvent;
+
+public class Panel extends JPanel implements Runnable {
+    public static final int WIDTH = 800;
+    public static final int HEIGHT = 600;
+
+    private Thread gameThread;
+    private boolean running = false;
+    private final int FPS = 60;
+
+    private GameMap gameMap;
+    private Player player;
+
+    public Panel() {
+        setPreferredSize(new Dimension(WIDTH, HEIGHT));
+        setBackground(Color.BLACK);
+        setFocusable(true);
+        requestFocus();
+
+        gameMap = new GameMap();
+        player = new Player();
+
+        addKeyListener(new KeyAdapter() {
+            @Override
+            public void keyPressed(KeyEvent e) {
+                player.keyPressed(e);
+            }
+
+            @Override
+            public void keyReleased(KeyEvent e) {
+                player.keyReleased(e);
+            }
+        });
+    }
+
+    public synchronized void startGame() {
+        if (running) return;
+        running = true;
+        gameThread = new Thread(this);
+        gameThread.start();
+    }
+
+    @Override
+    public void run() {
+        double drawInterval = 1000000000.0 / FPS;
+        double delta = 0;
+        long lastTime = System.nanoTime();
+        long currentTime;
+
+        while (running) {
+            currentTime = System.nanoTime();
+            delta += (currentTime - lastTime) / drawInterval;
+            lastTime = currentTime;
+
+            if (delta >= 1) {
+                update();
+                repaint();
+                delta--;
+            }
+        }
+    }
+
+    private void update() {
+        player.update(gameMap);
+    }
+
+    @Override
+    protected void paintComponent(Graphics g) {
+        super.paintComponent(g);
+        Graphics2D g2 = (Graphics2D) g;
+
+        int rows = gameMap.getRows();
+        int cols = gameMap.getCols();
+        int tileSize = GameMap.TILE_SIZE;
+
+        for (int r = 0; r < rows; r++) {
+            for (int c = 0; c < cols; c++) {
+                if (gameMap.getTile(c, r) == 1) {
+                    g2.setColor(Color.DARK_GRAY);
+                    g2.fillRect(c * tileSize, r * tileSize, tileSize, tileSize);
+                    g2.setColor(Color.BLACK);
+                    g2.drawRect(c * tileSize, r * tileSize, tileSize, tileSize);
+                } else {
+                    g2.setColor(Color.LIGHT_GRAY);
+                    g2.fillRect(c * tileSize, r * tileSize, tileSize, tileSize);
+                }
+            }
+        }
+
+        player.draw(g2);
+        g2.dispose();
+    }
+}

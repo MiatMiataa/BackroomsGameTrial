@@ -1,0 +1,66 @@
+package GameTrial;
+
+import java.awt.*;
+import java.awt.event.KeyEvent;
+
+public class Player {
+    private double x = 64 + 32;
+    private double y = 64 + 32;
+    private final int radius = 15;
+    private final double speed = 4.0;
+
+    private boolean up, down, left, right;
+
+    public void update(GameMap gameMap) {
+        double dx = 0;
+        double dy = 0;
+
+        if (up) dy -= speed;
+        if (down) dy += speed;
+        if (left) dx -= speed;
+        if (right) dx += speed;
+
+        if (dx != 0 && dy != 0) {
+            dx *= 0.7071;
+            dy *= 0.7071;
+        }
+
+        double nextX = x + dx;
+        if (!hasCollision(nextX, y, gameMap)) {
+            x = nextX;
+        }
+
+        double nextY = y + dy;
+        if (!hasCollision(x, nextY, gameMap)) {
+            y = nextY;
+        }
+    }
+
+    private boolean hasCollision(double targetX, double targetY, GameMap gameMap) {
+        return gameMap.isWall(targetX - radius, targetY - radius) ||
+                gameMap.isWall(targetX + radius, targetY - radius) ||
+                gameMap.isWall(targetX - radius, targetY + radius) ||
+                gameMap.isWall(targetX + radius, targetY + radius);
+    }
+
+    public void draw(Graphics2D g2) {
+        g2.setColor(Color.RED);
+        g2.fillOval((int) (x - radius), (int) (y - radius), radius * 2, radius * 2);
+    }
+
+    public void keyPressed(KeyEvent e) {
+        int code = e.getKeyCode();
+        if (code == KeyEvent.VK_W || code == KeyEvent.VK_UP) up = true;
+        if (code == KeyEvent.VK_S || code == KeyEvent.VK_DOWN) down = true;
+        if (code == KeyEvent.VK_A || code == KeyEvent.VK_LEFT) left = true;
+        if (code == KeyEvent.VK_D || code == KeyEvent.VK_RIGHT) right = true;
+    }
+
+    public void keyReleased(KeyEvent e) {
+        int code = e.getKeyCode();
+        if (code == KeyEvent.VK_W || code == KeyEvent.VK_UP) up = false;
+        if (code == KeyEvent.VK_S || code == KeyEvent.VK_DOWN) down = false;
+        if (code == KeyEvent.VK_A || code == KeyEvent.VK_LEFT) left = false;
+        if (code == KeyEvent.VK_D || code == KeyEvent.VK_RIGHT) right = false;
+    }
+}

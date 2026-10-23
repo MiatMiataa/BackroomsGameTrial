@@ -1,0 +1,34 @@
+package GameTrial;
+
+public class GameMap {
+    public static final int TILE_SIZE = 64;
+    private int[][] map = {
+            {1, 1, 1, 1, 1, 1, 1, 1},
+            {1, 0, 0, 0, 0, 0, 0, 1},
+            {1, 0, 1, 1, 1, 0, 0, 1},
+            {1, 0, 1, 0, 0, 0, 0, 1},
+            {1, 0, 1, 0, 0, 0, 0, 1},
+            {1, 0, 0, 0, 0, 1, 0, 1},
+            {1, 0, 0, 0, 0, 0, 0, 1},
+            {1, 1, 1, 1, 1, 1, 1, 1}
+    };
+
+    public int getTile(int col, int row) {
+        if (row < 0 || row >= map.length || col < 0 || col >= map[0].length) return 1;
+        return map[row][col];
+    }
+
+    public boolean isWall(double x, double y) {
+        int col = (int) (x / TILE_SIZE);
+        int row = (int) (y / TILE_SIZE);
+        return getTile(col, row) == 1;
+    }
+
+    public int getRows() {
+        return map.length;
+    }
+
+    public int getCols() {
+        return map[0].length;
+    }
+}
