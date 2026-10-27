@@ -4,6 +4,7 @@ import GameTrial.assets.TextureSet;
 import GameTrial.entity.Player;
 import GameTrial.input.InputState;
 import GameTrial.input.KeyboardInput;
+import GameTrial.input.MouseInput;
 import GameTrial.render.Raycaster;
 import GameTrial.render.Renderer;
 import GameTrial.world.GameMap;
@@ -18,6 +19,7 @@ public class Game {
     private final Renderer renderer;
     private final InputState inputState;
     private final KeyboardInput keyboardInput;
+    private final MouseInput mouseInput;
 
     public Game() {
         gameMap = new GameMap();
@@ -25,7 +27,8 @@ public class Game {
         player = new Player();
         inputState = new InputState();
         keyboardInput = new KeyboardInput(inputState);
-
+        mouseInput = new MouseInput(inputState);
+        
         try {
             renderer = new Renderer(raycaster, new TextureSet());
         } catch (IOException exception) {
@@ -36,6 +39,9 @@ public class Game {
     public void attachInput(Component screenComponent) {
         screenComponent.addKeyListener(keyboardInput);
         screenComponent.addFocusListener(keyboardInput);
+        screenComponent.addMouseListener(mouseInput);
+        screenComponent.addMouseMotionListener(mouseInput);
+        screenComponent.addFocusListener(mouseInput);
     }
 
     public void start(Runnable repaintAction) {

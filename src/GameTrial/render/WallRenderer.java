@@ -28,6 +28,7 @@ public class WallRenderer {
             RayHit rayHitResult = raycaster.castRay(player.positionX, player.positionY, rayDirectionX, rayDirectionY);
 
             int wallStripeHeight = (int) ((renderHeight * GameMap.TILE_SIZE) / rayHitResult.perpendicularWallDistance);
+            int fogAmount = Fog.getFogAmount(rayHitResult.perpendicularWallDistance);
 
             int stripeTopY = -wallStripeHeight / 2 + renderHeight / 2;
             if (stripeTopY < 0) stripeTopY = 0;
@@ -48,9 +49,10 @@ public class WallRenderer {
                 if (textureRowY >= wallTexture.height) textureRowY = wallTexture.height - 1;
                 textureRowPosition += textureStepPerPixel;
 
-                screenPixels[screenRow * renderWidth + screenColumn] = isShadedSide
-                        ? wallTexture.getDarkPixel(textureColumnX, textureRowY)
-                        : wallTexture.getPixel(textureColumnX, textureRowY);
+                int wallPixel = isShadedSide
+                    ? wallTexture.getDarkPixel(textureColumnX, textureRowY)
+                    : wallTexture.getPixel(textureColumnX, textureRowY);
+                screenPixels[screenRow * renderWidth + screenColumn] = Fog.blend(wallPixel, fogAmount);
             }
         }
     }

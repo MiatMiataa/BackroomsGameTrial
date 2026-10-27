@@ -19,8 +19,8 @@ public class DebugOverlay {
     }
     
     private void drawMinimap(Graphics2D graphics) {
-        int rowCount = gameMap.getRows();
-        int columnCount = gameMap.getColumn();
+        int rowCount = gameMap.getRowsCount();
+        int columnCount = gameMap.getColumnCount();
         int tileSize = GameMap.TILE_SIZE;
 
         for (int row = 0; row < rowCount; row++) {
@@ -53,8 +53,8 @@ public class DebugOverlay {
     public void drawMinimapOverlay(Graphics2D graphics) {
         int minimapBoxSize = 150;
         int minimapPadding = 10;
-        int rowCount = gameMap.getRows();
-        int columnCount = gameMap.getColumn();
+        int rowCount = gameMap.getRowsCount();
+        int columnCount = gameMap.getColumnCount();
         double minimapScale = (double) minimapBoxSize / (Math.max(rowCount, columnCount) * GameMap.TILE_SIZE);
 
         graphics.setColor(new Color(0, 0, 0, 180));

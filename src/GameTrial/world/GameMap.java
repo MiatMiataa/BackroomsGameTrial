@@ -23,16 +23,16 @@ public class GameMap {
     }
 
     public boolean isWall(double pixelX, double pixelY) {
-        int column = (int) (pixelX / TILE_SIZE);
-        int row = (int) (pixelY / TILE_SIZE);
+        int column = (int) Math.floor(pixelX / TILE_SIZE);
+        int row = (int) Math.floor(pixelY / TILE_SIZE);
         return getTile(column, row) == 1;
     }
 
-    public int getRows() {
+    public int getRowsCount() {
         return tileGrid.length;
     }
 
-    public int getColumn() {
+    public int getColumnCount() {
         return tileGrid[0].length;
     }
 }
