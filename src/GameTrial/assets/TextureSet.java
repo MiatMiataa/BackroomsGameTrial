@@ -10,8 +10,8 @@ public class TextureSet {
     public final Texture ceiling;
 
     public TextureSet() throws IOException {
-        wall = new Texture(TEXTURE_FOLDER + "wall.png");
-        floor = new Texture(TEXTURE_FOLDER + "floor.png");
+        wall = new Texture(TEXTURE_FOLDER + "wallpaper.png");
+        floor = new Texture(TEXTURE_FOLDER + "carpet.png");
         ceiling = new Texture(TEXTURE_FOLDER + "ceiling.png");
     }
 }

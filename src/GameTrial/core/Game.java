@@ -32,8 +32,10 @@ public class Game {
             throw new RuntimeException("Could not load a texture: " + exception.getMessage(), exception);
         }
     }
+
     public void attachInput(Component screenComponent) {
         screenComponent.addKeyListener(keyboardInput);
+        screenComponent.addFocusListener(keyboardInput);
     }
 
     public void start(Runnable repaintAction) {
@@ -44,11 +46,11 @@ public class Game {
         gameLoop.start();
     }
 
-    private void update() {
+    private synchronized void update() {
         player.update(gameMap, inputState);
     }
 
-    public void render() {
+    public synchronized void render() {
         renderer.render(player);
     }
 

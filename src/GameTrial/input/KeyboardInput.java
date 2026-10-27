@@ -1,9 +1,11 @@
 package GameTrial.input;
 
+import java.awt.event.FocusEvent;
+import java.awt.event.FocusListener;
 import java.awt.event.KeyAdapter;
 import java.awt.event.KeyEvent;
 
-public class KeyboardInput extends KeyAdapter {
+public class KeyboardInput extends KeyAdapter implements FocusListener {
     private final InputState inputState;
 
     private boolean isMovingForward, isMovingBackward, isTurningLeft, isTurningRight;
@@ -20,6 +22,20 @@ public class KeyboardInput extends KeyAdapter {
     @Override
     public void keyReleased(KeyEvent event) {
         updateKey(event.getKeyCode(), false);
+    }
+
+    @Override
+    public void focusLost(FocusEvent event) {
+        isMovingForward = false;
+        isMovingBackward = false;
+        isTurningLeft = false;
+        isTurningRight = false;
+        inputState.forward = 0;
+        inputState.turn = 0;
+    }
+
+    @Override
+    public void focusGained(FocusEvent event) {
     }
 
     private void updateKey(int keyCode, boolean isDown) {

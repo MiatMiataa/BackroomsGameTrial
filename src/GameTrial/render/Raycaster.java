@@ -1,6 +1,6 @@
 package GameTrial.render;
 
-import  GameTrial.world.GameMap;
+import GameTrial.world.GameMap;
 
 public class Raycaster {
     private final GameMap gameMap;
@@ -10,11 +10,11 @@ public class Raycaster {
     }
 
     public RayHit castRay(double rayStartX, double rayStartY, double rayDirectionX, double rayDirectionY) {
-        int currentTileColumn = (int) (rayStartX / GameMap.TILE_SIZE);
-        int currentTileRow = (int) (rayStartY / GameMap.TILE_SIZE);
+        int currentTileColumn = (int) Math.floor(rayStartX / GameMap.TILE_SIZE);
+        int currentTileRow = (int) Math.floor(rayStartY / GameMap.TILE_SIZE);
 
-        double distanceToCrossOneTileX = (rayDirectionX == 0) ? 1e30 : Math.abs (GameMap.TILE_SIZE / rayDirectionX);
-        double distanceToCrossOneTileY = (rayDirectionY == 0) ? 1e30 : Math.abs (GameMap.TILE_SIZE / rayDirectionY);
+        double distanceToCrossOneTileX = (rayDirectionX == 0) ? 1e30 : Math.abs(GameMap.TILE_SIZE / rayDirectionX);
+        double distanceToCrossOneTileY = (rayDirectionY == 0) ? 1e30 : Math.abs(GameMap.TILE_SIZE / rayDirectionY);
 
         int tileStepX, tileStepY;
         double distanceToNextTileEdgeX, distanceToNextTileEdgeY;
@@ -26,7 +26,6 @@ public class Raycaster {
             tileStepX = 1;
             distanceToNextTileEdgeX = ((currentTileColumn + 1) * GameMap.TILE_SIZE - rayStartX) / Math.abs(rayDirectionX);
         }
-    
         if (rayDirectionY < 0) {
             tileStepY = -1;
             distanceToNextTileEdgeY = (rayStartY - currentTileRow * GameMap.TILE_SIZE) / Math.abs(rayDirectionY);
@@ -52,8 +51,8 @@ public class Raycaster {
         }
 
         double perpendicularWallDistance = (wallOrientation == 0)
-            ? (distanceToNextTileEdgeX - distanceToCrossOneTileX)
-            : (distanceToNextTileEdgeY - distanceToCrossOneTileY);
+                ? (distanceToNextTileEdgeX - distanceToCrossOneTileX)
+                : (distanceToNextTileEdgeY - distanceToCrossOneTileY);
 
         double wallHitPixelX = rayStartX + rayDirectionX * perpendicularWallDistance;
         double wallHitPixelY = rayStartY + rayDirectionY * perpendicularWallDistance;

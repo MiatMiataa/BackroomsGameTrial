@@ -19,8 +19,8 @@ public class GameMap {
     }
 
     public boolean isWall(double x, double y) {
-        int col = (int) (x / TILE_SIZE);
-        int row = (int) (y / TILE_SIZE);
+        int column = (int) Math.floor(pixelX / TILE_SIZE);
+        int row = (int) Math.floor(pixelY / TILE_SIZE);
         return getTile(col, row) == 1;
     }
 
