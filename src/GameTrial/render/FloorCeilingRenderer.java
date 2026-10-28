@@ -61,8 +61,8 @@ public class FloorCeilingRenderer {
                 tileX += tileStepX;
                 tileY += tileStepY;
 
-                screenPixels[floorRowStart + screenColumn] = Fog.blend(floorTexture.getDarkPixel(floorTextureX, floorTextureY), fogAmount);
-                screenPixels[ceilingRowStart + screenColumn] = Fog.blend(ceilingTexture.getDarkPixel(ceilingTextureX, ceilingTextureY), fogAmount);
+                screenPixels[floorRowStart + screenColumn] = Fog.blend(floorTexture.getPixel(floorTextureX, floorTextureY), fogAmount);
+                screenPixels[ceilingRowStart + screenColumn] = Fog.blend(ceilingTexture.getPixel(ceilingTextureX, ceilingTextureY), fogAmount);
             }
         }
     }

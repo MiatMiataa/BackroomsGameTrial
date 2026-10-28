@@ -4,7 +4,7 @@ import GameTrial.world.GameMap;
 
 public class Fog {
     private static final double FOG_START_TILES = 2.0;
-    private static final double FOG_END_TILES = 9.0;
+    private static final double FOG_END_TILES = 24.0;
 
     private static final int FOG_RED = 42;
     private static final int FOG_GREEN = 36;

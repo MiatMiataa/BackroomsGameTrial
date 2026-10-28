@@ -28,6 +28,7 @@ public class WallRenderer {
             RayHit rayHitResult = raycaster.castRay(player.positionX, player.positionY, rayDirectionX, rayDirectionY);
 
             int wallStripeHeight = (int) ((renderHeight * GameMap.TILE_SIZE) / rayHitResult.perpendicularWallDistance);
+            if (!rayHitResult.hasHitWall) continue;
             int fogAmount = Fog.getFogAmount(rayHitResult.perpendicularWallDistance);
 
             int stripeTopY = -wallStripeHeight / 2 + renderHeight / 2;

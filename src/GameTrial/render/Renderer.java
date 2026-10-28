@@ -2,7 +2,6 @@ package GameTrial.render;
 
 import GameTrial.assets.TextureSet;
 import GameTrial.entity.Player;
-
 import java.awt.image.BufferedImage;
 
 public class Renderer {

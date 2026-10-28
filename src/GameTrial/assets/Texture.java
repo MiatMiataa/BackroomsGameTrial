@@ -59,9 +59,9 @@ public class Texture {
     }
 
     private static int halveBrightness(int color) {
-        int red = ((color >> 16) & 0xFF) / 2;
-        int green = ((color >> 8) & 0xFF) / 2;
-        int blue = (color & 0xFF) / 2;
+        int red = ((color >> 16) & 0xFF) * 3 / 4;
+        int green = ((color >> 8) & 0xFF) * 3 / 4;
+        int blue = (color & 0xFF) * 3 / 4;
         return (0xFF << 24) | (red << 16) | (green << 8) | blue;
     }
 }

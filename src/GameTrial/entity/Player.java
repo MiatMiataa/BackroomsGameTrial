@@ -12,8 +12,8 @@ public class Player {
     public double cameraPlaneX = 0, cameraPlaneY = 0.66;
 
     public final int collisionRadius = 15;
-    private final double moveSpeed = 3.0;
-    private final double rotationSpeed = 0.06;
+    private final double moveSpeed = 3.35;
+    private final double rotationSpeed = 0.055;
 
     public void update(GameMap gameMap, InputState inputState) {
         double totalTurn = inputState.getTotalTurn();

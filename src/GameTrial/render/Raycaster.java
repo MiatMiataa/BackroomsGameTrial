@@ -4,6 +4,7 @@ import GameTrial.world.GameMap;
 
 public class Raycaster {
     private final GameMap gameMap;
+    private static final int MAX_RAY_STEPS = 48;
 
     public Raycaster(GameMap gameMap) {
         this.gameMap = gameMap;
@@ -36,8 +37,9 @@ public class Raycaster {
 
         boolean hasHitWall = false;
         int wallOrientation = 0;
+        int stepCount = 0;
 
-        while (!hasHitWall) {
+        while (!hasHitWall && stepCount < MAX_RAY_STEPS) {
             if (distanceToNextTileEdgeX < distanceToNextTileEdgeY) {
                 distanceToNextTileEdgeX += distanceToCrossOneTileX;
                 currentTileColumn += tileStepX;
@@ -48,6 +50,7 @@ public class Raycaster {
                 wallOrientation = 1;
             }
             if (gameMap.getTile(currentTileColumn, currentTileRow) == 1) hasHitWall = true;
+            stepCount++;
         }
 
         double perpendicularWallDistance = (wallOrientation == 0)
@@ -61,6 +64,6 @@ public class Raycaster {
         if (wallHitFraction < 0) wallHitFraction += GameMap.TILE_SIZE;
         wallHitFraction /= GameMap.TILE_SIZE;
 
-        return new RayHit(currentTileColumn, currentTileRow, wallOrientation, perpendicularWallDistance, wallHitFraction);
+        return new RayHit(currentTileColumn, currentTileRow, wallOrientation, perpendicularWallDistance, wallHitFraction, hasHitWall);
     }
 }
