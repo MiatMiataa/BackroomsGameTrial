@@ -12,29 +12,31 @@ public class Player {
     public double cameraPlaneX = 0, cameraPlaneY = 0.66;
 
     public final int collisionRadius = 15;
-    private final double moveSpeed = 4.0;
-    private final double rotationSpeed = 0.05;
+    private final double moveSpeed = 3.0;
+    private final double rotationSpeed = 0.06;
 
     public void update(GameMap gameMap, InputState inputState) {
-    double totalTurn = inputState.getTotalTurn();
-    if (totalTurn != 0) rotate(totalTurn * rotationSpeed);
+        double totalTurn = inputState.getTotalTurn();
+        if (totalTurn != 0) rotate(totalTurn * rotationSpeed);
 
-    double moveX = directionX * inputState.forward - directionY * inputState.strafe;
-    double moveY = directionY * inputState.forward + directionX * inputState.strafe;
-    double moveLength = Math.hypot(moveX, moveY);
-    if (moveLength > 1) {
-        moveX /= moveLength;
-        moveY /= moveLength;
+        double moveX = directionX * inputState.forward - directionY * inputState.strafe;
+        double moveY = directionY * inputState.forward + directionX * inputState.strafe;
+        double moveLength = Math.hypot(moveX, moveY);
+    
+        if (moveLength > 1) {
+            moveX /= moveLength;
+            moveY /= moveLength;
+        }
+
+        moveX *= moveSpeed;
+        moveY *= moveSpeed;
+
+        double nextX = positionX + moveX;
+        if (!hasCollision(nextX, positionY, gameMap)) positionX = nextX;
+
+        double nextY = positionY + moveY;
+        if (!hasCollision(positionX, nextY, gameMap)) positionY = nextY;
     }
-    moveX *= moveSpeed;
-    moveY *= moveSpeed;
-
-    double nextX = positionX + moveX;
-    if (!hasCollision(nextX, positionY, gameMap)) positionX = nextX;
-
-    double nextY = positionY + moveY;
-    if (!hasCollision(positionX, nextY, gameMap)) positionY = nextY;
-}
 
     private void rotate(double angleInRadians) {
         double oldDirectionX = directionX;
@@ -47,9 +49,9 @@ public class Player {
     }
 
     private boolean hasCollision(double targetPositionX, double targetPositionY, GameMap gameMap) {
-        return gameMap.isWall(targetPositionX - collisionRadius, targetPositionY - collisionRadius) ||
-                gameMap.isWall(targetPositionX + collisionRadius, targetPositionY - collisionRadius) ||
-                gameMap.isWall(targetPositionX - collisionRadius, targetPositionY + collisionRadius) ||
-                gameMap.isWall(targetPositionX + collisionRadius, targetPositionY + collisionRadius);
+        return gameMap.isWall(targetPositionX - collisionRadius, targetPositionY - collisionRadius)
+            || gameMap.isWall(targetPositionX + collisionRadius, targetPositionY - collisionRadius)
+            || gameMap.isWall(targetPositionX - collisionRadius, targetPositionY + collisionRadius)
+            || gameMap.isWall(targetPositionX + collisionRadius, targetPositionY + collisionRadius);
     }
 }

@@ -5,7 +5,7 @@ import GameTrial.entity.Player;
 import GameTrial.world.GameMap;
 
 public class FloorCeilingRenderer {
-    private static final int HORIZON_ROW_COLOR = 0xFF3C3C50;
+    private static final int HORIZON_ROW_COLOR = 0xFF2A2410;
 
     private final ScreenBuffer screenBuffer;
     private final Texture floorTexture;
@@ -44,6 +44,7 @@ public class FloorCeilingRenderer {
             int ceilingRowStart = (horizonRow - 1 - distanceFromHorizon) * renderWidth;
 
             double rowDistanceInTiles = cameraHeight / distanceFromHorizon;
+            int fogAmount = Fog.getFogAmount(rowDistanceInTiles * GameMap.TILE_SIZE);
 
             double tileStepX = rowDistanceInTiles * (rightmostRayDirectionX - leftmostRayDirectionX) / renderWidth;
             double tileStepY = rowDistanceInTiles * (rightmostRayDirectionY - leftmostRayDirectionY) / renderWidth;
@@ -60,8 +61,8 @@ public class FloorCeilingRenderer {
                 tileX += tileStepX;
                 tileY += tileStepY;
 
-                screenPixels[floorRowStart + screenColumn] = floorTexture.getDarkPixel(floorTextureX, floorTextureY);
-                screenPixels[ceilingRowStart + screenColumn] = ceilingTexture.getDarkPixel(ceilingTextureX, ceilingTextureY);
+                screenPixels[floorRowStart + screenColumn] = Fog.blend(floorTexture.getDarkPixel(floorTextureX, floorTextureY), fogAmount);
+                screenPixels[ceilingRowStart + screenColumn] = Fog.blend(ceilingTexture.getDarkPixel(ceilingTextureX, ceilingTextureY), fogAmount);
             }
         }
     }
