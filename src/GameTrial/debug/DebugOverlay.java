@@ -11,6 +11,8 @@ public class DebugOverlay {
     private static final int MINIMAP_BOX_SIZE = 150;
     private static final int MINIMAP_PADDING = 10;
 
+    private static final Color PATH_COLOR = new Color(80, 120, 255);
+
     private static final Color WALL_COLOR = Color.DARK_GRAY;
     private static final Color FLOOR_COLOR = Color.LIGHT_GRAY;
     private static final Color EXIT_COLOR = Color.GREEN;
@@ -57,6 +59,8 @@ public class DebugOverlay {
 
                 if (column == gameMap.exitTileColumn && row == gameMap.exitTileRow) {
                     graphics.setColor(EXIT_COLOR);
+                } else if (gameMap.isOnPathToExit(column, row)) {
+                    graphics.setColor(PATH_COLOR);
                 } else if (gameMap.getTile(column, row) == 1) {
                     graphics.setColor(WALL_COLOR);
                 } else {

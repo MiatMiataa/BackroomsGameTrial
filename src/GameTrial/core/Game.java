@@ -28,7 +28,9 @@ public class Game {
         GeneratedLevel generatedLevel = MapGenerator.generate(MapGenerator.DEFAULT_SEED);
         int[] exitTile = generatedLevel.exitTiles.get(0);
 
-        gameMap = new GameMap(generatedLevel.tileGrid, exitTile[0], exitTile[1]);
+       gameMap = new GameMap(generatedLevel.tileGrid, generatedLevel.distanceToExit,
+            generatedLevel.spawnTileColumn, generatedLevel.spawnTileRow,
+            exitTile[0], exitTile[1]);
 
         raycaster = new Raycaster(gameMap);
 
