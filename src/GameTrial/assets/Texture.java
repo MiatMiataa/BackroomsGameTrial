@@ -12,6 +12,9 @@ public class Texture {
     public final int widthMask;
     public final int heightMask;
 
+    private static final int BRIGHTNESS_PERCENT = 80;
+    private static final int SHADED_SIDE_PERCENT = 75;
+
     private final int[] normalPixels;
 
     private final int[] darkPixels;
@@ -42,7 +45,9 @@ public class Texture {
 
         darkPixels = new int[normalPixels.length];
         for (int pixelIndex = 0; pixelIndex < normalPixels.length; pixelIndex++) {
-            darkPixels[pixelIndex] = halveBrightness(normalPixels[pixelIndex]);
+            int originalColor = normalPixels[pixelIndex];
+            normalPixels[pixelIndex] = scaleColor(originalColor, BRIGHTNESS_PERCENT);
+            darkPixels[pixelIndex] = scaleColor(originalColor, SHADED_SIDE_PERCENT);
         }
     }
 
@@ -58,10 +63,10 @@ public class Texture {
         return number > 0 && (number & (number - 1)) == 0;
     }
 
-    private static int halveBrightness(int color) {
-        int red = ((color >> 16) & 0xFF) * 3 / 4;
-        int green = ((color >> 8) & 0xFF) * 3 / 4;
-        int blue = (color & 0xFF) * 3 / 4;
+    private static int scaleColor(int color, int percentage) {
+        int red = ((color >> 16) & 0xFF) * percentage / 100;
+        int green = ((color >> 8) & 0xFF) * percentage / 100;
+        int blue = (color & 0xFF) * percentage / 100;
         return (0xFF << 24) | (red << 16) | (green << 8) | blue;
     }
 }

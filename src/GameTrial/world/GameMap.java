@@ -16,6 +16,12 @@ public class GameMap {
         {1,1,1,1,1,1,1,1,1,1}
     };
 
+    public GameMap() {
+    }
+
+    public GameMap(int[][] generatedTileGrid) {
+        this.tileGrid = generatedTileGrid;
+    }
 
     public int getTile(int column, int row) {
         if (row < 0 || row >= tileGrid.length || column < 0 || column >= tileGrid[0].length) return 1;
