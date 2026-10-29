@@ -21,7 +21,7 @@ public class GamePanel extends JPanel {
 
     public GamePanel(Game game, JFrame gameWindow) {
         this.game = game;
-        debugOverlay = new DebugOverlay(game.getPlayer(), game.getGameMap(), game.getRaycaster());
+        debugOverlay = new DebugOverlay(game.getPlayer(), game.getGameMap());
 
         setBackground(Color.BLACK);
         setFocusable(true);

@@ -8,6 +8,8 @@ import GameTrial.input.MouseInput;
 import GameTrial.render.Raycaster;
 import GameTrial.render.Renderer;
 import GameTrial.world.GameMap;
+import GameTrial.world.GeneratedLevel;
+import GameTrial.world.MapGenerator;
 import java.awt.Component;
 import java.awt.image.BufferedImage;
 import java.io.IOException;
@@ -22,9 +24,15 @@ public class Game {
     private final MouseInput mouseInput;
 
     public Game() {
-        gameMap = new GameMap();
+        GeneratedLevel generatedLevel = MapGenerator.generate(MapGenerator.DEFAULT_SEED);
+        gameMap = new GameMap(generatedLevel.tileGrid);
         raycaster = new Raycaster(gameMap);
         player = new Player();
+        player.positionX = (generatedLevel.spawnTileColumn + 0.5) * GameMap.TILE_SIZE;
+        player.positionY = (generatedLevel.spawnTileRow + 0.5) * GameMap.TILE_SIZE;
+        int[] exitTile = generatedLevel.exitTiles.get(0);
+        player.faceTowards((exitTile[0] + 0.5) * GameMap.TILE_SIZE,
+                (exitTile[1] + 0.5) * GameMap.TILE_SIZE);
         inputState = new InputState();
         keyboardInput = new KeyboardInput(inputState);
         mouseInput = new MouseInput(inputState);
@@ -64,15 +72,8 @@ public class Game {
         return renderer.getImage();
     }
 
-    public GameMap getGameMap() {
-        return gameMap;
-    }
-
-    public Raycaster getRaycaster() {
-        return raycaster;
-    }
-
     public Player getPlayer() {
         return player;
     }
+
 }

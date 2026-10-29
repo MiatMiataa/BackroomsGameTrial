@@ -15,6 +15,17 @@ public class Player {
     private final double moveSpeed = 3.35;
     private final double rotationSpeed = 0.055;
 
+    public void faceTowards(double targetPixelX, double targetPixelY) {
+        double deltaX = targetPixelX - positionX;
+        double deltaY = targetPixelY - positionY;
+        double distance = Math.hypot(deltaX, deltaY);
+        double cameraPlaneLength = Math.hypot(cameraPlaneX, cameraPlaneY);
+        directionX = deltaX / distance;
+        directionY = deltaY / distance;
+        cameraPlaneX = -directionY * cameraPlaneLength;
+        cameraPlaneY = directionX * cameraPlaneLength;
+    }
+    
     public void update(GameMap gameMap, InputState inputState) {
         double totalTurn = inputState.getTotalTurn();
         if (totalTurn != 0) rotate(totalTurn * rotationSpeed);
