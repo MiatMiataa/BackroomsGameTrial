@@ -76,4 +76,8 @@ public class Game {
         return player;
     }
 
+    public GameMap getGameMap() {
+        return gameMap;
+}
+
 }
