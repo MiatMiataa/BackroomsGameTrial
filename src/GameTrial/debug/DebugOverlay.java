@@ -1,15 +1,23 @@
 package GameTrial.debug;
 
-import java.awt.image.BufferedImage;
 import GameTrial.entity.Player;
 import GameTrial.world.GameMap;
 import java.awt.Color;
 import java.awt.Graphics2D;
 
 public class DebugOverlay {
-    private Player player;
-    private GameMap gameMap;
-    private BufferedImage minimapImage;
+    private static final int MINIMAP_VISIBLE_TILES = 30;
+
+    private static final int MINIMAP_BOX_SIZE = 150;
+    private static final int MINIMAP_PADDING = 10;
+
+    private static final Color WALL_COLOR = Color.DARK_GRAY;
+    private static final Color FLOOR_COLOR = Color.LIGHT_GRAY;
+    private static final Color EXIT_COLOR = Color.GREEN;
+    private static final Color BACKGROUND_COLOR = new Color(0, 0, 0, 180);
+
+    private final Player player;
+    private final GameMap gameMap;
 
     public DebugOverlay(Player player, GameMap gameMap) {
         this.player = player;
@@ -17,44 +25,50 @@ public class DebugOverlay {
     }
 
     public void drawMinimapOverlay(Graphics2D graphics) {
-        int minimapBoxSize = 150;
-        int minimapPadding = 10;
-        int rowCount = gameMap.getRowsCount();
-        int columnCount = gameMap.getColumnCount();
-        double minimapScale = (double) minimapBoxSize / (Math.max(rowCount, columnCount) * GameMap.TILE_SIZE);
+        graphics.setColor(BACKGROUND_COLOR);
+        graphics.fillRect(MINIMAP_PADDING, MINIMAP_PADDING, MINIMAP_BOX_SIZE, MINIMAP_BOX_SIZE);
 
-        graphics.setColor(new Color(0, 0, 0, 180));
-        graphics.fillRect(minimapPadding, minimapPadding, minimapBoxSize, minimapBoxSize);
+        drawTiles(graphics);
 
-        if (minimapImage == null) {
-            minimapImage = buildMinimapImage(minimapBoxSize, minimapScale);
-        }
-        graphics.drawImage(minimapImage, minimapPadding, minimapPadding, null);
+        int centerX = MINIMAP_PADDING + MINIMAP_BOX_SIZE / 2;
+        int centerY = MINIMAP_PADDING + MINIMAP_BOX_SIZE / 2;
 
-        int playerMinimapX = minimapPadding + (int) (player.positionX * minimapScale);
-        int playerMinimapY = minimapPadding + (int) (player.positionY * minimapScale);
         graphics.setColor(Color.RED);
-        graphics.fillOval(playerMinimapX - 3, playerMinimapY - 3, 6, 6);
+        graphics.fillOval(centerX - 3, centerY - 3, 6, 6);
 
         graphics.setColor(Color.YELLOW);
         int directionLineLength = 15;
-        graphics.drawLine(playerMinimapX, playerMinimapY,
-                playerMinimapX + (int) (player.directionX * directionLineLength),
-                playerMinimapY + (int) (player.directionY * directionLineLength));
+        graphics.drawLine(centerX, centerY,
+            centerX + (int) (player.directionX * directionLineLength),
+            centerY + (int) (player.directionY * directionLineLength));
     }
 
-    private BufferedImage buildMinimapImage(int minimapBoxSize, double minimapScale) {
-        BufferedImage image = new BufferedImage(minimapBoxSize, minimapBoxSize, BufferedImage.TYPE_INT_ARGB);
-        int wallColor = Color.DARK_GRAY.getRGB();
-        int floorColor = Color.LIGHT_GRAY.getRGB();
-        for (int pixelY = 0; pixelY < minimapBoxSize; pixelY++) {
-            for (int pixelX = 0; pixelX < minimapBoxSize; pixelX++) {
-                int column = (int) (pixelX / minimapScale / GameMap.TILE_SIZE);
-                int row = (int) (pixelY / minimapScale / GameMap.TILE_SIZE);
-                image.setRGB(pixelX, pixelY, gameMap.getTile(column, row) == 1 ? wallColor : floorColor);
+    private void drawTiles(Graphics2D graphics) {
+        int playerTileColumn = (int) Math.floor(player.positionX / GameMap.TILE_SIZE);
+        int playerTileRow = (int) Math.floor(player.positionY / GameMap.TILE_SIZE);
+        int halfVisible = MINIMAP_VISIBLE_TILES / 2;
+        double pixelsPerTile = (double) MINIMAP_BOX_SIZE / MINIMAP_VISIBLE_TILES;
+        int tilePixelSize = (int) Math.ceil(pixelsPerTile);
+
+        for (int offsetRow = 0; offsetRow < MINIMAP_VISIBLE_TILES; offsetRow++) {
+            for (int offsetColumn = 0; offsetColumn < MINIMAP_VISIBLE_TILES; offsetColumn++) {
+                int column = playerTileColumn + offsetColumn - halfVisible;
+                int row = playerTileRow + offsetRow - halfVisible;
+
+                if (column == gameMap.exitTileColumn && row == gameMap.exitTileRow) {
+                    graphics.setColor(EXIT_COLOR);
+                } else if (gameMap.getTile(column, row) == 1) {
+                    graphics.setColor(WALL_COLOR);
+                } else {
+                    graphics.setColor(FLOOR_COLOR);
+                }
+
+                graphics.fillRect(
+                    MINIMAP_PADDING + (int) (offsetColumn * pixelsPerTile),
+                    MINIMAP_PADDING + (int) (offsetRow * pixelsPerTile),
+                    tilePixelSize,
+                    tilePixelSize);
             }
         }
-        return image;
     }
-
 }

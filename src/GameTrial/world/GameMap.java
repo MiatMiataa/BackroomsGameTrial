@@ -3,6 +3,9 @@ package GameTrial.world;
 public class GameMap {
     public static final int TILE_SIZE = 64;
     
+    public final int exitTileColumn;
+    public final int exitTileRow;
+
     private int[][] tileGrid = {
         {1,0,1,1,1,1,1,1,1,1},
         {1,0,0,0,0,0,0,0,0,1},
@@ -17,10 +20,20 @@ public class GameMap {
     };
 
     public GameMap() {
+        this.exitTileColumn = -1;
+        this.exitTileRow = -1;
     }
 
     public GameMap(int[][] generatedTileGrid) {
         this.tileGrid = generatedTileGrid;
+        this.exitTileColumn = -1;
+        this.exitTileRow = -1;
+    }
+
+    public GameMap(int[][] generatedTileGrid, int exitTileColumn, int exitTileRow) {
+        this.tileGrid = generatedTileGrid;
+        this.exitTileColumn = exitTileColumn;
+        this.exitTileRow = exitTileRow;
     }
 
     public int getTile(int column, int row) {
