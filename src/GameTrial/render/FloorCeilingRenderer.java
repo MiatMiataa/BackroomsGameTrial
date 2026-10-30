@@ -19,7 +19,7 @@ public class FloorCeilingRenderer {
 
     public void render(Player player) {
         int renderWidth = screenBuffer.width;
-        int renderHeight = screenBuffer.height;
+        int renderHeight = Renderer.VIEW_HEIGHT;
         int[] screenPixels = screenBuffer.pixels;
 
         int horizonRow = renderHeight / 2;
@@ -61,8 +61,11 @@ public class FloorCeilingRenderer {
                 tileX += tileStepX;
                 tileY += tileStepY;
 
-                screenPixels[floorRowStart + screenColumn] = Fog.blend(floorTexture.getPixel(floorTextureX, floorTextureY), fogAmount);
-                screenPixels[ceilingRowStart + screenColumn] = Fog.blend(ceilingTexture.getPixel(ceilingTextureX, ceilingTextureY), fogAmount);
+                screenPixels[floorRowStart + screenColumn] = Fog.blend(floorTexture.getPixel(floorTextureX, 
+                    floorTextureY), fogAmount);
+
+                screenPixels[ceilingRowStart + screenColumn] = Fog.blend(ceilingTexture.getPixel(ceilingTextureX, 
+                    ceilingTextureY), fogAmount);
             }
         }
     }

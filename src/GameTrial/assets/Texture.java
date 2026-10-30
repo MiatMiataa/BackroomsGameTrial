@@ -47,7 +47,7 @@ public class Texture {
         for (int pixelIndex = 0; pixelIndex < normalPixels.length; pixelIndex++) {
             int originalColor = normalPixels[pixelIndex];
             normalPixels[pixelIndex] = scaleColor(originalColor, BRIGHTNESS_PERCENT);
-            darkPixels[pixelIndex] = scaleColor(originalColor, SHADED_SIDE_PERCENT);
+        darkPixels[pixelIndex] = scaleColor(originalColor, SHADED_SIDE_PERCENT * SHADED_SIDE_PERCENT / 100);
         }
     }
 

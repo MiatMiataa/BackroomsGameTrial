@@ -6,6 +6,7 @@ import java.awt.Color;
 import java.awt.Graphics2D;
 
 public class DebugOverlay {
+    private static final boolean SHOW_ROUTE = false;
     private static final int MINIMAP_VISIBLE_TILES = 30;
 
     private static final int MINIMAP_BOX_SIZE = 150;
@@ -59,7 +60,7 @@ public class DebugOverlay {
 
                 if (column == gameMap.exitTileColumn && row == gameMap.exitTileRow) {
                     graphics.setColor(EXIT_COLOR);
-                } else if (gameMap.isOnPathToExit(column, row)) {
+                } else if (SHOW_ROUTE && gameMap.isOnPathToExit(column, row)) {
                     graphics.setColor(PATH_COLOR);
                 } else if (gameMap.getTile(column, row) == 1) {
                     graphics.setColor(WALL_COLOR);
