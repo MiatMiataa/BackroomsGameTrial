@@ -6,7 +6,7 @@ import java.awt.Color;
 import java.awt.Graphics2D;
 
 public class DebugOverlay {
-    private static final boolean SHOW_ROUTE = false;
+    private static final boolean SHOW_ROUTE = true;
     private static final int MINIMAP_VISIBLE_TILES = 30;
 
     private static final int MINIMAP_BOX_SIZE = 150;

@@ -8,11 +8,13 @@ public class WallRenderer {
     private final ScreenBuffer screenBuffer;
     private final Raycaster raycaster;
     private final Texture wallTexture;
+    public final double[] columnWallDistances;
 
     public WallRenderer(ScreenBuffer screenBuffer, Raycaster raycaster, Texture wallTexture) {
         this.screenBuffer = screenBuffer;
         this.raycaster = raycaster;
         this.wallTexture = wallTexture;
+        this.columnWallDistances = new double[screenBuffer.width];
     }
 
     public void render(Player player) {
@@ -27,6 +29,7 @@ public class WallRenderer {
 
             RayHit rayHitResult = raycaster.castRay(player.positionX, player.positionY, rayDirectionX, rayDirectionY);
 
+            columnWallDistances[screenColumn] = rayHitResult.hasHitWall ? rayHitResult.perpendicularWallDistance : Double.MAX_VALUE;
             int wallStripeHeight = (int) ((renderHeight * GameMap.TILE_SIZE) / rayHitResult.perpendicularWallDistance);
             if (!rayHitResult.hasHitWall) continue;
             int fogAmount = Fog.getFogAmount(rayHitResult.perpendicularWallDistance);

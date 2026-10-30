@@ -44,10 +44,11 @@ public class Texture {
         normalPixels = loadedImage.getRGB(0, 0, width, height, null, 0, width);
 
         darkPixels = new int[normalPixels.length];
+
         for (int pixelIndex = 0; pixelIndex < normalPixels.length; pixelIndex++) {
             int originalColor = normalPixels[pixelIndex];
             normalPixels[pixelIndex] = scaleColor(originalColor, BRIGHTNESS_PERCENT);
-        darkPixels[pixelIndex] = scaleColor(originalColor, SHADED_SIDE_PERCENT * SHADED_SIDE_PERCENT / 100);
+            darkPixels[pixelIndex] = scaleColor(originalColor, SHADED_SIDE_PERCENT * SHADED_SIDE_PERCENT / 100);
         }
     }
 
@@ -67,6 +68,10 @@ public class Texture {
         int red = ((color >> 16) & 0xFF) * percentage / 100;
         int green = ((color >> 8) & 0xFF) * percentage / 100;
         int blue = (color & 0xFF) * percentage / 100;
-        return (0xFF << 24) | (red << 16) | (green << 8) | blue;
+        return (color & 0xFF000000) | (red << 16) | (green << 8) | blue;
     }
+
+    public boolean isTransparent(int x, int y) {
+        return (normalPixels[y * width + x] >>> 24) < 128;
+}
 }
