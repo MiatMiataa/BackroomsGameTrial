@@ -34,7 +34,8 @@ public class GamePanel extends JPanel {
                     gameWindow.setExtendedState(JFrame.ICONIFIED);
                 }
             }
-        });
+        }
+        );
 
         game.attachInput(this);
     }

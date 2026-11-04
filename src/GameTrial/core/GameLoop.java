@@ -36,8 +36,10 @@ public class GameLoop implements Runnable {
             frameTimeAccumulator += (currentFrameTimestamp - lastFrameTimestamp) / nanosecondsPerFrame;
             lastFrameTimestamp = currentFrameTimestamp;
 
-            if (frameTimeAccumulator > MAX_CATCH_UP_TICKS) frameTimeAccumulator = MAX_CATCH_UP_TICKS;
-
+            if (frameTimeAccumulator > MAX_CATCH_UP_TICKS) {
+                frameTimeAccumulator = MAX_CATCH_UP_TICKS;
+            }
+            
             if (frameTimeAccumulator >= 1) {
                 tickAction.run();
                 frameTimeAccumulator--;

@@ -28,7 +28,9 @@ public class Player {
     
     public void update(GameMap gameMap, InputState inputState) {
         double totalTurn = inputState.getTotalTurn();
-        if (totalTurn != 0) rotate(totalTurn * rotationSpeed);
+        if (totalTurn != 0) {
+            rotate(totalTurn * rotationSpeed);
+        }
 
         double moveX = directionX * inputState.forward - directionY * inputState.strafe;
         double moveY = directionY * inputState.forward + directionX * inputState.strafe;
@@ -43,10 +45,13 @@ public class Player {
         moveY *= moveSpeed;
 
         double nextX = positionX + moveX;
-        if (!hasCollision(nextX, positionY, gameMap)) positionX = nextX;
-
+        if (!hasCollision(nextX, positionY, gameMap)) {
+            positionX = nextX;
+        }
         double nextY = positionY + moveY;
-        if (!hasCollision(positionX, nextY, gameMap)) positionY = nextY;
+        if (!hasCollision(positionX, nextY, gameMap)) {
+            positionY = nextY;
+        }
     }
 
     private void rotate(double angleInRadians) {

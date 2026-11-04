@@ -38,16 +38,19 @@ public class SpriteRenderer {
 
             double cameraSpaceX = inverseDeterminant * (player.directionY * relativeX - player.directionX * relativeY);
             double depth = inverseDeterminant * (-player.cameraPlaneY * relativeX + player.cameraPlaneX * relativeY);
-            if (depth < 1) continue;
-
+            if (depth < 1) {
+                continue;
+            }
             int spriteCenterX = (int) ((renderWidth / 2.0) * (1 + cameraSpaceX / depth));
             int wallHeightAtDepth = (int) ((viewHeight * GameMap.TILE_SIZE) / depth);
             int spriteHeight = (int) (wallHeightAtDepth * sprite.heightScale);
-            if (spriteHeight < 1) continue;
+            if (spriteHeight < 1) {
+                continue;
+            }
             int spriteWidth = spriteHeight;
 
             int spriteLeftX = spriteCenterX - spriteWidth / 2;
-            int spriteTopY = viewHeight / 2 + (wallHeightAtDepth - spriteH eight) / 2 - spriteHeight / 2;
+            int spriteTopY = viewHeight / 2 + (wallHeightAtDepth - spriteHeight) / 2 - spriteHeight / 2;
 
             int firstColumn = Math.max(spriteLeftX, 0);
             int lastColumn = Math.min(spriteLeftX + spriteWidth, renderWidth);
@@ -58,12 +61,16 @@ public class SpriteRenderer {
             Texture texture = sprite.texture;
 
             for (int screenColumn = firstColumn; screenColumn < lastColumn; screenColumn++) {
-                if (depth >= columnWallDistances[screenColumn]) continue;
+                if (depth >= columnWallDistances[screenColumn]) {
+                    continue;
+                }
                 int textureX = (screenColumn - spriteLeftX) * texture.width / spriteWidth;
 
                 for (int screenRow = firstRow; screenRow < lastRow; screenRow++) {
                     int textureY = (screenRow - spriteTopY) * texture.height / spriteHeight;
-                    if (texture.isTransparent(textureX, textureY)) continue;
+                    if (texture.isTransparent(textureX, textureY)) {
+                        continue;
+                    }
                     screenPixels[screenRow * renderWidth + screenColumn] =
                         Fog.blend(texture.getPixel(textureX, textureY), fogAmount);
                 }

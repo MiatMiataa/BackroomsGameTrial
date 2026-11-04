@@ -29,33 +29,51 @@ public class WallRenderer {
 
             RayHit rayHitResult = raycaster.castRay(player.positionX, player.positionY, rayDirectionX, rayDirectionY);
 
-            columnWallDistances[screenColumn] = rayHitResult.hasHitWall ? rayHitResult.perpendicularWallDistance : Double.MAX_VALUE;
+            columnWallDistances[screenColumn] = rayHitResult.hasHitWall 
+                ? rayHitResult.perpendicularWallDistance 
+                : Double.MAX_VALUE;
+
             int wallStripeHeight = (int) ((renderHeight * GameMap.TILE_SIZE) / rayHitResult.perpendicularWallDistance);
-            if (!rayHitResult.hasHitWall) continue;
+            if (!rayHitResult.hasHitWall) {
+                continue;
+            }
+
             int fogAmount = Fog.getFogAmount(rayHitResult.perpendicularWallDistance);
 
             int stripeTopY = -wallStripeHeight / 2 + renderHeight / 2;
-            if (stripeTopY < 0) stripeTopY = 0;
+            if (stripeTopY < 0) {
+                stripeTopY = 0;
+            }
+
             int stripeBottomY = wallStripeHeight / 2 + renderHeight / 2;
-            if (stripeBottomY >= renderHeight) stripeBottomY = renderHeight - 1;
+            if (stripeBottomY >= renderHeight) {
+                stripeBottomY = renderHeight - 1;
+            }
 
             boolean isShadedSide = (rayHitResult.wallOrientation == 1);
 
             int textureColumnX = ((int) (rayHitResult.wallHitFraction * wallTexture.width)) & wallTexture.widthMask;
-            if (rayHitResult.wallOrientation == 0 && rayDirectionX > 0) textureColumnX = wallTexture.width - textureColumnX - 1;
-            if (rayHitResult.wallOrientation == 1 && rayDirectionY < 0) textureColumnX = wallTexture.width - textureColumnX - 1;
+            if (rayHitResult.wallOrientation == 0 && rayDirectionX > 0) {
+                textureColumnX = wallTexture.width - textureColumnX - 1; 
+            }
+            if (rayHitResult.wallOrientation == 1 && rayDirectionY < 0) { 
+                textureColumnX = wallTexture.width - textureColumnX - 1;
+            }
 
             double textureStepPerPixel = (double) wallTexture.height / wallStripeHeight;
             double textureRowPosition = (stripeTopY - renderHeight / 2 + wallStripeHeight / 2) * textureStepPerPixel;
 
             for (int screenRow = stripeTopY; screenRow < stripeBottomY; screenRow++) {
                 int textureRowY = (int) textureRowPosition;
-                if (textureRowY >= wallTexture.height) textureRowY = wallTexture.height - 1;
+                if (textureRowY >= wallTexture.height) {
+                    textureRowY = wallTexture.height - 1;
+                }
                 textureRowPosition += textureStepPerPixel;
 
                 int wallPixel = isShadedSide
                     ? wallTexture.getDarkPixel(textureColumnX, textureRowY)
                     : wallTexture.getPixel(textureColumnX, textureRowY);
+                    
                 screenPixels[screenRow * renderWidth + screenColumn] = Fog.blend(wallPixel, fogAmount);
             }
         }

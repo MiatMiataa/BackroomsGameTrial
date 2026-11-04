@@ -49,8 +49,11 @@ public class Raycaster {
                 currentTileRow += tileStepY;
                 wallOrientation = 1;
             }
-            if (gameMap.getTile(currentTileColumn, currentTileRow) == 1) hasHitWall = true;
-            stepCount++;
+            if (gameMap.getTile(currentTileColumn, currentTileRow) == 1) {
+                hasHitWall = true;
+                stepCount++;
+            }
+
         }
 
         double perpendicularWallDistance = (wallOrientation == 0)
@@ -60,8 +63,11 @@ public class Raycaster {
         double wallHitPixelX = rayStartX + rayDirectionX * perpendicularWallDistance;
         double wallHitPixelY = rayStartY + rayDirectionY * perpendicularWallDistance;
         double wallHitFraction = (wallOrientation == 0) ? wallHitPixelY : wallHitPixelX;
+
         wallHitFraction = wallHitFraction % GameMap.TILE_SIZE;
-        if (wallHitFraction < 0) wallHitFraction += GameMap.TILE_SIZE;
+        if (wallHitFraction < 0) {
+            wallHitFraction += GameMap.TILE_SIZE;
+        }
         wallHitFraction /= GameMap.TILE_SIZE;
 
         return new RayHit(currentTileColumn, currentTileRow, wallOrientation, perpendicularWallDistance, wallHitFraction, hasHitWall);
