@@ -109,7 +109,7 @@ public class Game {
     }
 
     private synchronized void update() {
-        if (hasLost) {
+        if (hasLost || hasWon) {
             return;
         }
         if (!entity.isAttacking()) {

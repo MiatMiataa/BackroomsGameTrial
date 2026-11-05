@@ -12,6 +12,7 @@ public class TextureSet {
     public final Texture floor;
     public final Texture ceiling;
     public final Texture itemHealth;
+    public final Texture exitMarker;
     public final Texture[][] usherPatrol = new Texture[8][4];
     public final Texture[] usherChase = new Texture[4];
     public final Texture[] usherAttack = new Texture[3];
@@ -22,6 +23,7 @@ public class TextureSet {
         floor = new Texture(TEXTURE_FOLDER + "carpet.png");
         ceiling = new Texture(TEXTURE_FOLDER + "ceiling.png");
         itemHealth = new Texture(TEXTURE_FOLDER + "item_health.png");
+        exitMarker = new Texture(TEXTURE_FOLDER + "exit_marker.png");
 
         for (int direction = 0; direction < usherPatrol.length; direction++) {
             for (int frame = 0; frame < usherPatrol[direction].length; frame++) {

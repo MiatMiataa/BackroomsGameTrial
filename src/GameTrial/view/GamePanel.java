@@ -1,5 +1,8 @@
 package GameTrial.view;
 
+
+import java.awt.Font;
+import java.awt.FontMetrics;
 import GameTrial.core.Game;
 import GameTrial.debug.DebugOverlay;
 import java.awt.Color;
@@ -81,5 +84,15 @@ public class GamePanel extends JPanel {
         }
         graphics.setColor(Color.WHITE);
         graphics.drawString("FPS: " + displayedFps, 20, 30);
+
+        if (game.hasWon() || game.hasLost()) {
+            String message = game.hasWon() ? "YOU ESCAPED!" : "YOU DIED";
+            graphics.setColor(new Color(0, 0, 0, 170));
+            graphics.fillRect(letterboxOffsetX, letterboxOffsetY, scaledImageWidth, scaledImageHeight);
+            graphics.setColor(game.hasWon() ? Color.GREEN : Color.RED);
+            graphics.setFont(graphics.getFont().deriveFont(Font.BOLD, 48f));
+            FontMetrics metrics = graphics.getFontMetrics();
+            graphics.drawString(message, (panelWidth - metrics.stringWidth(message)) / 2, panelHeight / 2 + metrics.getAscent() / 2);
+        }
     }
 }
