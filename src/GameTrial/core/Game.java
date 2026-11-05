@@ -3,6 +3,7 @@ package GameTrial.core;
 import GameTrial.assets.TextureSet;
 import GameTrial.entity.Player;
 import GameTrial.entity.Sprite;
+import GameTrial.entity.Entity;
 import java.util.ArrayList;
 import java.util.List;
 import GameTrial.input.InputState;
@@ -26,7 +27,9 @@ public class Game {
     private final KeyboardInput keyboardInput;
     private final MouseInput mouseInput;
     private volatile boolean hasWon = false;
+    private volatile boolean hasLost = false;
     private final List<Sprite> sprites = new ArrayList<>();
+    private final Entity entity;
 
     public Game() {
         GeneratedLevel generatedLevel = MapGenerator.generate(MapGenerator.DEFAULT_SEED);
@@ -61,6 +64,11 @@ public class Game {
                 player.positionY - player.positionY * 120, 
                 textureSet.itemHealth, 0.5
             ));
+            int[] entityTile = findHalfwayTile(generatedLevel);
+            List<int[]> patrolTiles = new ArrayList<>(generatedLevel.exitTiles);
+            patrolTiles.add(new int[] {generatedLevel.spawnTileColumn, generatedLevel.spawnTileRow});
+            entity = new Entity((entityTile[0] + 0.5) * GameMap.TILE_SIZE, (entityTile[1] + 0.5) * GameMap.TILE_SIZE, textureSet, patrolTiles);
+            sprites.add(entity);
         } catch (IOException exception) {
             throw new RuntimeException("Could not load a texture: " + exception.getMessage(), exception);
         }
@@ -86,12 +94,10 @@ public class Game {
 
     private synchronized void update() {
         player.update(gameMap, inputState);
-            if (!hasWon) {
-                int playerTileColumn = (int) Math.floor(player.positionX / GameMap.TILE_SIZE);
-                int playerTileRow = (int) Math.floor(player.positionY / GameMap.TILE_SIZE);
-            if (playerTileColumn == gameMap.exitTileColumn && playerTileRow == gameMap.exitTileRow) {
-                hasWon = true;
-            }
+            if (!entity.isAttacking()) player.update(gameMap, inputState);
+            boolean playerIsMoving = inputState.forward != 0 || inputState.strafe != 0;
+            entity.update(gameMap, player, playerIsMoving);
+            if (!hasWon && entity.isAttackFinished()) hasLost = true;
         }
     }
 
