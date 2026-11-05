@@ -2,6 +2,9 @@ package GameTrial.core;
 
 import GameTrial.assets.TextureSet;
 import GameTrial.entity.Player;
+import GameTrial.entity.Sprite;
+import java.util.ArrayList;
+import java.util.List;
 import GameTrial.input.InputState;
 import GameTrial.input.KeyboardInput;
 import GameTrial.input.MouseInput;
@@ -23,6 +26,7 @@ public class Game {
     private final KeyboardInput keyboardInput;
     private final MouseInput mouseInput;
     private volatile boolean hasWon = false;
+    private final List<Sprite> sprites = new ArrayList<>();
 
     public Game() {
         GeneratedLevel generatedLevel = MapGenerator.generate(MapGenerator.DEFAULT_SEED);
@@ -47,10 +51,21 @@ public class Game {
         mouseInput = new MouseInput(inputState);
         
         try {
+            TextureSet textureSet = new TextureSet();
             renderer = new Renderer(raycaster, new TextureSet());
+            sprites.add(new Sprite(player.positionX + player.positionX * 120,
+                player.positionY + player.positionY * 120, 
+                textureSet.itemHealth, 0.5
+            ));
+            sprites.add(new Sprite(player.positionX - player.positionX * 120,
+                player.positionY - player.positionY * 120, 
+                textureSet.itemHealth, 0.5
+            ));
         } catch (IOException exception) {
             throw new RuntimeException("Could not load a texture: " + exception.getMessage(), exception);
         }
+
+        
     }
 
     public void attachInput(Component screenComponent) {
@@ -81,7 +96,7 @@ public class Game {
     }
 
     public synchronized void render() {
-        renderer.render(player);
+        renderer.render(player, sprites);
     }
 
     public boolean hasWon() {

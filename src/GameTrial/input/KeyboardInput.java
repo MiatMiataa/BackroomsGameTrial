@@ -34,6 +34,7 @@ public class KeyboardInput extends KeyAdapter implements FocusListener {
         isStrafingRight = false;
         inputState.forward = 0;
         inputState.turn = 0;
+        inputState.strafe = 0;
     }
 
     @Override

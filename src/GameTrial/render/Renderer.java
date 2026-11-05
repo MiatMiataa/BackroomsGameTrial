@@ -8,23 +8,26 @@ import java.util.Arrays;
 import java.awt.image.BufferedImage;
 
 public class Renderer {
-    public static final int RENDER_WIDTH = 540;
+    public static final int RENDER_WIDTH = 960;
+    public static final int RENDER_HEIGHT = 540;
     public static final int VIEW_HEIGHT = 440;
     private static final int HUB_COLOR = 0xFF101010;
-    private final SpriteRenderer spriteRenderer;
     
     private final ScreenBuffer screenBuffer = new ScreenBuffer(RENDER_WIDTH, VIEW_HEIGHT);
     private final FloorCeilingRenderer floorCeilingRenderer;
     private final WallRenderer wallRenderer;
+    private final SpriteRenderer spriteRenderer;
 
     public Renderer(Raycaster raycaster, TextureSet textureSet) {
         floorCeilingRenderer = new FloorCeilingRenderer(screenBuffer, textureSet.floor, textureSet.ceiling);
         wallRenderer = new WallRenderer(screenBuffer, raycaster, textureSet.wall);
+        spriteRenderer = new SpriteRenderer(screenBuffer, wallRenderer.columnWallDistances);
     }
 
-    public void render(Player player) {
+    public void render(Player playe, List<Sprite> sprites) {
         floorCeilingRenderer.render(player);
         wallRenderer.render(player);
+        spriteRenderer.render(playe, sprites);
         Arrays.fill(screenBuffer.pixels, RENDER_WIDTH * VIEW_HEIGHT, screenBuffer.pixels.length, HUB_COLOR); 
     }
 
