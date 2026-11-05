@@ -56,7 +56,7 @@ public class Texture {
         return normalPixels[y * width + x];
     }
 
-    public boolean isTrasparent(int x, int y) {
+    public boolean isTransparent(int x, int y) {
         return (normalPixels[y * width + x] >>> 24) < 128;
     }
 
@@ -74,8 +74,4 @@ public class Texture {
         int blue = (color & 0xFF) * percentage / 100;
         return (color & 0xFF000000) | (red << 16) | (green << 8) | blue;
     }
-
-    public boolean isTransparent(int x, int y) {
-        return (normalPixels[y * width + x] >>> 24) < 128;
-}
 }

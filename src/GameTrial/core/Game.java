@@ -55,25 +55,41 @@ public class Game {
         
         try {
             TextureSet textureSet = new TextureSet();
-            renderer = new Renderer(raycaster, new TextureSet());
-            sprites.add(new Sprite(player.positionX + player.positionX * 120,
-                player.positionY + player.positionY * 120, 
-                textureSet.itemHealth, 0.5
-            ));
-            sprites.add(new Sprite(player.positionX - player.positionX * 120,
-                player.positionY - player.positionY * 120, 
-                textureSet.itemHealth, 0.5
-            ));
+            renderer = new Renderer(raycaster, textureSet);
+
+            sprites.add(new Sprite(player.positionX + player.directionX * 120,
+                player.positionY + player.directionY * 120,
+                textureSet.itemHealth, 0.5));
+
+            sprites.add(new Sprite(player.positionX - player.directionX * 120,
+                player.positionY - player.directionY * 120,
+                textureSet.itemHealth, 0.5));
+
             int[] entityTile = findHalfwayTile(generatedLevel);
             List<int[]> patrolTiles = new ArrayList<>(generatedLevel.exitTiles);
+
             patrolTiles.add(new int[] {generatedLevel.spawnTileColumn, generatedLevel.spawnTileRow});
             entity = new Entity((entityTile[0] + 0.5) * GameMap.TILE_SIZE, (entityTile[1] + 0.5) * GameMap.TILE_SIZE, textureSet, patrolTiles);
             sprites.add(entity);
         } catch (IOException exception) {
             throw new RuntimeException("Could not load a texture: " + exception.getMessage(), exception);
         }
+    }
 
-        
+    private int[] findHalfwayTile(GeneratedLevel generatedLevel) {
+        int halfwaySteps = generatedLevel.distanceToExit[generatedLevel.spawnTileRow][generatedLevel.spawnTileColumn] / 2;
+        for (int row = 0; row < gameMap.getRowsCount(); row++) {
+            for (int column = 0; column < gameMap.getColumnCount(); column++) {
+                if (gameMap.isOnPathToExit(column, row) && generatedLevel.distanceToExit[row][column] == halfwaySteps) {
+                    return new int[] {column, row};
+                }
+            }
+        }
+        return new int[] {generatedLevel.spawnTileColumn, generatedLevel.spawnTileRow};
+    }
+
+    public boolean hasLost() {
+        return hasLost;
     }
 
     public void attachInput(Component screenComponent) {
@@ -93,11 +109,23 @@ public class Game {
     }
 
     private synchronized void update() {
-        player.update(gameMap, inputState);
-            if (!entity.isAttacking()) player.update(gameMap, inputState);
-            boolean playerIsMoving = inputState.forward != 0 || inputState.strafe != 0;
-            entity.update(gameMap, player, playerIsMoving);
-            if (!hasWon && entity.isAttackFinished()) hasLost = true;
+        if (hasLost) {
+            return;
+        }
+        if (!entity.isAttacking()) {
+            player.update(gameMap, inputState);
+        }
+        if (!hasWon) {
+            int playerTileColumn = (int) Math.floor(player.positionX / GameMap.TILE_SIZE);
+            int playerTileRow = (int) Math.floor(player.positionY / GameMap.TILE_SIZE);
+            if (playerTileColumn == gameMap.exitTileColumn && playerTileRow == gameMap.exitTileRow) {
+                hasWon = true;
+            }
+        }
+        boolean playerIsMoving = inputState.forward != 0 || inputState.strafe != 0;
+        entity.update(gameMap, player, playerIsMoving);
+        if (!hasWon && entity.isAttackFinished()) {
+            hasLost = true;
         }
     }
 
@@ -119,6 +147,6 @@ public class Game {
 
     public GameMap getGameMap() {
         return gameMap;
-}
+    }
 
 }

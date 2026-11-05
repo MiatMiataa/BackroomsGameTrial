@@ -22,20 +22,23 @@ public class TextureSet {
         floor = new Texture(TEXTURE_FOLDER + "carpet.png");
         ceiling = new Texture(TEXTURE_FOLDER + "ceiling.png");
         itemHealth = new Texture(TEXTURE_FOLDER + "item_health.png");
-    }
 
-    for (int direction = 0; direction < usherPatrol.length; direction++) {
-        for (int frame = 0; frame < usherPatrol.length; frame++) {
-            usherPatrol[direction][frame] = new Texture(USHER_FOLDER + "patrol_" + USHER_DIRECTIONS[direction] + "_" + (frame + 1) + ".png");
+        for (int direction = 0; direction < usherPatrol.length; direction++) {
+            for (int frame = 0; frame < usherPatrol[direction].length; frame++) {
+                usherPatrol[direction][frame] = new Texture(USHER_FOLDER + "patrol_" + USHER_DIRECTIONS[direction] + "_" + (frame + 1) + ".png");
+            }
         }
-    }
-    for (int frame = 0; frame < usherChase.length; frame++) {
-        usherChase[frame] = new Texture(USHER_FOLDER + "chase_" + (frame + 1) + ".png");
-    }
-    for (int frame = 0; frame < usherAttack.length; frame++) {
-        usherAttack[frame] = new Texture(USHER_FOLDER + "attack_" + (frame + 1) + ".png");
-    }
-    for (int frame = 0; frame < usherVanish.length; frame++) {
-        usherVanish[frame] = new Texture(USHER_FOLDER + "vanish_" + (frame + 1) + ".png");
+
+        for (int frame = 0; frame < usherChase.length; frame++) {
+            usherChase[frame] = new Texture(USHER_FOLDER + "chase_" + (frame + 1) + ".png");
+        }
+
+        for (int frame = 0; frame < usherAttack.length; frame++) {
+            usherAttack[frame] = new Texture(USHER_FOLDER + "attack_" + (frame + 1) + ".png");
+        }
+
+        for (int frame = 0; frame < usherVanish.length; frame++) {
+            usherVanish[frame] = new Texture(USHER_FOLDER + "vanish_" + (frame + 1) + ".png");
+        }
     }
 }
