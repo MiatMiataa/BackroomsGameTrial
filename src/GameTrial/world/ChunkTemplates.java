@@ -72,13 +72,13 @@ public class ChunkTemplates {
 
     // Hand-made rooms for the start and the exit. Same rule. Draw your own later.
     public static final int[][] SPAWN_ROOM = {
+        {1,1,0,0,0,1,1},
+        {1,1,0,0,0,1,1},
         {0,0,0,0,0,0,0},
         {0,0,0,0,0,0,0},
         {0,0,0,0,0,0,0},
-        {0,0,0,0,0,0,0},
-        {0,0,0,0,0,0,0},
-        {0,0,0,0,0,0,0},
-        {0,0,0,0,0,0,0}
+        {1,1,0,0,0,1,1},
+        {1,1,0,0,0,1,1}
     };
 
     public static final int[][] EXIT_ROOM = {
@@ -105,7 +105,9 @@ public class ChunkTemplates {
 
     // Stops the game with the template's name if a rule is broken.
     public static void checkAll(int expectedSize) {
-        for (Template template : TEMPLATES) checkTemplate(template.name, template.tiles, expectedSize);
+        for (Template template : TEMPLATES) {
+            checkTemplate(template.name, template.tiles, expectedSize);
+        }
         checkTemplate("spawn room", SPAWN_ROOM, expectedSize);
         checkTemplate("exit room", EXIT_ROOM, expectedSize);
     }

@@ -6,6 +6,10 @@ public class Raycaster {
     private final GameMap gameMap;
     private static final int MAX_RAY_STEPS = 48;
 
+    public GameMap getGameMap() {
+        return gameMap;
+    }
+
     public Raycaster(GameMap gameMap) {
         this.gameMap = gameMap;
     }
@@ -40,6 +44,7 @@ public class Raycaster {
         int stepCount = 0;
 
         while (!hasHitWall && stepCount < MAX_RAY_STEPS) {
+            stepCount++;
             if (distanceToNextTileEdgeX < distanceToNextTileEdgeY) {
                 distanceToNextTileEdgeX += distanceToCrossOneTileX;
                 currentTileColumn += tileStepX;
@@ -51,7 +56,6 @@ public class Raycaster {
             }
             if (gameMap.getTile(currentTileColumn, currentTileRow) == 1) {
                 hasHitWall = true;
-                stepCount++;
             }
 
         }

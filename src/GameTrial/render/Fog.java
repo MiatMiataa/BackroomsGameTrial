@@ -15,7 +15,8 @@ public class Fog {
     public static int getFogAmount(double distanceInPixels) {
         double distanceInTiles = distanceInPixels / GameMap.TILE_SIZE;
         if (distanceInTiles <= FOG_START_TILES) {
-            return 0; }
+            return 0; 
+        }
         if (distanceInTiles >= FOG_END_TILES) {
             return FULL_FOG;
         }

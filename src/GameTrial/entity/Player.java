@@ -24,6 +24,9 @@ public class Player {
         directionY = deltaY / distance;
         cameraPlaneX = -directionY * cameraPlaneLength;
         cameraPlaneY = directionX * cameraPlaneLength;
+        if (distance < 1e-6) {
+            return;
+        }
     }
     
     public void update(GameMap gameMap, InputState inputState) {

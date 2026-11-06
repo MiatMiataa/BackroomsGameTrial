@@ -10,17 +10,22 @@ public class MapGenerator {
 
     // Tiles per chunk side. Each chunk owns its top and left wall, so 1 wall + 7 open tiles.
     private static final int CHUNK_SIZE = 8;
+
     // Chunks per world side. Keep it odd so the exit chunk sits exactly in the middle.
     private static final int WORLD_CHUNKS = 21;
+
     // Chance that a closed wall between two chunks gets an extra door (makes loops and detours).
     private static final double EXTRA_DOOR_CHANCE = 0.12;
+
     // 0 = bushy tree with many short dead ends. Closer to 1 = long winding routes with fewer branches.
     private static final double WINDING_CHANCE = 0.6;
+
     // Tries with the next seed if the exit cannot be reached. Should never be needed.
     private static final int MAX_SEED_ATTEMPTS = 50;
 
     private static final int WALL_TILE = 1;
     private static final int OPEN_TILE = 0;
+
     // Door tiles along a chunk wall. Also the clear lane through the chunk, so doors always connect.
     private static final int LANE_START = 3;
     private static final int LANE_END = 4;
@@ -42,8 +47,12 @@ public class MapGenerator {
         int exitChunkColumn = WORLD_CHUNKS / 2;
         int exitChunkRow = WORLD_CHUNKS / 2;
         // Spawn in a random corner chunk.
-        int spawnChunkColumn = random.nextBoolean() ? 0 : WORLD_CHUNKS - 1;
-        int spawnChunkRow = random.nextBoolean() ? 0 : WORLD_CHUNKS - 1;
+        int spawnChunkColumn = random.nextBoolean() 
+            ? 0 
+            : WORLD_CHUNKS - 1;
+        int spawnChunkRow = random.nextBoolean() 
+            ? 0 
+            : WORLD_CHUNKS - 1;
 
         // doorEast[c][r] = door between chunk (c,r) and (c+1,r). doorSouth[c][r] = door between (c,r) and (c,r+1).
         boolean[][] doorEast = new boolean[WORLD_CHUNKS][WORLD_CHUNKS];
@@ -55,7 +64,9 @@ public class MapGenerator {
         int tileCount = WORLD_CHUNKS * CHUNK_SIZE + 1;
         int[][] tileGrid = new int[tileCount][tileCount];
         for (int row = 0; row < tileCount; row++) {
-            for (int column = 0; column < tileCount; column++) tileGrid[row][column] = WALL_TILE;
+            for (int column = 0; column < tileCount; column++) {
+                tileGrid[row][column] = WALL_TILE;
+            }
         }
 
         for (int chunkRow = 0; chunkRow < WORLD_CHUNKS; chunkRow++) {
@@ -147,10 +158,15 @@ public class MapGenerator {
 
     private static void openDoor(int columnA, int rowA, int columnB, int rowB,
                                  boolean[][] doorEast, boolean[][] doorSouth) {
-        if (columnB == columnA + 1) doorEast[columnA][rowA] = true;
-        else if (columnB == columnA - 1) doorEast[columnB][rowB] = true;
-        else if (rowB == rowA + 1) doorSouth[columnA][rowA] = true;
-        else doorSouth[columnB][rowB] = true;
+        if (columnB == columnA + 1) {
+            doorEast[columnA][rowA] = true;
+        } else if (columnB == columnA - 1) {
+            doorEast[columnB][rowB] = true;
+        } else if (rowB == rowA + 1) {
+            doorSouth[columnA][rowA] = true;
+        } else {
+            doorSouth[columnB][rowB] = true;
+        }
     }
 
     private static void buildChunk(int[][] tileGrid, int chunkColumn, int chunkRow,
@@ -167,8 +183,12 @@ public class MapGenerator {
 
         // Doors in the walls this chunk owns. The south and east doors are owned by the neighbours.
         for (int lane = LANE_START; lane <= LANE_END; lane++) {
-            if (hasWestDoor) tileGrid[originRow + lane][originColumn] = OPEN_TILE;
-            if (hasNorthDoor) tileGrid[originRow][originColumn + lane] = OPEN_TILE;
+            if (hasWestDoor) {
+                tileGrid[originRow + lane][originColumn] = OPEN_TILE;
+            }
+            if (hasNorthDoor) {
+                tileGrid[originRow][originColumn + lane] = OPEN_TILE;
+            }
         }
     }
 
@@ -178,7 +198,9 @@ public class MapGenerator {
         int columnCount = tileGrid[0].length;
         int[][] distanceToExit = new int[rowCount][columnCount];
         for (int row = 0; row < rowCount; row++) {
-            for (int column = 0; column < columnCount; column++) distanceToExit[row][column] = -1;
+            for (int column = 0; column < columnCount; column++) {
+                distanceToExit[row][column] = -1;
+            }
         }
 
         ArrayDeque<int[]> waitingTiles = new ArrayDeque<>();
@@ -191,8 +213,12 @@ public class MapGenerator {
                 int nextColumn = currentTile[0] + direction[0];
                 int nextRow = currentTile[1] + direction[1];
                 boolean isInside = nextColumn >= 0 && nextColumn < columnCount && nextRow >= 0 && nextRow < rowCount;
-                if (!isInside || tileGrid[nextRow][nextColumn] == WALL_TILE) continue;
-                if (distanceToExit[nextRow][nextColumn] != -1) continue;
+                if (!isInside || tileGrid[nextRow][nextColumn] == WALL_TILE) {
+                    continue;
+                }
+                if (distanceToExit[nextRow][nextColumn] != -1) {
+                    continue;
+                }
                 distanceToExit[nextRow][nextColumn] = distanceToExit[currentTile[1]][currentTile[0]] + 1;
                 waitingTiles.add(new int[]{nextColumn, nextRow});
             }
@@ -207,8 +233,12 @@ public class MapGenerator {
         for (int row = 0; row < level.tileGrid.length; row++) {
             for (int column = 0; column < level.tileGrid[0].length; column++) {
                 char symbol = level.tileGrid[row][column] == WALL_TILE ? '#' : '.';
-                if (column == level.spawnTileColumn && row == level.spawnTileRow) symbol = 'S';
-                if (column == level.exitTiles.get(0)[0] && row == level.exitTiles.get(0)[1]) symbol = 'E';
+                if (column == level.spawnTileColumn && row == level.spawnTileRow) {
+                    symbol = 'S';
+                }
+                if (column == level.exitTiles.get(0)[0] && row == level.exitTiles.get(0)[1]) {
+                    symbol = 'E';
+                }
                 text.append(symbol);
             }
             text.append('\n');

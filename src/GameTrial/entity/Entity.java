@@ -8,16 +8,17 @@ import java.util.List;
 // The Usher: walks a loop through the patrol tiles, is nearly blind (notices only movement up close),
 // chases when it notices you, and attacks when it touches you.
 public class Entity extends Sprite {
-    private enum State { PATROL, CHASE, ATTACK }
+    private enum State { PATROL, CHASE, ATTACK, VANSIH }
 
     private static final double PATROL_SPEED = 1.2;
-    private static final double CHASE_SPEED = 2.2;       // the player walks at 3.35
+    private static final double CHASE_SPEED = 3.35;       // the player walks at 3.35
     private static final double CATCH_DISTANCE = 36;
     private static final double SIGHT_DISTANCE = 4.5 * GameMap.TILE_SIZE;
     private static final int GIVE_UP_STEPS = 12;         // path steps from the player before it gives up chasing
 
     private static final int TICKS_PER_WALK_FRAME = 8;
     private static final int TICKS_PER_ATTACK_FRAME = 10;
+    private static final int TICKS_PER_VANISH_FRAME = 6;
 
     private static final int[] COLUMN_STEPS = {1, -1, 0, 0};
     private static final int[] ROW_STEPS = {0, 0, 1, -1};
@@ -91,6 +92,16 @@ public class Entity extends Sprite {
             }
         }
 
+        if (state == State.VANSIH) {
+            if (animationTicks >= textures.usherVanish.length * TICKS_PER_VANISH_FRAME) {
+                state = State.PATROL;
+                animationTicks = 0;
+                patrolIndex = (patrolIndex + 1) % patrolTiles.size();
+            }
+            updateTexture(player);
+            return;
+        }
+
         if (state == State.PATROL) {
             int[] patrolTile = patrolTiles.get(patrolIndex);
             setGoal(gameMap, patrolTile[0], patrolTile[1]);
@@ -112,9 +123,14 @@ public class Entity extends Sprite {
             int frame = Math.min(animationTicks / TICKS_PER_ATTACK_FRAME, textures.usherAttack.length - 1);
             texture = textures.usherAttack[frame];
         } else if (state == State.CHASE) {
-            texture = textures.usherChase[(animationTicks / TICKS_PER_WALK_FRAME) % textures.usherChase.length];
+            int frameDuration = 3;
+            texture = textures.usherChase[(animationTicks / frameDuration) % textures.usherChase.length];
         } else {
             texture = textures.usherPatrol[viewSector(player)][(animationTicks / TICKS_PER_WALK_FRAME) % 4];
+        }
+        if (state == State.VANSIH) {
+            int frame = Math.min(animationTicks / TICKS_PER_VANISH_FRAME, textures.usherVanish.length - 1);
+            texture = textures.usherVanish[frame];
         }
     }
 
