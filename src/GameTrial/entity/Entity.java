@@ -5,26 +5,26 @@ import GameTrial.world.GameMap;
 import java.util.Arrays;
 import java.util.List;
 
-// The Usher: walks a loop through the patrol tiles, is nearly blind (notices only movement up close),
-// chases when it notices you, and attacks when it touches you.
 public class Entity extends Sprite {
-    private enum State { PATROL, CHASE, ATTACK, VANSIH }
+    private enum State { PATROL, CHASE, ATTACK, VANISH }
 
     private static final double PATROL_SPEED = 1.2;
-    private static final double CHASE_SPEED = 3.35;       // the player walks at 3.35
+    private static final double CHASE_SPEED = 3.35;
     private static final double CATCH_DISTANCE = 36;
     private static final double SIGHT_DISTANCE = 4.5 * GameMap.TILE_SIZE;
-    private static final int GIVE_UP_STEPS = 12;         // path steps from the player before it gives up chasing
+    private static final int GIVE_UP_STEPS = 12;      
 
     private static final int TICKS_PER_WALK_FRAME = 8;
     private static final int TICKS_PER_ATTACK_FRAME = 10;
+    private static final int TICKS_PER_CHASE_FRAME = 3;
     private static final int TICKS_PER_VANISH_FRAME = 6;
+    
 
     private static final int[] COLUMN_STEPS = {1, -1, 0, 0};
     private static final int[] ROW_STEPS = {0, 0, 1, -1};
 
     private final TextureSet textures;
-    private final List<int[]> patrolTiles;   // {column, row} pairs, visited in order, then repeated
+    private final List<int[]> patrolTiles;  
     private int patrolIndex = 0;
 
     private State state = State.PATROL;
@@ -36,7 +36,6 @@ public class Entity extends Sprite {
     private double targetX;
     private double targetY;
 
-    // Steps to the current goal tile for every tile, [row][column]. -1 = wall or cannot reach.
     private int[][] distanceToGoal;
     private int goalColumn = -1;
     private int goalRow = -1;
@@ -79,6 +78,7 @@ public class Entity extends Sprite {
             if (playerIsMoving && distanceToPlayer <= SIGHT_DISTANCE
                 && hasLineOfSight(gameMap, player.positionX, player.positionY)) {
                 state = State.CHASE;
+                animationTicks = 0;
             }
         }
 
@@ -92,7 +92,7 @@ public class Entity extends Sprite {
             }
         }
 
-        if (state == State.VANSIH) {
+        if (state == State.VANISH) {
             if (animationTicks >= textures.usherVanish.length * TICKS_PER_VANISH_FRAME) {
                 state = State.PATROL;
                 animationTicks = 0;
@@ -101,7 +101,7 @@ public class Entity extends Sprite {
             updateTexture(player);
             return;
         }
-
+        
         if (state == State.PATROL) {
             int[] patrolTile = patrolTiles.get(patrolIndex);
             setGoal(gameMap, patrolTile[0], patrolTile[1]);
@@ -128,7 +128,7 @@ public class Entity extends Sprite {
         } else {
             texture = textures.usherPatrol[viewSector(player)][(animationTicks / TICKS_PER_WALK_FRAME) % 4];
         }
-        if (state == State.VANSIH) {
+        if (state == State.VANISH) {
             int frame = Math.min(animationTicks / TICKS_PER_VANISH_FRAME, textures.usherVanish.length - 1);
             texture = textures.usherVanish[frame];
         }

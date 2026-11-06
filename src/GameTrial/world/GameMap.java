@@ -72,7 +72,6 @@ public class GameMap {
     return pathToExit[row][column];
 }
 
-// Walks from spawn to exit by descending distanceToExit by 1 each step.
 private static boolean[][] buildPathToExit(int[][] distanceToExit, int spawnColumn, int spawnRow) {
     boolean[][] path = new boolean[distanceToExit.length][distanceToExit[0].length];
     int currentColumn = spawnColumn;
@@ -123,7 +122,6 @@ public int getArrowDirection(int column, int row) {
     return arrowDirection[row][column];
 }
 
-// Arrows sit on a grid of tiles and point one step toward the exit.
 private static byte[][] buildArrowDirections(int[][] distanceToExit) {
     int[] columnSteps = {1, -1, 0, 0};
     int[] rowSteps = {0, 0, 1, -1};

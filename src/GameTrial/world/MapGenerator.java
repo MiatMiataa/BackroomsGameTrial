@@ -8,25 +8,19 @@ import java.util.Random;
 public class MapGenerator {
     public static final long DEFAULT_SEED = 12345L;
 
-    // Tiles per chunk side. Each chunk owns its top and left wall, so 1 wall + 7 open tiles.
     private static final int CHUNK_SIZE = 8;
 
-    // Chunks per world side. Keep it odd so the exit chunk sits exactly in the middle.
     private static final int WORLD_CHUNKS = 21;
 
-    // Chance that a closed wall between two chunks gets an extra door (makes loops and detours).
     private static final double EXTRA_DOOR_CHANCE = 0.12;
 
-    // 0 = bushy tree with many short dead ends. Closer to 1 = long winding routes with fewer branches.
     private static final double WINDING_CHANCE = 0.6;
 
-    // Tries with the next seed if the exit cannot be reached. Should never be needed.
     private static final int MAX_SEED_ATTEMPTS = 50;
 
     private static final int WALL_TILE = 1;
     private static final int OPEN_TILE = 0;
 
-    // Door tiles along a chunk wall. Also the clear lane through the chunk, so doors always connect.
     private static final int LANE_START = 3;
     private static final int LANE_END = 4;
 
@@ -46,7 +40,6 @@ public class MapGenerator {
 
         int exitChunkColumn = WORLD_CHUNKS / 2;
         int exitChunkRow = WORLD_CHUNKS / 2;
-        // Spawn in a random corner chunk.
         int spawnChunkColumn = random.nextBoolean() 
             ? 0 
             : WORLD_CHUNKS - 1;
@@ -54,7 +47,6 @@ public class MapGenerator {
             ? 0 
             : WORLD_CHUNKS - 1;
 
-        // doorEast[c][r] = door between chunk (c,r) and (c+1,r). doorSouth[c][r] = door between (c,r) and (c,r+1).
         boolean[][] doorEast = new boolean[WORLD_CHUNKS][WORLD_CHUNKS];
         boolean[][] doorSouth = new boolean[WORLD_CHUNKS][WORLD_CHUNKS];
 
@@ -104,7 +96,6 @@ public class MapGenerator {
         return new GeneratedLevel(tileGrid, spawnTileColumn, spawnTileRow, exitTiles, distanceToExit, safeSpotTiles, seed);
     }
 
-    // Grows a tree of doors over all chunks: every chunk gets reachable, with many short dead ends.
     private static void connectAllChunks(Random random, int startChunkColumn, int startChunkRow,
                                          boolean[][] doorEast, boolean[][] doorSouth) {
         boolean[][] isVisited = new boolean[WORLD_CHUNKS][WORLD_CHUNKS];
@@ -174,14 +165,12 @@ public class MapGenerator {
         int originColumn = chunkColumn * CHUNK_SIZE;
         int originRow = chunkRow * CHUNK_SIZE;
 
-        // The template fills the inside: everything except the top row and left column (the walls).
         for (int row = 0; row < template.length; row++) {
             for (int column = 0; column < template[row].length; column++) {
                 tileGrid[originRow + 1 + row][originColumn + 1 + column] = template[row][column];
             }
         }
 
-        // Doors in the walls this chunk owns. The south and east doors are owned by the neighbours.
         for (int lane = LANE_START; lane <= LANE_END; lane++) {
             if (hasWestDoor) {
                 tileGrid[originRow + lane][originColumn] = OPEN_TILE;
@@ -192,7 +181,6 @@ public class MapGenerator {
         }
     }
 
-    // Flood fill from the exit. Also proves the exit can be reached.
     private static int[][] measureDistanceToExit(int[][] tileGrid, int exitTileColumn, int exitTileRow) {
         int rowCount = tileGrid.length;
         int columnCount = tileGrid[0].length;
@@ -226,7 +214,6 @@ public class MapGenerator {
         return distanceToExit;
     }
 
-    // Run this class to read the map as text. # = wall, . = open, S = spawn, E = exit.
     public static void main(String[] arguments) {
         GeneratedLevel level = generate(DEFAULT_SEED);
         StringBuilder text = new StringBuilder();

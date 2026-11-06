@@ -19,14 +19,15 @@ public class Player {
         double deltaX = targetPixelX - positionX;
         double deltaY = targetPixelY - positionY;
         double distance = Math.hypot(deltaX, deltaY);
+        if (distance < 1e-6) {
+            return;
+        }
         double cameraPlaneLength = Math.hypot(cameraPlaneX, cameraPlaneY);
         directionX = deltaX / distance;
         directionY = deltaY / distance;
         cameraPlaneX = -directionY * cameraPlaneLength;
         cameraPlaneY = directionX * cameraPlaneLength;
-        if (distance < 1e-6) {
-            return;
-        }
+        
     }
     
     public void update(GameMap gameMap, InputState inputState) {
