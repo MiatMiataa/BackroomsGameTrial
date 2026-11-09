@@ -86,7 +86,8 @@ public class Entity extends Sprite {
             setGoal(gameMap, toTile(player.positionX), toTile(player.positionY));
             int stepsAway = distanceToGoal[toTile(positionY)][toTile(positionX)];
             if (stepsAway < 0 || stepsAway > GIVE_UP_STEPS) {
-                state = State.PATROL;
+                state = State.VANISH;
+                animationTicks = 0;
             } else {
                 walkAlongGrid(stepsAway, CHASE_SPEED, player.positionX, player.positionY);
             }
@@ -123,6 +124,7 @@ public class Entity extends Sprite {
             int frame = Math.min(animationTicks / TICKS_PER_ATTACK_FRAME, textures.usherAttack.length - 1);
             texture = textures.usherAttack[frame];
         } else if (state == State.CHASE) {
+<<<<<<< HEAD
             int frameDuration = 3;
             texture = textures.usherChase[(animationTicks / frameDuration) % textures.usherChase.length];
         } else if (state == State.VANISH) {
@@ -130,6 +132,13 @@ public class Entity extends Sprite {
             texture = textures.usherVanish[frame];
         } else {
             texture = textures.usherPatrol[viewSector(player)][(animationTicks / TICKS_PER_WALK_FRAME) % 4];
+=======
+            texture = textures.usherChase[(animationTicks / TICKS_PER_CHASE_FRAME) % textures.usherChase.length];
+        } else if (state == State.VANISH) {
+            int frame = Math.min(animationTicks / TICKS_PER_VANKSH_FRAME, textures.usherVanish.length - 1);
+        } else {          
+            texture = textures.usherPatrol[viewSectore(player)][(animationTicks / TICKS_PER_WALK_FRAME) % 4]
+>>>>>>> 84992a906153f15b5d4327eb86e799f4a63ad5aa
         }
     }
 
