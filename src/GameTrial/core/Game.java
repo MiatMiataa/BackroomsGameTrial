@@ -12,8 +12,6 @@ import GameTrial.input.MouseInput;
 import GameTrial.render.Raycaster;
 import GameTrial.render.Renderer;
 import GameTrial.world.GameMap;
-import GameTrial.world.GeneratedLevel;
-import GameTrial.world.MapGenerator;
 import java.awt.Component;
 import java.awt.image.BufferedImage;
 import java.io.IOException;
@@ -30,62 +28,43 @@ public class Game {
     private volatile boolean hasLost = false;
     private final List<Sprite> sprites = new ArrayList<>();
     private final Entity entity;
+    private final Player tabletCamera;
+
+    private enum View { OFFICE, TABLET }
+    private View currentView = View.OFFICE;
 
     public Game() {
-        GeneratedLevel generatedLevel = MapGenerator.generate(MapGenerator.DEFAULT_SEED);
-        int[] exitTile = generatedLevel.exitTiles.get(0);
-
-       gameMap = new GameMap(generatedLevel.tileGrid, generatedLevel.distanceToExit,
-            generatedLevel.spawnTileColumn, generatedLevel.spawnTileRow,
-            exitTile[0], exitTile[1]);
-
+        gameMap = new GameMap();
         raycaster = new Raycaster(gameMap);
 
         player = new Player();
-        player.positionX = (generatedLevel.spawnTileColumn + 0.5) * GameMap.TILE_SIZE;
-        player.positionY = (generatedLevel.spawnTileRow + 0.5) * GameMap.TILE_SIZE;
-        player.faceTowards((exitTile[0] + 0.5) * GameMap.TILE_SIZE,
-            (exitTile[1] + 0.5) * GameMap.TILE_SIZE);
-        
+        player.positionX = (gameMap.guardColumn + 0.5) * GameMap.TILE_SIZE;
+        player.positionY = (gameMap.guardRow + 0.5) * GameMap.TILE_SIZE;
+        player.faceTowards(player.positionX, player.positionY - GameMap.TILE_SIZE);
+
+        tabletCamera = new Player();
+        placeCamera(tabletCamera, gameMap.cameraTiles[0]);
+
         inputState = new InputState();
-
         keyboardInput = new KeyboardInput(inputState);
-
         mouseInput = new MouseInput(inputState);
-        
+
         try {
             TextureSet textureSet = new TextureSet();
             renderer = new Renderer(raycaster, textureSet);
 
-            sprites.add(new Sprite(player.positionX + player.directionX * 120,
-                player.positionY + player.directionY * 120,
-                textureSet.itemHealth, 0.5));
-
-            sprites.add(new Sprite(player.positionX - player.directionX * 120,
-                player.positionY - player.directionY * 120,
-                textureSet.itemHealth, 0.5));
-
-            int[] entityTile = findHalfwayTile(generatedLevel);
-            List<int[]> patrolTiles = new ArrayList<>(generatedLevel.exitTiles);
-
-            patrolTiles.add(new int[] {generatedLevel.spawnTileColumn, generatedLevel.spawnTileRow});
-            entity = new Entity((entityTile[0] + 0.5) * GameMap.TILE_SIZE, (entityTile[1] + 0.5) * GameMap.TILE_SIZE, textureSet, patrolTiles);
+            // placeholder animatronic: walks between the 9 camera spots
+            List<int[]> patrolTiles = new ArrayList<>();
+            for (int[] cameraTile : gameMap.cameraTiles) {
+                patrolTiles.add(cameraTile);
+            }
+            int[] startTile = gameMap.cameraTiles[gameMap.cameraTiles.length - 1];
+            entity = new Entity((startTile[0] + 0.5) * GameMap.TILE_SIZE,
+                (startTile[1] + 0.5) * GameMap.TILE_SIZE, textureSet, patrolTiles);
             sprites.add(entity);
         } catch (IOException exception) {
             throw new RuntimeException("Could not load a texture: " + exception.getMessage(), exception);
         }
-    }
-
-    private int[] findHalfwayTile(GeneratedLevel generatedLevel) {
-        int halfwaySteps = generatedLevel.distanceToExit[generatedLevel.spawnTileRow][generatedLevel.spawnTileColumn] / 2;
-        for (int row = 0; row < gameMap.getRowsCount(); row++) {
-            for (int column = 0; column < gameMap.getColumnCount(); column++) {
-                if (gameMap.isOnPathToExit(column, row) && generatedLevel.distanceToExit[row][column] == halfwaySteps) {
-                    return new int[] {column, row};
-                }
-            }
-        }
-        return new int[] {generatedLevel.spawnTileColumn, generatedLevel.spawnTileRow};
     }
 
     public boolean hasLost() {
@@ -113,16 +92,13 @@ public class Game {
             return;
         }
         if (!entity.isAttacking()) {
-            player.update(gameMap, inputState);
-        }
-        if (!hasWon) {
-            int playerTileColumn = (int) Math.floor(player.positionX / GameMap.TILE_SIZE);
-            int playerTileRow = (int) Math.floor(player.positionY / GameMap.TILE_SIZE);
-            if (playerTileColumn == gameMap.exitTileColumn && playerTileRow == gameMap.exitTileRow) {
-                hasWon = true;
+            if (inputState.tabletTogglePressed) {
+                inputState.tabletTogglePressed = false;
+                currentView = (currentView == View.OFFICE) ? View.TABLET : View.OFFICE;
             }
+            getActiveCamera().update(inputState);
         }
-        boolean playerIsMoving = inputState.forward != 0 || inputState.strafe != 0;
+        boolean playerIsMoving = false; // guard never moves
         entity.update(gameMap, player, playerIsMoving);
         if (!hasWon && entity.isAttackFinished()) {
             hasLost = true;
@@ -130,7 +106,30 @@ public class Game {
     }
 
     public synchronized void render() {
-        renderer.render(player, sprites);
+        renderer.render(getActiveCamera(), sprites);
+    }
+
+    // puts a camera in a tile, aims it away from the nearby walls and limits how far it can pan:
+    // corner = 90 degrees in total, flat wall = 180 degrees in total
+    private void placeCamera(Player camera, int[] tile) {
+        int column = tile[0];
+        int row = tile[1];
+        int lookX = (gameMap.getTile(column - 1, row) == 1 ? 1 : 0) - (gameMap.getTile(column + 1, row) == 1 ? 1 : 0);
+        int lookY = (gameMap.getTile(column, row - 1) == 1 ? 1 : 0) - (gameMap.getTile(column, row + 1) == 1 ? 1 : 0);
+        if (lookX == 0 && lookY == 0) {
+            lookY = -1; // no clear wall nearby: face north
+        }
+        double lookLength = Math.hypot(lookX, lookY);
+        double wallOffsetInTiles = 0.25; // moves the camera toward the wall without touching it
+        camera.positionX = (column + 0.5 - lookX / lookLength * wallOffsetInTiles) * GameMap.TILE_SIZE;
+        camera.positionY = (row + 0.5 - lookY / lookLength * wallOffsetInTiles) * GameMap.TILE_SIZE;
+        camera.faceTowards(camera.positionX + lookX * GameMap.TILE_SIZE, camera.positionY + lookY * GameMap.TILE_SIZE);
+        boolean isCorner = lookX != 0 && lookY != 0;
+        camera.setMaxYawRadians(Math.toRadians(isCorner ? 45 : 90));
+    }
+
+    private Player getActiveCamera() {
+        return currentView == View.OFFICE ? player : tabletCamera;
     }
 
     public boolean hasWon() {

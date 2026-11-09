@@ -10,16 +10,11 @@ public class FloorCeilingRenderer {
     private final ScreenBuffer screenBuffer;
     private final Texture floorTexture;
     private final Texture ceilingTexture;
-    private final GameMap gameMap;
-    private final Texture arrowTexture;
 
-    public FloorCeilingRenderer(ScreenBuffer screenBuffer, Texture floorTexture, Texture ceilingTexture, 
-                                GameMap gameMap, Texture arrowTexture) {
+    public FloorCeilingRenderer(ScreenBuffer screenBuffer, Texture floorTexture, Texture ceilingTexture) {
         this.screenBuffer = screenBuffer;
         this.floorTexture = floorTexture;
         this.ceilingTexture = ceilingTexture;
-        this.gameMap = gameMap;
-        this.arrowTexture = arrowTexture;   
     }
 
     public void render(Player player) {
@@ -62,17 +57,10 @@ public class FloorCeilingRenderer {
                 int floorTextureY = ((int) Math.floor(tileY * floorTexture.height)) & floorTexture.heightMask;
                 int ceilingTextureX = ((int) Math.floor(tileX * ceilingTexture.width)) & ceilingTexture.widthMask;
                 int ceilingTextureY = ((int) Math.floor(tileY * ceilingTexture.height)) & ceilingTexture.heightMask;
-                int cellColumn = (int) Math.floor(tileX);
-                int cellRow = (int) Math.floor(tileY);
-                int arrowDirection = gameMap.getArrowDirection(cellColumn, cellRow);
-                int arrowColor = arrowDirection < 0 
-                    ? 0 
-                    : sampleArrow(tileX - cellColumn, tileY - cellRow, arrowDirection);
-                
                 tileX += tileStepX;
                 tileY += tileStepY;
 
-                int floorColor = arrowColor != 0 ? arrowColor : floorTexture.getPixel(floorTextureX, floorTextureY);
+                int floorColor = floorTexture.getPixel(floorTextureX, floorTextureY);
                 screenPixels[floorRowStart + screenColumn] = Fog.blend(floorColor, fogAmount);
 
                 screenPixels[ceilingRowStart + screenColumn] = Fog.blend(ceilingTexture.getPixel(ceilingTextureX, 
@@ -80,22 +68,4 @@ public class FloorCeilingRenderer {
             }
         }
     }
-    
-    private int sampleArrow(double fractionX, double fractionY, int direction) {
-    int size = arrowTexture.width;
-    int arrowX = (int) (fractionX * size);
-    int arrowY = (int) (fractionY * size);
-    int textureX;
-    int textureY;
-    switch (direction) {
-        case 0: textureX = arrowY; textureY = size - 1 - arrowX; break;
-        case 1: textureX = size - 1 - arrowY; textureY = arrowX; break;
-        case 2: textureX = size - 1 - arrowX; textureY = size - 1 - arrowY; break;
-        default: textureX = arrowX; textureY = arrowY; break;
-    }
-    if (arrowTexture.isTransparent(textureX, textureY)) {
-        return 0;
-    }
-    return arrowTexture.getPixel(textureX, textureY);
-}
 }

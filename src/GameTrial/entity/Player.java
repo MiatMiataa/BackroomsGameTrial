@@ -1,7 +1,6 @@
 package GameTrial.entity;
 
 import GameTrial.input.InputState;
-import GameTrial.world.GameMap;
 
 public class Player {
     public double positionX = 64 + 32;
@@ -11,9 +10,14 @@ public class Player {
 
     public double cameraPlaneX = 0, cameraPlaneY = 0.66;
 
-    public final int collisionRadius = 15;
-    private final double moveSpeed = 3.35;
+    // guard can look this far left or right of the start direction (90 = both office doors)
+    private double maxYawRadians = Math.toRadians(90);
+
+    public void setMaxYawRadians(double newMaxYawRadians) {
+        maxYawRadians = newMaxYawRadians;
+    }
     private final double rotationSpeed = 0.055;
+    private double currentYawRadians = 0;
 
     public void faceTowards(double targetPixelX, double targetPixelY) {
         double deltaX = targetPixelX - positionX;
@@ -27,35 +31,19 @@ public class Player {
         directionY = deltaY / distance;
         cameraPlaneX = -directionY * cameraPlaneLength;
         cameraPlaneY = directionX * cameraPlaneLength;
-        
+        // this direction is now the center of the look range
+        currentYawRadians = 0;
     }
-    
-    public void update(GameMap gameMap, InputState inputState) {
+
+    public void update(InputState inputState) {
         double totalTurn = inputState.getTotalTurn();
-        if (totalTurn != 0) {
-            rotate(totalTurn * rotationSpeed);
+        if (totalTurn == 0) {
+            return;
         }
-
-        double moveX = directionX * inputState.forward - directionY * inputState.strafe;
-        double moveY = directionY * inputState.forward + directionX * inputState.strafe;
-        double moveLength = Math.hypot(moveX, moveY);
-    
-        if (moveLength > 1) {
-            moveX /= moveLength;
-            moveY /= moveLength;
-        }
-
-        moveX *= moveSpeed;
-        moveY *= moveSpeed;
-
-        double nextX = positionX + moveX;
-        if (!hasCollision(nextX, positionY, gameMap)) {
-            positionX = nextX;
-        }
-        double nextY = positionY + moveY;
-        if (!hasCollision(positionX, nextY, gameMap)) {
-            positionY = nextY;
-        }
+        double requestedYaw = currentYawRadians + totalTurn * rotationSpeed;
+        double allowedYaw = Math.max(-maxYawRadians, Math.min(maxYawRadians, requestedYaw));
+        rotate(allowedYaw - currentYawRadians);
+        currentYawRadians = allowedYaw;
     }
 
     private void rotate(double angleInRadians) {
@@ -66,12 +54,5 @@ public class Player {
         double oldCameraPlaneX = cameraPlaneX;
         cameraPlaneX = cameraPlaneX * Math.cos(angleInRadians) - cameraPlaneY * Math.sin(angleInRadians);
         cameraPlaneY = oldCameraPlaneX * Math.sin(angleInRadians) + cameraPlaneY * Math.cos(angleInRadians);
-    }
-
-    private boolean hasCollision(double targetPositionX, double targetPositionY, GameMap gameMap) {
-        return gameMap.isWall(targetPositionX - collisionRadius, targetPositionY - collisionRadius)
-            || gameMap.isWall(targetPositionX + collisionRadius, targetPositionY - collisionRadius)
-            || gameMap.isWall(targetPositionX - collisionRadius, targetPositionY + collisionRadius)
-            || gameMap.isWall(targetPositionX + collisionRadius, targetPositionY + collisionRadius);
     }
 }

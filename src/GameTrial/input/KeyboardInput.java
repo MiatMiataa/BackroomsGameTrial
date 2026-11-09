@@ -10,6 +10,8 @@ public class KeyboardInput extends KeyAdapter implements FocusListener {
 
     private boolean isMovingForward, isMovingBackward, isTurningLeft, isTurningRight, isStrafingLeft, isStrafingRight;
 
+    private boolean isSpaceDown;
+
     public KeyboardInput(InputState inputState) {
         this.inputState = inputState;
     }
@@ -32,6 +34,7 @@ public class KeyboardInput extends KeyAdapter implements FocusListener {
         isTurningRight = false;
         isStrafingLeft = false;
         isStrafingRight = false;
+        isSpaceDown = false;
         inputState.forward = 0;
         inputState.turn = 0;
         inputState.strafe = 0;
@@ -42,6 +45,13 @@ public class KeyboardInput extends KeyAdapter implements FocusListener {
     }
 
     private void updateKey(int keyCode, boolean isDown) {
+        if (keyCode == KeyEvent.VK_SPACE) {
+            if (isDown && !isSpaceDown) {
+                inputState.tabletTogglePressed = true;
+            }
+            isSpaceDown = isDown;
+        }
+        
         if (keyCode == KeyEvent.VK_W || keyCode == KeyEvent.VK_UP) isMovingForward = isDown;
         if (keyCode == KeyEvent.VK_S || keyCode == KeyEvent.VK_DOWN) isMovingBackward = isDown;
         if (keyCode == KeyEvent.VK_LEFT) isTurningLeft = isDown;

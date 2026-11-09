@@ -125,12 +125,11 @@ public class Entity extends Sprite {
         } else if (state == State.CHASE) {
             int frameDuration = 3;
             texture = textures.usherChase[(animationTicks / frameDuration) % textures.usherChase.length];
-        } else {
-            texture = textures.usherPatrol[viewSector(player)][(animationTicks / TICKS_PER_WALK_FRAME) % 4];
-        }
-        if (state == State.VANISH) {
+        } else if (state == State.VANISH) {
             int frame = Math.min(animationTicks / TICKS_PER_VANISH_FRAME, textures.usherVanish.length - 1);
             texture = textures.usherVanish[frame];
+        } else {
+            texture = textures.usherPatrol[viewSector(player)][(animationTicks / TICKS_PER_WALK_FRAME) % 4];
         }
     }
 
