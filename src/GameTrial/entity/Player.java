@@ -31,7 +31,6 @@ public class Player {
         directionY = deltaY / distance;
         cameraPlaneX = -directionY * cameraPlaneLength;
         cameraPlaneY = directionX * cameraPlaneLength;
-        // this direction is now the center of the look range
         currentYawRadians = 0;
     }
 

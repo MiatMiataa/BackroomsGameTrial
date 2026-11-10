@@ -115,7 +115,6 @@ public class Game {
         animatronics.sprites());
     }
 
-    // which animatronic is visible from this camera index, or null
     private AnimatronicType cameraAnimatronic(int cameraIndex) {
         int[] tile = gameMap.cameraTiles[cameraIndex];
         int[] cove = gameMap.foxyPath[0];
@@ -125,7 +124,6 @@ public class Game {
         return null;
     }
 
-    // unchanged from your original
     private void placeCamera(Player camera, int[] tile) {
         int column = tile[0];
         int row = tile[1];

@@ -22,7 +22,7 @@ public class Foxy extends Animatronic {
     @Override
     protected void updatePatrol(GameMap map, Player player, ThreatContext threatContext) {
         if (!sprinting) {
-            // Stage up only when the player is NOT watching the cove
+            // Stage up only when the player is NOT watching the cove / timer for foxy to come out running
             if (threatContext.viewingCamera == AnimatronicType.FOXY) {
                 stage = 0;
                 stageTimer = 0;

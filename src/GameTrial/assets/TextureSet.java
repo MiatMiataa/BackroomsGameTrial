@@ -17,8 +17,8 @@ public class TextureSet {
         new EnumMap<>(AnimatronicType.class);
 
     public TextureSet() throws IOException {
-        wall    = new Texture(TEXTURE_FOLDER + "wallpaper.png");
-        floor   = new Texture(TEXTURE_FOLDER + "carpet.png");
+        wall    = new Texture(TEXTURE_FOLDER + "wall.png");
+        floor   = new Texture(TEXTURE_FOLDER + "floor.png");
         ceiling = new Texture(TEXTURE_FOLDER + "ceiling.png");
 
         for (AnimatronicType type : AnimatronicType.values()) {

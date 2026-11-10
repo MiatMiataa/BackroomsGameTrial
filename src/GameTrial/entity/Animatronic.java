@@ -71,7 +71,8 @@ public abstract class Animatronic extends Sprite {
         double targetX = (waypoint[0] + 0.5) * GameMap.TILE_SIZE;
         double targetY = (waypoint[1] + 0.5) * GameMap.TILE_SIZE;
 
-        // wallclip guard: don't slide into a wall tile
+        // wallclip guard
+
         double dx = targetX - positionX;
         double dy = targetY - positionY;
         double length = Math.hypot(dx, dy);
@@ -95,7 +96,7 @@ public abstract class Animatronic extends Sprite {
         return pathIndex == path.length - 1 && arrivedAtWaypoint();
     }
 
-    // ---- animation ----
+    // animation stuff
 
     protected Texture pickTexture(Player player) {
     if (state == State.ATTACK) {
@@ -107,8 +108,6 @@ public abstract class Animatronic extends Sprite {
     }
     return textures.walk[viewSector(player)][(animationTicks / TICKS_PER_WALK_FRAME) % 4];
 }
-
-    // ---- shared helpers (unchanged from original Entity) ----
 
     protected void moveToward(double goalX, double goalY, double speed) {
         double deltaX = goalX - positionX;
@@ -167,8 +166,11 @@ public abstract class Animatronic extends Sprite {
         return (int) Math.floor(pixelPosition / GameMap.TILE_SIZE);
     }
 
-    // ---- queries used by AnimatronicManager ----
-
-    public boolean isAttacking()      { return state == State.ATTACK; }
-    public boolean isAttackFinished() { return attackFinished; }
+    public boolean isAttacking() {
+         return state == State.ATTACK;
+        }
+        
+    public boolean isAttackFinished() {
+        return attackFinished; 
+    }
 }
