@@ -8,9 +8,9 @@ import java.awt.event.KeyEvent;
 public class KeyboardInput extends KeyAdapter implements FocusListener {
     private final InputState inputState;
 
-    private boolean isMovingForward, isMovingBackward, isTurningLeft, isTurningRight, isStrafingLeft, isStrafingRight;
-
+    private boolean isTurningLeft, isTurningRight;
     private boolean isSpaceDown;
+    private boolean wasLeftDoorDown, wasRightDoorDown, wasFlashlightOn;
 
     public KeyboardInput(InputState inputState) {
         this.inputState = inputState;
@@ -27,24 +27,33 @@ public class KeyboardInput extends KeyAdapter implements FocusListener {
     }
 
     @Override
-    public void focusLost(FocusEvent event) {
-        isMovingForward = false;
-        isMovingBackward = false;
-        isTurningLeft = false;
-        isTurningRight = false;
-        isStrafingLeft = false;
-        isStrafingRight = false;
-        isSpaceDown = false;
-        inputState.forward = 0;
-        inputState.turn = 0;
-        inputState.strafe = 0;
-    }
-
-    @Override
     public void focusGained(FocusEvent event) {
     }
 
     private void updateKey(int keyCode, boolean isDown) {
+        if (keyCode == KeyEvent.VK_Q) {
+            if (isDown && !wasLeftDoorDown) {
+                inputState.leftDoorTogglePressed = !inputState.leftDoorTogglePressed;
+                wasLeftDoorDown = isDown;
+            }
+        }
+
+        if (keyCode == KeyEvent.VK_E) {
+            if (isDown && !wasRightDoorDown) {
+                inputState.rightDoorTogglePressed = !inputState.rightDoorTogglePressed;
+                wasRightDoorDown = isDown;
+            }
+        }
+
+        if (keyCode == KeyEvent.VK_F) {
+            inputState.flashlightOn = isDown;
+            wasFlashlightOn = isDown;
+        }
+
+        if (keyCode == KeyEvent.VK_1 && keyCode <= KeyEvent.VK_9) {
+            
+            }
+
         if (keyCode == KeyEvent.VK_SPACE) {
             if (isDown && !isSpaceDown) {
                 inputState.tabletTogglePressed = true;
@@ -52,15 +61,22 @@ public class KeyboardInput extends KeyAdapter implements FocusListener {
             isSpaceDown = isDown;
         }
         
-        if (keyCode == KeyEvent.VK_W || keyCode == KeyEvent.VK_UP) isMovingForward = isDown;
-        if (keyCode == KeyEvent.VK_S || keyCode == KeyEvent.VK_DOWN) isMovingBackward = isDown;
         if (keyCode == KeyEvent.VK_LEFT) isTurningLeft = isDown;
         if (keyCode == KeyEvent.VK_RIGHT) isTurningRight = isDown;
-        if (keyCode == KeyEvent.VK_A) isStrafingLeft = isDown;
-        if (keyCode == KeyEvent.VK_D) isStrafingRight = isDown;
         
-        inputState.forward = (isMovingForward ? 1 : 0) - (isMovingBackward ? 1 : 0);
         inputState.turn = (isTurningRight ? 1 : 0) - (isTurningLeft ? 1 : 0);
-        inputState.strafe = (isStrafingRight ? 1 : 0) - (isStrafingLeft ? 1 : 0);
+    }
+
+        @Override
+    public void focusLost(FocusEvent event) {
+        isTurningLeft = false;
+        isTurningRight = false;
+        isSpaceDown = false;
+        wasLeftDoorDown = false;
+        wasRightDoorDown = false;
+        wasFlashlightOn = false;
+        inputState.leftDoorTogglePressed = false;
+        inputState.rightDoorTogglePressed = false;
+        inputState.turn = 0;
     }
 }

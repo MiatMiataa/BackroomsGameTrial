@@ -60,8 +60,6 @@ public class DebugOverlay {
 
                 if (column == gameMap.exitTileColumn && row == gameMap.exitTileRow) {
                     graphics.setColor(EXIT_COLOR);
-                } else if (SHOW_ROUTE && gameMap.isOnPathToExit(column, row)) {
-                    graphics.setColor(PATH_COLOR);
                 } else if (gameMap.getTile(column, row) == 1) {
                     graphics.setColor(WALL_COLOR);
                 } else {

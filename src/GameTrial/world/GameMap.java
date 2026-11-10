@@ -39,11 +39,54 @@ public class GameMap {
     public final int guardRow = 24;
 
     // left and right office doors (column, row). Treated as open for now.
-    public final int[][] doorTiles = { {6, 23}, {11, 23} };
+    public final int[][] doorTiles = { {6, 22}, {12, 22} };
 
     // CAM 1..9 (column, row): Party3, Party1, Party4, Party2, CentralHall, MainHall, Dining, Backstage, Kitchen
     public final int[][] cameraTiles = {
-        {6, 25}, {14, 15}, {15, 9}, {15, 14}, {9, 9}, {1, 6}, {43, 6}, {33, 1}, {31, 21}
+        {5, 25},
+        {13, 15},
+        {15, 9},
+        {15, 14},
+        {9, 9},
+        {1, 6},
+        {43, 6},
+        {33, 1},
+        {31, 21}
+    };
+
+    public final int[] freddySpawn = {21, 21};
+    public final int[] bonnieSpawn = {43, 6};
+    public final int[] chicaSpawn = {1, 6};
+    public final int[] foxySpawn = {14, 15};
+
+    // Each path is {column, row} waypoints. First waypoint = spawn.
+    // Last waypoint = the tile where the animatronic transitions to APPROACH.
+    
+    public final int[][] freddyPath = {
+        {14, 15},   // spawn (Party1)
+        {9,   9},   // Central Hall
+        {15,  9},   // Party4
+        {11, 23}    // right door
+    };
+
+    public final int[][] bonniePath = {
+        {31, 21},   // spawn (Kitchen)
+        {14, 15},   // Party1
+        {6,  25},   // Party3
+        {6,  23}    // left door
+    };
+
+    public final int[][] chicaPath = {
+        {43,  6},   // spawn (Dining)
+        {15,  9},   // Party4
+        {15, 14},   // Party2
+        {11, 23}    // right door
+    };
+
+    public final int[][] foxyPath = {
+        {1,  6},    // Pirate Cove (Main Hall)
+        {9,  9},    // Central Hall
+        {6, 23}     // left door
     };
 
     public int getTile(int column, int row) {
