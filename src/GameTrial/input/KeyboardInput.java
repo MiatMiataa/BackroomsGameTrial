@@ -31,43 +31,49 @@ public class KeyboardInput extends KeyAdapter implements FocusListener {
     }
 
     private void updateKey(int keyCode, boolean isDown) {
-        if (keyCode == KeyEvent.VK_Q) {
-            if (isDown && !wasLeftDoorDown) {
-                inputState.leftDoorTogglePressed = !inputState.leftDoorTogglePressed;
-                wasLeftDoorDown = isDown;
-            }
+    if (keyCode == KeyEvent.VK_Q) {
+        if (isDown && !wasLeftDoorDown) {
+            inputState.leftDoorClosed = !inputState.leftDoorClosed;
         }
-
-        if (keyCode == KeyEvent.VK_E) {
-            if (isDown && !wasRightDoorDown) {
-                inputState.rightDoorTogglePressed = !inputState.rightDoorTogglePressed;
-                wasRightDoorDown = isDown;
-            }
-        }
-
-        if (keyCode == KeyEvent.VK_F) {
-            inputState.flashlightOn = isDown;
-            wasFlashlightOn = isDown;
-        }
-
-        if (keyCode == KeyEvent.VK_1 && keyCode <= KeyEvent.VK_9) {
-            
-            }
-
-        if (keyCode == KeyEvent.VK_SPACE) {
-            if (isDown && !isSpaceDown) {
-                inputState.tabletTogglePressed = true;
-            }
-            isSpaceDown = isDown;
-        }
-        
-        if (keyCode == KeyEvent.VK_LEFT) isTurningLeft = isDown;
-        if (keyCode == KeyEvent.VK_RIGHT) isTurningRight = isDown;
-        
-        inputState.turn = (isTurningRight ? 1 : 0) - (isTurningLeft ? 1 : 0);
+        wasLeftDoorDown = isDown;
     }
 
-        @Override
+    if (keyCode == KeyEvent.VK_E) {
+        if (isDown && !wasRightDoorDown) {
+            inputState.rightDoorClosed = !inputState.rightDoorClosed;
+        }
+        wasRightDoorDown = isDown;
+    }
+
+    if (keyCode == KeyEvent.VK_F) {
+        inputState.flashlightOn = isDown;
+    }
+
+    if (keyCode >= KeyEvent.VK_1 && keyCode <= KeyEvent.VK_9) {
+        if (isDown) {
+            inputState.requestedCamera = keyCode - KeyEvent.VK_1;
+        }
+    }
+
+    if (keyCode == KeyEvent.VK_SPACE) {
+        if (isDown && !isSpaceDown) {
+            inputState.tabletTogglePressed = true;
+            isSpaceDown = isDown;
+        }
+    }
+
+    if (keyCode == KeyEvent.VK_LEFT) {
+        isTurningLeft  = isDown;
+    }
+
+    if (keyCode == KeyEvent.VK_RIGHT) {
+        isTurningRight = isDown;
+    }
+
+    inputState.turn = (isTurningRight ? 1 : 0) - (isTurningLeft ? 1 : 0);
+    }
+
+    @Override
     public void focusLost(FocusEvent event) {
         isTurningLeft = false;
         isTurningRight = false;
@@ -75,8 +81,8 @@ public class KeyboardInput extends KeyAdapter implements FocusListener {
         wasLeftDoorDown = false;
         wasRightDoorDown = false;
         wasFlashlightOn = false;
-        inputState.leftDoorTogglePressed = false;
-        inputState.rightDoorTogglePressed = false;
+        inputState.leftDoorClosed = false;
+        inputState.rightDoorClosed = false;
         inputState.turn = 0;
     }
 }

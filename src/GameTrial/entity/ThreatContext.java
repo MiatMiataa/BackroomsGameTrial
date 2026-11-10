@@ -5,5 +5,6 @@ public class ThreatContext {
     public boolean leftDoorClosed;
     public boolean rightDoorClosed;
     public boolean flashlightOn;
+    public AnimatronicType viewingCamera;
     public long tick;
 }

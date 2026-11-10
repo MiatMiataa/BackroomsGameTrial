@@ -2,6 +2,7 @@ package GameTrial.entity;
 
 import GameTrial.assets.AnimatronicTextures;
 import GameTrial.world.GameMap;
+import GameTrial.assets.Texture;
 
 public abstract class Animatronic extends Sprite {
     public enum State { PATROL, APPROACH, ATTACK, RETREAT }
@@ -58,7 +59,7 @@ public abstract class Animatronic extends Sprite {
         if (animationTicks >= textures.attack.length * TICKS_PER_ATTACK_FRAME) attackFinished = true;
     }
 
-    // ---- path walking ----
+    // pathing stuff
 
     protected double currentSpeed() {
         return sprinting && sprintSpeed > 0 ? sprintSpeed : walkSpeed;
@@ -70,7 +71,7 @@ public abstract class Animatronic extends Sprite {
         double targetX = (waypoint[0] + 0.5) * GameMap.TILE_SIZE;
         double targetY = (waypoint[1] + 0.5) * GameMap.TILE_SIZE;
 
-        // wall-clip guard: don't slide into a wall tile
+        // wallclip guard: don't slide into a wall tile
         double dx = targetX - positionX;
         double dy = targetY - positionY;
         double length = Math.hypot(dx, dy);
@@ -96,7 +97,16 @@ public abstract class Animatronic extends Sprite {
 
     // ---- animation ----
 
-    private net.minecraft.none.Texture pickTexture(Player player) { return null; } // placeholder
+    protected Texture pickTexture(Player player) {
+    if (state == State.ATTACK) {
+        int frame = Math.min(animationTicks / TICKS_PER_ATTACK_FRAME, textures.attack.length - 1);
+        return textures.attack[frame];
+    }
+    if (sprinting && textures.sprint != null) {
+        return textures.sprint[(animationTicks / TICKS_PER_SPRINT_FRAME) % textures.sprint.length];
+    }
+    return textures.walk[viewSector(player)][(animationTicks / TICKS_PER_WALK_FRAME) % 4];
+}
 
     // ---- shared helpers (unchanged from original Entity) ----
 

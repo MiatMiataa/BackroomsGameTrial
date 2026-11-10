@@ -58,9 +58,10 @@ public class DebugOverlay {
                 int column = playerTileColumn + offsetColumn - halfVisible;
                 int row = playerTileRow + offsetRow - halfVisible;
 
-                if (column == gameMap.exitTileColumn && row == gameMap.exitTileRow) {
+                int tileValue = gameMap.getTile(column, row);
+                if (tileValue == 7) {
                     graphics.setColor(EXIT_COLOR);
-                } else if (gameMap.getTile(column, row) == 1) {
+                } else if (tileValue == 1) {
                     graphics.setColor(WALL_COLOR);
                 } else {
                     graphics.setColor(FLOOR_COLOR);

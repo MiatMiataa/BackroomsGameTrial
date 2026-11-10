@@ -1,11 +1,19 @@
 package GameTrial.entity;
 
 public enum AnimatronicType {
-    FREDDY("Freddy"),
-    BONNIE("Bonnie"),
-    CHICA("Chica"),
-    GOLDEN_FREDDY("Golden Freddy"),
-    FOXY("Foxy");
+    FREDDY("freddy"),
+    BONNIE("bonnie"),
+    CHICA("chica"),
+    GOLDEN_FREDDY("golden_freddy"),
+    FOXY("foxy");
+
+    private final String folder;
+
+    AnimatronicType(String folder) { 
+        this.folder = folder;
+    }
+    
+    public String folder() { 
+        return folder;
+    }
 }
-
-

@@ -1,11 +1,9 @@
 package GameTrial.assets;
 
-
 import GameTrial.entity.AnimatronicType;
 import java.io.IOException;
 import java.util.EnumMap;
 import java.util.Map;
-
 
 public class TextureSet {
     private static final String TEXTURE_FOLDER = "src/textures/";
@@ -15,11 +13,21 @@ public class TextureSet {
     public final Texture floor;
     public final Texture ceiling;
 
-    private final Map<AnimatronicType, AnimatronicTextures> animatronicTextures = new EnumMap<>(AnimatronicType.class);
+    private final Map<AnimatronicType, AnimatronicTextures> animatronicTextures =
+        new EnumMap<>(AnimatronicType.class);
 
     public TextureSet() throws IOException {
         wall    = new Texture(TEXTURE_FOLDER + "wallpaper.png");
         floor   = new Texture(TEXTURE_FOLDER + "carpet.png");
         ceiling = new Texture(TEXTURE_FOLDER + "ceiling.png");
+
+        for (AnimatronicType type : AnimatronicType.values()) {
+            animatronicTextures.put(type,
+                new AnimatronicTextures(ANIMATRONIC_FOLDER + type.folder() + "/"));
+        }
+    }
+
+    public AnimatronicTextures of(AnimatronicType type) {
+        return animatronicTextures.get(type);
     }
 }

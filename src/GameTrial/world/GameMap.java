@@ -61,7 +61,7 @@ public class GameMap {
 
     // Each path is {column, row} waypoints. First waypoint = spawn.
     // Last waypoint = the tile where the animatronic transitions to APPROACH.
-    
+
     public final int[][] freddyPath = {
         {14, 15},   // spawn (Party1)
         {9,   9},   // Central Hall
@@ -70,10 +70,11 @@ public class GameMap {
     };
 
     public final int[][] bonniePath = {
-        {31, 21},   // spawn (Kitchen)
-        {14, 15},   // Party1
-        {6,  25},   // Party3
-        {6,  23}    // left door
+        {43, 6},   // Dining (floor)
+        {43, 7},   // step down
+        {9,  7},   // hallway
+        {9,  22},  // central corridor
+        {6,  22}   // left door (matches doorTiles[0])
     };
 
     public final int[][] chicaPath = {
