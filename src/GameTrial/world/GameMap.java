@@ -35,7 +35,7 @@ public class GameMap {
     };
 
     // office: guard stands here (column, row)
-    public final int guardColumn = 10;
+    public final int guardColumn = 9;
     public final int guardRow = 24;
 
     // left and right office doors (column, row). Treated as open for now.
