@@ -25,7 +25,7 @@ public abstract class Animatronic extends Sprite {
     protected int animationTicks = 0;
     protected boolean attackFinished = false;
     protected boolean sprinting = false;
-    protected boolean isMoving;
+    protected boolean isMoving = false;
 
     protected double facingX = 0, facingY = 1;
 

@@ -22,6 +22,11 @@ public class GameTrial {
         gameWindow.setVisible(true);
 
         gamePanel.requestFocusInWindow();
-        game.start(() -> gamePanel.repaint());
+        game.start(new Runnable() {
+            @Override
+            public void run() {
+                gamePanel.repaint();
+            }
+        });
     }
 }
