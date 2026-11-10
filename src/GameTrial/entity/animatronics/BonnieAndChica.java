@@ -31,7 +31,9 @@ public class BonnieAndChica extends Animatronic {
             animationTicks = 0;
             return;
         }
-        if (++stepTimer < stepTicks) return;
+        if (++stepTimer < stepTicks) {
+            return;
+        }
         stepTimer = 0;
         pathIndex++;
         moveAlongPath(map);
