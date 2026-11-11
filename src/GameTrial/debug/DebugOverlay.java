@@ -66,7 +66,7 @@ public class DebugOverlay {
                 } else {
                     graphics.setColor(FLOOR_COLOR);
                 }
-
+                
                 graphics.fillRect(
                     MINIMAP_PADDING + (int) (offsetColumn * pixelsPerTile),
                     MINIMAP_PADDING + (int) (offsetRow * pixelsPerTile),

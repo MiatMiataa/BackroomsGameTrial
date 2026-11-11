@@ -58,8 +58,8 @@ public class KeyboardInput extends KeyAdapter implements FocusListener {
     if (keyCode == KeyEvent.VK_SPACE) {
         if (isDown && !isSpaceDown) {
             inputState.tabletTogglePressed = true;
-            isSpaceDown = isDown;
         }
+        isSpaceDown = isDown;
     }
 
     if (keyCode == KeyEvent.VK_LEFT) {

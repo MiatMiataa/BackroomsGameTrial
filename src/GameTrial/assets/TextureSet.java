@@ -1,6 +1,8 @@
 package GameTrial.assets;
 
 import GameTrial.entity.AnimatronicType;
+
+import java.io.File;
 import java.io.IOException;
 import java.util.EnumMap;
 import java.util.Map;
@@ -25,6 +27,14 @@ public class TextureSet {
             animatronicTextures.put(type,
                 new AnimatronicTextures(ANIMATRONIC_FOLDER + type.folder() + "/"));
         }
+    }
+
+    private Texture loadOrFail(String path) throws IOException {
+        File file = new File(path);
+        if (!file.exists()) {
+            return new Texture(TEXTURE_FOLDER + "error.png");
+        }
+        return new Texture(path);
     }
 
     public AnimatronicTextures of(AnimatronicType type) {
