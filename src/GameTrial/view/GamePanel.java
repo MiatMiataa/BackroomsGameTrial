@@ -87,6 +87,44 @@ public class GamePanel extends JPanel {
             letterboxOffsetX + scaledImageWidth, letterboxOffsetY + scaledImageHeight,
             0, 0, renderWidth, renderHeight, null);
 
+        // --- FLASHLIGHT / VIGNETTE EFFECT ---
+        Graphics2D lightLayer = (Graphics2D) graphics.create();
+        lightLayer.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
+
+        int centerX = letterboxOffsetX + scaledImageWidth / 2;
+        int centerY = letterboxOffsetY + scaledImageHeight / 2;
+        
+        float radius;
+        float[] dist;
+        Color[] colors;
+
+        if (game.isFlashlightOn()) {
+            // Flashlight ON: Wide, bright cone that reveals the hallway
+            radius = scaledImageWidth * 0.8f; // Much wider
+            dist = new float[] {0.0f, 0.6f, 1.0f};
+            colors = new Color[] { 
+                new Color(0, 0, 0, 0),      // Center is completely clear
+                new Color(0, 0, 0, 10),     // Very subtle mid-transition
+                new Color(0, 0, 0, 150)     // Edges darken slightly (not pure black)
+            };
+        } else {
+            // Flashlight OFF: Dimly lit office, dark corners
+            radius = scaledImageWidth * 1.2f; // Huge radius so it covers the whole room
+            dist = new float[] {0.0f, 0.5f, 1.0f};
+            colors = new Color[] { 
+                new Color(0, 0, 0, 60),     // Office is dimly visible
+                new Color(0, 0, 0, 120),    // Hallways get dark
+                new Color(0, 0, 0, 220)     // Corners fade to black
+            };
+        }
+
+        java.awt.RadialGradientPaint paint = new java.awt.RadialGradientPaint(
+            new Point(centerX, centerY), radius, dist, colors);
+        
+        lightLayer.setPaint(paint);
+        lightLayer.fillRect(letterboxOffsetX, letterboxOffsetY, scaledImageWidth, scaledImageHeight);
+        lightLayer.dispose();
+
         // --- HUD SCALING ---
         // Scale the HUD and Minimap so they aren't tiny on a 1080p monitor
         double hudScale = (double) scaledImageWidth / Renderer.RENDER_WIDTH;
@@ -137,7 +175,9 @@ public class GamePanel extends JPanel {
 
         // Game Over Screen
         if (game.hasWon() || game.hasLost()) {
-            String message = game.hasWon() ? "YOU ESCAPED!" : "YOU DIED";
+            String message = game.hasWon() 
+            ? "6 AM, You Survived!" 
+            : "The animatronics killed you";
             graphics.setColor(new Color(0, 0, 0, 200));
             graphics.fillRect(letterboxOffsetX, letterboxOffsetY, scaledImageWidth, scaledImageHeight);
             graphics.setColor(game.hasWon() ? Color.GREEN : Color.RED);

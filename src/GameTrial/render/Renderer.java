@@ -10,7 +10,7 @@ import java.awt.image.BufferedImage;
 public class Renderer {
     public static final int RENDER_WIDTH = 960;
     public static final int RENDER_HEIGHT = 540;
-    public static final int VIEW_HEIGHT = 440;
+    public static final int VIEW_HEIGHT = 540;
     private static final int HUD_COLOR = 0xFF101010;
     
     private final ScreenBuffer screenBuffer = new ScreenBuffer(RENDER_WIDTH, RENDER_HEIGHT);

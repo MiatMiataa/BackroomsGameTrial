@@ -6,7 +6,7 @@ import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 
 public class MouseInput extends MouseAdapter implements FocusListener {
-    private static final double DEAD_ZONE_FRACTION = 0.11;
+    private static final double DEAD_ZONE_FRACTION = 0.20;
 
     private final InputState inputState;
 

@@ -4,7 +4,10 @@ import GameTrial.world.GameMap;
 
 public class Fog {
     private static final double FOG_START_TILES = 2.0;
-    private static final double FOG_END_TILES = 24.0;
+    private static final double FOG_END_TILES_DARK = 7.0;
+    private static final double FOG_END_TILES_LIGHT = 20.0;
+
+    public static boolean isFlashlightOn = false;
 
     private static final int FOG_RED = 42;
     private static final int FOG_GREEN = 36;
@@ -14,13 +17,15 @@ public class Fog {
 
     public static int getFogAmount(double distanceInPixels) {
         double distanceInTiles = distanceInPixels / GameMap.TILE_SIZE;
+        double currentEndTiles = isFlashlightOn ? FOG_END_TILES_LIGHT : FOG_END_TILES_DARK;
+
         if (distanceInTiles <= FOG_START_TILES) {
             return 0; 
         }
-        if (distanceInTiles >= FOG_END_TILES) {
+        if (distanceInTiles >= currentEndTiles) {
             return FULL_FOG;
         }
-        return (int) (FULL_FOG * (distanceInTiles - FOG_START_TILES) / (FOG_END_TILES - FOG_START_TILES));
+        return (int) (FULL_FOG * (distanceInTiles - FOG_START_TILES) / (currentEndTiles - FOG_START_TILES));
     }
 
     public static int blend(int pixel, int fogAmount) {

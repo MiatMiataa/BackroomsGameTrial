@@ -18,14 +18,13 @@ public class TextureSet {
     private final Map<AnimatronicType, AnimatronicTextures> animatronicTextures =
         new EnumMap<>(AnimatronicType.class);
 
-    public TextureSet() throws IOException {
-        wall    = new Texture(TEXTURE_FOLDER + "wall.png");
-        floor   = new Texture(TEXTURE_FOLDER + "floor.png");
-        ceiling = new Texture(TEXTURE_FOLDER + "ceiling.png");
+        public TextureSet() throws IOException {
+            wall = loadOrFail(TEXTURE_FOLDER + "wall.png");
+            floor = loadOrFail(TEXTURE_FOLDER + "floor.png");
+            ceiling = loadOrFail(TEXTURE_FOLDER + "ceiling.png");
 
         for (AnimatronicType type : AnimatronicType.values()) {
-            animatronicTextures.put(type,
-                new AnimatronicTextures(ANIMATRONIC_FOLDER + type.folder() + "/"));
+            animatronicTextures.put(type, new AnimatronicTextures(ANIMATRONIC_FOLDER + type.folder() + "/"));
         }
     }
 

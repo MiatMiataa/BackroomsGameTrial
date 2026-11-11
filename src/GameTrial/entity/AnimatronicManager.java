@@ -4,6 +4,7 @@ import GameTrial.assets.TextureSet;
 import GameTrial.entity.animatronics.BonnieAndChica;
 import GameTrial.entity.animatronics.Foxy;
 import GameTrial.entity.animatronics.Freddy;
+import GameTrial.entity.animatronics.GoldenFreddy;
 import GameTrial.world.GameMap;
 import java.util.ArrayList;
 import java.util.List;
@@ -29,6 +30,10 @@ public class AnimatronicManager {
         animatronics.add(new Foxy(
             gameMap.foxyPath,
             textures.of(AnimatronicType.FOXY)));
+
+        animatronics.add(new GoldenFreddy(
+            new int[][]{{8, 22}}, // dummy path
+            textures.of(AnimatronicType.GOLDEN_FREDDY)));
     }
 
     public void update(GameMap gameMap, Player player, ThreatContext threatContext) {

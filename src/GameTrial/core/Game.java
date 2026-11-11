@@ -8,6 +8,7 @@ import GameTrial.entity.ThreatContext;
 import GameTrial.input.InputState;
 import GameTrial.input.KeyboardInput;
 import GameTrial.input.MouseInput;
+import GameTrial.render.Fog;
 import GameTrial.render.Raycaster;
 import GameTrial.render.Renderer;
 import GameTrial.world.GameMap;
@@ -82,6 +83,13 @@ public class Game {
     private synchronized void update() {
         if (hasLost || hasWon) return;
 
+        if (threatContext.tick > 3600) {
+            hasWon = true;
+            return;
+        }
+
+        Fog.isFlashlightOn = inputState.flashlightOn; 
+
         if (!animatronics.isAnyAttacking()) {
             if (inputState.tabletTogglePressed) {
                 inputState.tabletTogglePressed = false;
@@ -96,12 +104,13 @@ public class Game {
             getActiveCamera().update(inputState);
         }
 
-        threatContext.tabletUp        = currentView == View.TABLET;
-        threatContext.viewingCamera   = threatContext.tabletUp
-            ? cameraAnimatronic(currentCameraIndex) : null;
-        threatContext.leftDoorClosed  = inputState.leftDoorClosed;
+        threatContext.tabletUp = currentView == View.TABLET;
+        threatContext.viewingCamera = threatContext.tabletUp
+            ? cameraAnimatronic(currentCameraIndex)
+            : null;
+        threatContext.leftDoorClosed = inputState.leftDoorClosed;
         threatContext.rightDoorClosed = inputState.rightDoorClosed;
-        threatContext.flashlightOn    = inputState.flashlightOn;
+        threatContext.flashlightOn = inputState.flashlightOn;
         threatContext.tick++;
 
         animatronics.update(gameMap, player, threatContext);
@@ -143,6 +152,26 @@ public class Game {
 
     private Player getActiveCamera() {
         return currentView == View.OFFICE ? player : tabletCamera;
+    }
+
+        public boolean isTablet() {
+        return currentView == View.TABLET;
+    }
+
+    public int getCurrentCameraIndex() {
+        return currentCameraIndex;
+    }
+
+    public boolean isLeftDoorClosed() {
+        return inputState.leftDoorClosed;
+    }
+
+    public boolean isRightDoorClosed() {
+        return inputState.rightDoorClosed;
+    }
+
+    public boolean isFlashlightOn() {
+        return inputState.flashlightOn;
     }
 
     public BufferedImage getRenderedImage() {
