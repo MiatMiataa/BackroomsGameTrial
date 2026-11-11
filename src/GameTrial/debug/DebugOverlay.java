@@ -6,13 +6,10 @@ import java.awt.Color;
 import java.awt.Graphics2D;
 
 public class DebugOverlay {
-    private static final boolean SHOW_ROUTE = true;
     private static final int MINIMAP_VISIBLE_TILES = 30;
 
     private static final int MINIMAP_BOX_SIZE = 150;
     private static final int MINIMAP_PADDING = 10;
-
-    private static final Color PATH_COLOR = new Color(80, 120, 255);
 
     private static final Color WALL_COLOR = Color.DARK_GRAY;
     private static final Color FLOOR_COLOR = Color.LIGHT_GRAY;
