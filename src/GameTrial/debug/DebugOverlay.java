@@ -64,12 +64,7 @@ public class DebugOverlay {
 																																																																																																																drawPixelX,
 																																																																																																																					drawPixelY,
 																																																																																																																										(int) Math.ceil(smallestScale),
-																																																																																																																															(int) Math.ceil(smallestScale)
-																																																																																																																																			);
-																																																																																																																																						}
-																																																																																																																																								}
-
-																																																																																																																																										// 2. Draw the hardcoded paths
+																																																																																																																															(int) Math.ceil(smallestScale)	// 2. Draw the hardcoded paths
 																																																																																																																																												graphicsContext.setColor(new Color(80, 120, 255)); // Blue color for path lines
 																																																																																																																																														drawAnimatronicPath(graphicsContext, gameMap.bonniePath, smallestScale);
 																																																																																																																																																drawAnimatronicPath(graphicsContext, gameMap.chicaPath, smallestScale);
