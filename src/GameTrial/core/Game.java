@@ -183,4 +183,7 @@ public class Game {
     public GameMap getGameMap() {
         return gameMap;
     }
+    public AnimatronicManager getAnimatronicManager() {
+        return animatronics;
+    }
 }
