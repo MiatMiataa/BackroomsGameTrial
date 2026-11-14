@@ -11,6 +11,7 @@ import java.util.List;
 
 public class AnimatronicManager {
     private final List<Animatronic> animatronics = new ArrayList<>();
+    private final List<Sprite> cachedSprites = new ArrayList<>();
     private Animatronic attacker;
     private boolean hasLost;
 
@@ -52,7 +53,9 @@ public class AnimatronicManager {
     }
 
     public List<Sprite> sprites() {
-        return new ArrayList<>(animatronics);
+        cachedSprites.clear();
+        cachedSprites.addAll(animatronics);
+        return cachedSprites;
     }
 
     public boolean hasLost() {
