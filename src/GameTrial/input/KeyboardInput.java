@@ -10,7 +10,7 @@ public class KeyboardInput extends KeyAdapter implements FocusListener {
 
     private boolean isTurningLeft, isTurningRight;
     private boolean isSpaceDown;
-    private boolean wasLeftDoorDown, wasRightDoorDown, wasFlashlightOn;
+    private boolean wasLeftDoorDown, wasRightDoorDown;
 
     public KeyboardInput(InputState inputState) {
         this.inputState = inputState;
@@ -80,7 +80,6 @@ public class KeyboardInput extends KeyAdapter implements FocusListener {
         isSpaceDown = false;
         wasLeftDoorDown = false;
         wasRightDoorDown = false;
-        wasFlashlightOn = false;
         inputState.leftDoorClosed = false;
         inputState.rightDoorClosed = false;
         inputState.turn = 0;
