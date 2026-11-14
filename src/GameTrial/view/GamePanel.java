@@ -26,14 +26,9 @@ public class GamePanel extends JPanel {
     private int displayedFps = 0;
     private long lastFpsUpdateTimestamp = System.nanoTime();
 
-    private final BufferedImage lightOnVignette;
-    private final BufferedImage lightOffVignette;
-    private static final Font HUD_FONT_SMALL = new Font("Monospaced", Font.BOLD, 16);
-    private static final Font HUD_FONT_LARGE = new Font("Monospaced", Font.BOLD, 24);
-
     public GamePanel(Game game, JFrame gameWindow) {
         this.game = game;
-        debugOverlay = new DebugOverlay(game.getPlayer(), game.getGameMap(), game.AnimatronicManager());
+        debugOverlay = new DebugOverlay(game.getPlayer(), game.getGameMap(), game.getAnimatronicManager());
 
         setBackground(Color.BLACK);
         setFocusable(true);
@@ -190,23 +185,5 @@ public class GamePanel extends JPanel {
             FontMetrics metrics = graphics.getFontMetrics();
             graphics.drawString(message, (panelWidth - metrics.stringWidth(message)) / 2, panelHeight / 2 + metrics.getAscent() / 2);
         }
-    }
-
-        private BufferedImage createVignette(int width, int height, boolean isOn) {
-        BufferedImage img = new BufferedImage(width, height, BufferedImage.TYPE_INT_ARGB);
-        Graphics2D g = img.createGraphics();
-        g.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
-        
-        float radius = isOn ? width * 0.8f : width * 1.2f;
-        float[] dist = isOn ? new float[]{0f, 0.6f, 1f} : new float[]{0f, 0.5f, 1f};
-        Color[] colors = isOn 
-            ? new Color[]{ new Color(0,0,0,0), new Color(0,0,0,10), new Color(0,0,0,150) }
-            : new Color[]{ new Color(0,0,0,60), new Color(0,0,0,120), new Color(0,0,0,220) };
-
-        g.setPaint(new java.awt.RadialGradientPaint(
-            new Point(width / 2, height / 2), radius, dist, colors));
-        g.fillRect(0, 0, width, height);
-        g.dispose();
-        return img;
     }
 }
