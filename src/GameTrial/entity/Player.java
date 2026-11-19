@@ -3,8 +3,8 @@ package GameTrial.entity;
 import GameTrial.input.InputState;
 
 public class Player {
-    public double positionX = 64 + 32;
-    public double positionY = 64 + 32;
+    public double positionX = 0;
+    public double positionY = 0;
 
     public double directionX = 1, directionY = 0;
 
