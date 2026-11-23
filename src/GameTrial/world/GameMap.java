@@ -1,7 +1,7 @@
 package GameTrial.world;
 
 public class GameMap {
-    public static final int TILE_SIZE = 64;
+    public static final int TILE_SIZE = 64;  //each tile is 64px
 
     // 1 = wall, 0 = floor
     private final int[][] tileGrid = {
