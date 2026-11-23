@@ -15,7 +15,7 @@ public class GameMap {
         {1,2,0,1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1,0,0,1,1,1,1,1},  //7
         {1,1,1,1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1,0,0,1,1,1,1,1},  //8
         {1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1,0,0,0,0,0,0,1},  //9
-        {1,0,0,1,0,0,2,0,0,0,0,0,0,0,0,0,0,0,0,0,1,0,0,1,0,0,0,1},  //10
+        {1,0,0,3,0,0,2,0,0,0,0,0,0,0,0,0,0,0,0,0,1,0,0,1,0,0,0,1},  //10
         {1,1,1,1,1,1,1,1,0,0,1,1,1,0,0,1,1,0,1,1,1,1,1,1,1,1,1,1},  //11
         {1,1,1,1,1,1,1,1,0,0,1,1,1,0,0,1,0,0,0,0,0,0,0,1,1,1,1,1},  //12
         {1,1,1,1,0,0,0,1,0,0,1,1,1,0,0,1,0,0,0,0,0,0,0,1,1,1,1,1},  //13
@@ -33,8 +33,8 @@ public class GameMap {
 
     // left and right office doors (column, row).
     public final int[][] doorTiles = { 
-        {9, 16}, //this ones left door
-        {13, 16} //this ones right door
+        {10, 16}, //this ones left door
+        {12, 16} //this ones right door
     };
 
     public final int[][] cameraTiles = {
@@ -46,13 +46,15 @@ public class GameMap {
         {1, 6},
         {43, 6},
         {33, 1},
+        {31, 21},
+        {31, 21},
         {31, 21}
     };
 
-    public final int[] freddySpawn = {21, 21};
-    public final int[] bonnieSpawn = {43, 6};
-    public final int[] chicaSpawn = {1, 6};
-    public final int[] foxySpawn = {14, 15};
+    public final int[] freddySpawn = {11, 1};
+    public final int[] bonnieSpawn = {10, 1};
+    public final int[] chicaSpawn = {12, 1};
+    public final int[] foxySpawn = {14, 9};
 
     // Each path is {column, row} waypoints. First waypoint = spawn.
     // Last waypoint = the tile where the animatronic transitions to APPROACH.
@@ -88,7 +90,7 @@ public class GameMap {
     /*
 
     public final int[][] goldenfreddy = {
-        {8, 22} 
+        {16, 11} 
     };
     wait for now because golden freddy is not implemented yet, but this is where he would spawn and attack from
     esmeringhoy
