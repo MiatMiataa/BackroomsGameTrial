@@ -8,7 +8,6 @@ import GameTrial.entity.ThreatContext;
 import GameTrial.input.InputState;
 import GameTrial.input.KeyboardInput;
 import GameTrial.input.MouseInput;
-import GameTrial.render.Fog;
 import GameTrial.render.Raycaster;
 import GameTrial.render.Renderer;
 import GameTrial.world.GameMap;
@@ -88,8 +87,6 @@ public class Game {
             return;
         }
 
-        Fog.isFlashlightOn = inputState.flashlightOn; 
-
         if (!animatronics.isAnyAttacking()) {
             if (inputState.tabletTogglePressed) {
                 inputState.tabletTogglePressed = false;
@@ -110,7 +107,6 @@ public class Game {
             : null;
         threatContext.leftDoorClosed = inputState.leftDoorClosed;
         threatContext.rightDoorClosed = inputState.rightDoorClosed;
-        threatContext.flashlightOn = inputState.flashlightOn;
         threatContext.tick++;
 
         animatronics.update(gameMap, player, threatContext);
@@ -168,10 +164,6 @@ public class Game {
 
     public boolean isRightDoorClosed() {
         return inputState.rightDoorClosed;
-    }
-
-    public boolean isFlashlightOn() {
-        return inputState.flashlightOn;
     }
 
     public BufferedImage getRenderedImage() {

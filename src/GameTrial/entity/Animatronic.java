@@ -125,15 +125,18 @@ public abstract class Animatronic extends Sprite {
                                 textures.attack.length - 1);
             return textures.attack[frame];
         }
+
         if (sprinting && textures.sprint != null) {
             return textures.sprint[(animationTicks / TICKS_PER_SPRINT_FRAME)
                                     % textures.sprint.length];
         }
+
         if (isMoving) {
             Texture[] walkFrames = textures.walk[viewSector(player)];
             return walkFrames[(animationTicks / TICKS_PER_WALK_FRAME)
                                % walkFrames.length];
         }
+
         return textures.idle[(animationTicks / TICKS_PER_IDLE_FRAME)
                               % textures.idle.length];
         }
@@ -211,4 +214,10 @@ public abstract class Animatronic extends Sprite {
     public boolean isAttackFinished() {
         return attackFinished; 
     }
+
+    public boolean isVisible() {
+        return true;
+    }
+
+    
 }

@@ -54,7 +54,11 @@ public class AnimatronicManager {
 
     public List<Sprite> sprites() {
         cachedSprites.clear();
-        cachedSprites.addAll(animatronics);
+        for (Animatronic animatronic : animatronics) {
+            if (animatronic.isVisible()) {
+                cachedSprites.add(animatronic);
+            }
+        }
         return cachedSprites;
     }
 

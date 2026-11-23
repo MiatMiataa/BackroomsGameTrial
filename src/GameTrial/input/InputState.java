@@ -6,7 +6,6 @@ public class InputState {
     public volatile boolean tabletTogglePressed;
     public volatile boolean leftDoorClosed;
     public volatile boolean rightDoorClosed;
-    public volatile boolean flashlightOn;
     public volatile int requestedCamera = -1;
 
     public double getTotalTurn() {

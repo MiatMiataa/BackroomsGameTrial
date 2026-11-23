@@ -58,4 +58,9 @@ public class GoldenFreddy extends Animatronic {
         state = State.PATROL;
         animationTicks = 0;
     }
+
+    @Override
+    public boolean isVisible() {
+        return state == State.ATTACK;
+    }
 }

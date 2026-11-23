@@ -5,7 +5,6 @@ import GameTrial.world.GameMap;
 public class Fog {
     private static final double FOG_START_TILES = 2.0;
     private static final double FOG_END_TILES_DARK = 7.0;
-    private static final double FOG_END_TILES_LIGHT = 20.0;
 
     public static boolean isFlashlightOn = false;
 
@@ -17,8 +16,8 @@ public class Fog {
 
     public static int getFogAmount(double distanceInPixels) {
         double distanceInTiles = distanceInPixels / GameMap.TILE_SIZE;
-        double currentEndTiles = isFlashlightOn ? FOG_END_TILES_LIGHT : FOG_END_TILES_DARK;
-
+        double currentEndTiles = FOG_END_TILES_DARK;
+        
         if (distanceInTiles <= FOG_START_TILES) {
             return 0; 
         }

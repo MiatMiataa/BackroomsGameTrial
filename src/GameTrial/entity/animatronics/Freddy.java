@@ -41,7 +41,7 @@ public class Freddy extends Animatronic {
 
     @Override
     protected void updateApproach(Player player, ThreatContext threatContext) {
-        if (threatContext.flashlightOn) {
+        if (threatContext.rightDoorClosed) {
             state = State.RETREAT;
             animationTicks = 0;
             return;

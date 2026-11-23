@@ -45,10 +45,6 @@ public class KeyboardInput extends KeyAdapter implements FocusListener {
         wasRightDoorDown = isDown;
     }
 
-    if (keyCode == KeyEvent.VK_F) {
-        inputState.flashlightOn = isDown;
-    }
-
     if (isDown) {
         int requestedCameraIndex = -1;
         if (keyCode >= KeyEvent.VK_1 && keyCode <= KeyEvent.VK_9) {

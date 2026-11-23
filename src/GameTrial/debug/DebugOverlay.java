@@ -1,5 +1,6 @@
 package GameTrial.debug;
 
+import GameTrial.render.Renderer;
 import GameTrial.entity.Player;
 import GameTrial.entity.Sprite;
 import GameTrial.entity.AnimatronicManager;
@@ -17,6 +18,9 @@ public class DebugOverlay {
     private static final Color FLOOR_COLOR = Color.LIGHT_GRAY;
     private static final Color EXIT_COLOR = Color.GREEN;
     private static final Color BACKGROUND_COLOR = new Color(0, 0, 0, 180);
+
+    private int minimapOriginX;
+    private int minimapOriginY;
 
     private final Player player;
     private final GameMap gameMap;
@@ -40,9 +44,12 @@ public class DebugOverlay {
         int mapPixelWidth = (int) (totalColumns * smallestScale);
         int mapPixelHeight = (int) (totalRows * smallestScale);
 
+        minimapOriginX = Renderer.RENDER_WIDTH - mapPixelWidth - MINIMAP_PADDING;
+        minimapOriginY = Renderer.RENDER_HEIGHT - mapPixelHeight - MINIMAP_PADDING;
+
         // Draw the dark background box
         graphicsContext.setColor(BACKGROUND_COLOR);
-        graphicsContext.fillRect(MINIMAP_PADDING, MINIMAP_PADDING, mapPixelWidth, mapPixelHeight);
+        graphicsContext.fillRect(minimapOriginX, minimapOriginY, mapPixelWidth, mapPixelHeight);
 
         // 1. Draw the whole map grid
         for (int currentColumn = 0; currentColumn < totalColumns; currentColumn++) {
@@ -57,8 +64,8 @@ public class DebugOverlay {
                     graphicsContext.setColor(FLOOR_COLOR);
                 }
                 
-                int drawPixelX = MINIMAP_PADDING + (int) (currentColumn * smallestScale);
-                int drawPixelY = MINIMAP_PADDING + (int) (currentRow * smallestScale);
+                int drawPixelX = minimapOriginX + (int) (currentColumn * smallestScale);
+                int drawPixelY = minimapOriginY + (int) (currentRow * smallestScale);
                 
                 graphicsContext.fillRect(
                     drawPixelX, 

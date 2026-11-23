@@ -94,29 +94,13 @@ public class GamePanel extends JPanel {
         int centerX = letterboxOffsetX + scaledImageWidth / 2;
         int centerY = letterboxOffsetY + scaledImageHeight / 2;
         
-        float radius;
-        float[] dist;
-        Color[] colors;
-
-        if (game.isFlashlightOn()) {
-            // Flashlight ON: Wide, bright cone that reveals the hallway
-            radius = scaledImageWidth * 0.8f; // Much wider
-            dist = new float[] {0.0f, 0.6f, 1.0f};
-            colors = new Color[] { 
-                new Color(0, 0, 0, 0),      // Center is completely clear
-                new Color(0, 0, 0, 10),     // Very subtle mid-transition
-                new Color(0, 0, 0, 150)     // Edges darken slightly (not pure black)
-            };
-        } else {
-            // Flashlight OFF: Dimly lit office, dark corners
-            radius = scaledImageWidth * 1.2f; // Huge radius so it covers the whole room
-            dist = new float[] {0.0f, 0.5f, 1.0f};
-            colors = new Color[] { 
-                new Color(0, 0, 0, 60),     // Office is dimly visible
-                new Color(0, 0, 0, 120),    // Hallways get dark
-                new Color(0, 0, 0, 220)     // Corners fade to black
-            };
-        }
+        float radius = scaledImageWidth * 1.2f;
+        float[] dist = new float[] {0.0f, 0.5f, 1.0f};
+        Color[] colors = new Color[] {
+            new Color(0, 0, 0, 60),
+            new Color(0, 0, 0, 120),
+            new Color(0, 0, 0, 220)
+        };
 
         java.awt.RadialGradientPaint paint = new java.awt.RadialGradientPaint(
             new Point(centerX, centerY), radius, dist, colors);
@@ -160,16 +144,15 @@ public class GamePanel extends JPanel {
             hudGraphics.drawString(camNames[game.getCurrentCameraIndex()], 
                 20, Renderer.RENDER_HEIGHT - 20);
         } else {
-            int barWidth = 30;
+            int barWidth = 12;
+            int barHeight = Renderer.RENDER_HEIGHT / 3;
+            int barTopY = (Renderer.RENDER_HEIGHT - barHeight) / 2;
+
             hudGraphics.setColor(game.isLeftDoorClosed() ? new Color(60, 200, 60) : new Color(200, 60, 60));
-            hudGraphics.fillRect(0, 0, barWidth, Renderer.RENDER_HEIGHT);
-            
+            hudGraphics.fillRect(0, barTopY, barWidth, barHeight);
+
             hudGraphics.setColor(game.isRightDoorClosed() ? new Color(60, 200, 60) : new Color(200, 60, 60));
-            hudGraphics.fillRect(Renderer.RENDER_WIDTH - barWidth, 0, barWidth, Renderer.RENDER_HEIGHT);
-            
-            hudGraphics.setColor(game.isFlashlightOn() ? new Color(255, 240, 160) : new Color(80, 80, 80));
-            hudGraphics.fillOval(Renderer.RENDER_WIDTH / 2 - 15, 
-                Renderer.RENDER_HEIGHT - 50, 30, 30);
+            hudGraphics.fillRect(Renderer.RENDER_WIDTH - barWidth, barTopY, barWidth, barHeight);
         }
         
         hudGraphics.dispose();
