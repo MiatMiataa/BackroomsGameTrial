@@ -49,9 +49,17 @@ public class KeyboardInput extends KeyAdapter implements FocusListener {
         inputState.flashlightOn = isDown;
     }
 
-    if (keyCode >= KeyEvent.VK_1 && keyCode <= KeyEvent.VK_9) {
-        if (isDown) {
-            inputState.requestedCamera = keyCode - KeyEvent.VK_1;
+    if (isDown) {
+        int requestedCameraIndex = -1;
+        if (keyCode >= KeyEvent.VK_1 && keyCode <= KeyEvent.VK_9) {
+            requestedCameraIndex = keyCode - KeyEvent.VK_1;
+        } else if (keyCode == KeyEvent.VK_0) {
+            requestedCameraIndex = 9;   // CAM 6 - Kitchen
+        } else if (keyCode == KeyEvent.VK_MINUS) {
+            requestedCameraIndex = 10;  // CAM 7 - Restrooms
+        }
+        if (requestedCameraIndex >= 0) {
+            inputState.requestedCamera = requestedCameraIndex;
         }
     }
 

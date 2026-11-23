@@ -150,25 +150,26 @@ public class GamePanel extends JPanel {
         // FNAF HUD (Camera Name, Doors, Flashlight)
         if (game.isTablet()) {
             String[] camNames = {
-                "CAM 1 - Party 3", "CAM 2 - Party 1", "CAM 3 - Party 4", 
-                "CAM 4 - Party 2", "CAM 5 - Central Hall", "CAM 6 - Main Hall", 
-                "CAM 7 - Dining", "CAM 8 - Backstage", "CAM 9 - Kitchen"
+                "CAM 1A - Show Stage", "CAM 1B - Dining Area", "CAM 1C - Pirate Cove",
+                "CAM 2A - West Hall", "CAM 2B - West Hall Corner", "CAM 3 - Supply Closet",
+                "CAM 4A - East Hall", "CAM 4B - East Hall Corner", "CAM 5 - Backstage",
+                "CAM 6 - Kitchen", "CAM 7 - Restrooms"
             };
             hudGraphics.setColor(Color.WHITE);
             hudGraphics.setFont(new Font("Monospaced", Font.BOLD, 24));
             hudGraphics.drawString(camNames[game.getCurrentCameraIndex()], 
-                20, Renderer.VIEW_HEIGHT - 20);
+                20, Renderer.RENDER_HEIGHT - 20);
         } else {
             int barWidth = 30;
             hudGraphics.setColor(game.isLeftDoorClosed() ? new Color(60, 200, 60) : new Color(200, 60, 60));
-            hudGraphics.fillRect(0, 0, barWidth, Renderer.VIEW_HEIGHT);
+            hudGraphics.fillRect(0, 0, barWidth, Renderer.RENDER_HEIGHT);
             
             hudGraphics.setColor(game.isRightDoorClosed() ? new Color(60, 200, 60) : new Color(200, 60, 60));
-            hudGraphics.fillRect(Renderer.RENDER_WIDTH - barWidth, 0, barWidth, Renderer.VIEW_HEIGHT);
+            hudGraphics.fillRect(Renderer.RENDER_WIDTH - barWidth, 0, barWidth, Renderer.RENDER_HEIGHT);
             
             hudGraphics.setColor(game.isFlashlightOn() ? new Color(255, 240, 160) : new Color(80, 80, 80));
             hudGraphics.fillOval(Renderer.RENDER_WIDTH / 2 - 15, 
-                Renderer.VIEW_HEIGHT - 50, 30, 30);
+                Renderer.RENDER_HEIGHT - 50, 30, 30);
         }
         
         hudGraphics.dispose();
@@ -177,7 +178,7 @@ public class GamePanel extends JPanel {
         if (game.hasWon() || game.hasLost()) {
             String message = game.hasWon() 
             ? "6 AM, You Survived!" 
-            : "The animatronics killed you";
+            : "YOU DIED";
             graphics.setColor(new Color(0, 0, 0, 200));
             graphics.fillRect(letterboxOffsetX, letterboxOffsetY, scaledImageWidth, scaledImageHeight);
             graphics.setColor(game.hasWon() ? Color.GREEN : Color.RED);

@@ -19,7 +19,7 @@ public class FloorCeilingRenderer {
 
     public void render(Player player) {
         int renderWidth = screenBuffer.width;
-        int renderHeight = Renderer.VIEW_HEIGHT;
+        int renderHeight = Renderer.RENDER_HEIGHT;
         int[] screenPixels = screenBuffer.pixels;
 
         int horizonRow = renderHeight / 2;

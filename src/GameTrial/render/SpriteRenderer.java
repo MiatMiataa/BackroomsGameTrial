@@ -20,7 +20,7 @@ public class SpriteRenderer {
 
     public void render(Player player, List<Sprite> sprites) {
         int renderWidth = screenBuffer.width;
-        int viewHeight = Renderer.VIEW_HEIGHT;
+        int viewHeight = Renderer.RENDER_HEIGHT;
         int[] screenPixels = screenBuffer.pixels;
 
         for (Sprite sprite : sprites) {
