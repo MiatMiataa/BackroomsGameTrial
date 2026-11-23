@@ -50,6 +50,10 @@ public class GameMap {
         {31, 21},
         {31, 21}
     };
+    
+    public final int[][] PirateCoveCurtain = {
+        {3, 9}
+    };
 
     public final int[] freddySpawn = {11, 1};
     public final int[] bonnieSpawn = {10, 1};
@@ -59,7 +63,7 @@ public class GameMap {
     // Each path is {column, row} waypoints. First waypoint = spawn.
     // Last waypoint = the tile where the animatronic transitions to APPROACH.
 
-        public final int[][] freddyPath = {
+    public final int[][] freddyPath = {
         {14, 15},   // spawn (Party 1)
         {10, 15},   // move left to corridor
         {10, 22},   // move down corridor
