@@ -158,18 +158,18 @@ public class GamePanel extends JPanel {
             hudGraphics.setColor(Color.WHITE);
             hudGraphics.setFont(new Font("Monospaced", Font.BOLD, 24));
             hudGraphics.drawString(camNames[game.getCurrentCameraIndex()], 
-                20, Renderer.VIEW_HEIGHT - 20);
+                20, Renderer.RENDER_HEIGHT - 20);
         } else {
             int barWidth = 30;
             hudGraphics.setColor(game.isLeftDoorClosed() ? new Color(60, 200, 60) : new Color(200, 60, 60));
-            hudGraphics.fillRect(0, 0, barWidth, Renderer.VIEW_HEIGHT);
+            hudGraphics.fillRect(0, 0, barWidth, Renderer.RENDER_HEIGHT);
             
             hudGraphics.setColor(game.isRightDoorClosed() ? new Color(60, 200, 60) : new Color(200, 60, 60));
-            hudGraphics.fillRect(Renderer.RENDER_WIDTH - barWidth, 0, barWidth, Renderer.VIEW_HEIGHT);
+            hudGraphics.fillRect(Renderer.RENDER_WIDTH - barWidth, 0, barWidth, Renderer.RENDER_HEIGHT);
             
             hudGraphics.setColor(game.isFlashlightOn() ? new Color(255, 240, 160) : new Color(80, 80, 80));
             hudGraphics.fillOval(Renderer.RENDER_WIDTH / 2 - 15, 
-                Renderer.VIEW_HEIGHT - 50, 30, 30);
+                Renderer.RENDER_HEIGHT - 50, 30, 30);
         }
         
         hudGraphics.dispose();
@@ -178,7 +178,7 @@ public class GamePanel extends JPanel {
         if (game.hasWon() || game.hasLost()) {
             String message = game.hasWon() 
             ? "6 AM, You Survived!" 
-            : "The animatronics killed you";
+            : "YOU DIED";
             graphics.setColor(new Color(0, 0, 0, 200));
             graphics.fillRect(letterboxOffsetX, letterboxOffsetY, scaledImageWidth, scaledImageHeight);
             graphics.setColor(game.hasWon() ? Color.GREEN : Color.RED);
