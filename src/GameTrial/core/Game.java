@@ -11,7 +11,6 @@ import GameTrial.input.MouseInput;
 import GameTrial.render.Raycaster;
 import GameTrial.render.Renderer;
 import GameTrial.world.GameMap;
-import GameTrial.entity.Animatronic;
 import java.awt.Component;
 import java.awt.image.BufferedImage;
 import java.io.IOException;
@@ -35,8 +34,8 @@ public class Game {
     private enum View { OFFICE, TABLET }
     private View currentView = View.OFFICE;
 
-    private static final int TICKS_PER_HOUR  = 5340;   // about 89 s at 60 FPS
-    private static final int TICKS_PER_NIGHT = TICKS_PER_HOUR * 6;   // 32,040
+    private static final int TICKS_PER_HOUR  = 5340;   
+    private static final int TICKS_PER_NIGHT = TICKS_PER_HOUR * 6;   
 
     private final int currentNightNumber;
     private int freddyAILevel;
@@ -53,7 +52,6 @@ public class Game {
         bonnieAILevel = NightConfig.bonnieAILevel(currentNightNumber);
         chicaAILevel = NightConfig.chicaAILevel(currentNightNumber);
         foxyAILevel = NightConfig.foxyAILevel(currentNightNumber);
-        goldenFreddyAILevel = NightConfig.goldenFreddyAILevel(currentNightNumber);
 
         gameMap = new GameMap();
         raycaster = new Raycaster(gameMap);
@@ -77,14 +75,12 @@ public class Game {
         } catch (IOException exception) {
             throw new RuntimeException("Could not load a texture: " + exception.getMessage(), exception);
         }
+        
+        animatronics.setAILevels(freddyAILevel, bonnieAILevel, chicaAILevel, foxyAILevel);
     }
 
-    public boolean hasWon() {
-        return hasWon;
-    }
-    public boolean hasLost() {
-        return hasLost;
-    }
+    public boolean hasWon() { return hasWon; }
+    public boolean hasLost() { return hasLost; }
 
     public void attachInput(Component screenComponent) {
         screenComponent.addKeyListener(keyboardInput);
@@ -101,10 +97,10 @@ public class Game {
 
     private void applyHourlyAIGains(int hourIndex) {
         boolean gainsHappened = false;
-        if (hourIndex == 2) {                 // 2 AM
+        if (hourIndex == 2) {
             bonnieAILevel++;
             gainsHappened = true;
-        } else if (hourIndex == 3 || hourIndex == 4) {   // 3 AM and 4 AM
+        } else if (hourIndex == 3 || hourIndex == 4) {
             bonnieAILevel++;
             chicaAILevel++;
             foxyAILevel++;
@@ -119,7 +115,7 @@ public class Game {
 
     public int getDisplayedClockHour() {
         int hourIndex = (int) (threatContext.tick / TICKS_PER_HOUR);
-        return hourIndex == 0 ? 12 : hourIndex;   // 12, 1, 2, 3, 4, 5, 6
+        return hourIndex == 0 ? 12 : hourIndex; 
     }
 
     private synchronized void update() {
@@ -142,8 +138,7 @@ public class Game {
                 currentView = (currentView == View.OFFICE) ? View.TABLET : View.OFFICE;
             }
             if (currentView == View.TABLET && inputState.requestedCamera >= 0) {
-                currentCameraIndex = Math.min(inputState.requestedCamera,
-                    gameMap.cameraTiles.length - 1);
+                currentCameraIndex = Math.min(inputState.requestedCamera, gameMap.cameraTiles.length - 1);
                 inputState.requestedCamera = -1;
                 placeCamera(tabletCamera, gameMap.cameraTiles[currentCameraIndex]);
             }
@@ -151,9 +146,7 @@ public class Game {
         }
 
         threatContext.tabletUp = currentView == View.TABLET;
-        threatContext.viewingCamera = threatContext.tabletUp
-            ? cameraAnimatronic(currentCameraIndex)
-            : null;
+        threatContext.viewingCamera = threatContext.tabletUp ? cameraAnimatronic(currentCameraIndex) : null;
         threatContext.leftDoorClosed = inputState.leftDoorClosed;
         threatContext.rightDoorClosed = inputState.rightDoorClosed;
         threatContext.tick++;
@@ -165,8 +158,7 @@ public class Game {
     }
 
     public synchronized void render() {
-        renderer.render(getActiveCamera(),
-        animatronics.sprites());
+        renderer.render(getActiveCamera(), animatronics.sprites());
     }
 
     private AnimatronicType cameraAnimatronic(int cameraIndex) {
@@ -183,15 +175,13 @@ public class Game {
         int row = tile[1];
         int lookX = (gameMap.getTile(column - 1, row) == 1 ? 1 : 0) - (gameMap.getTile(column + 1, row) == 1 ? 1 : 0);
         int lookY = (gameMap.getTile(column, row - 1) == 1 ? 1 : 0) - (gameMap.getTile(column, row + 1) == 1 ? 1 : 0);
-        if (lookX == 0 && lookY == 0) {
-            lookY = -1;
-        }
+        if (lookX == 0 && lookY == 0) lookY = -1;
+        
         double lookLength = Math.hypot(lookX, lookY);
         double wallOffsetInTiles = 0.25;
         camera.positionX = (column + 0.5 - lookX / lookLength * wallOffsetInTiles) * GameMap.TILE_SIZE;
         camera.positionY = (row + 0.5 - lookY / lookLength * wallOffsetInTiles) * GameMap.TILE_SIZE;
-        camera.faceTowards(camera.positionX + lookX * GameMap.TILE_SIZE,
-                           camera.positionY + lookY * GameMap.TILE_SIZE);
+        camera.faceTowards(camera.positionX + lookX * GameMap.TILE_SIZE, camera.positionY + lookY * GameMap.TILE_SIZE);
         camera.setMaxYawRadians(Math.toRadians((lookX != 0 && lookY != 0) ? 45 : 90));
     }
 
@@ -199,32 +189,12 @@ public class Game {
         return currentView == View.OFFICE ? player : tabletCamera;
     }
 
-        public boolean isTablet() {
-        return currentView == View.TABLET;
-    }
-
-    public int getCurrentCameraIndex() {
-        return currentCameraIndex;
-    }
-
-    public boolean isLeftDoorClosed() {
-        return inputState.leftDoorClosed;
-    }
-
-    public boolean isRightDoorClosed() {
-        return inputState.rightDoorClosed;
-    }
-
-    public BufferedImage getRenderedImage() {
-        return renderer.getImage();
-    }
-    public Player getPlayer() {
-        return player;
-    }
-    public GameMap getGameMap() {
-        return gameMap;
-    }
-    public AnimatronicManager getAnimatronicManager() {
-        return animatronics;
-    }
+    public boolean isTablet() { return currentView == View.TABLET; }
+    public int getCurrentCameraIndex() { return currentCameraIndex; }
+    public boolean isLeftDoorClosed() { return inputState.leftDoorClosed; }
+    public boolean isRightDoorClosed() { return inputState.rightDoorClosed; }
+    public BufferedImage getRenderedImage() { return renderer.getImage(); }
+    public Player getPlayer() { return player; }
+    public GameMap getGameMap() { return gameMap; }
+    public AnimatronicManager getAnimatronicManager() { return animatronics; }
 }

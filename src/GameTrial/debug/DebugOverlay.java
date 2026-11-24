@@ -76,11 +76,14 @@ public class DebugOverlay {
             }
         }
 
-        // 2. Draw the hardcoded paths
-        graphicsContext.setColor(new Color(80, 120, 255)); // Blue color for path lines
+         // 2. Draws the paths with different colors
+        graphicsContext.setColor(Color.MAGENTA); // Bonnie
         drawAnimatronicPath(graphicsContext, gameMap.bonniePath, smallestScale);
+        graphicsContext.setColor(Color.YELLOW); // Chica
         drawAnimatronicPath(graphicsContext, gameMap.chicaPath, smallestScale);
+        graphicsContext.setColor(new Color(139, 69, 19)); // Freddy (Brown)
         drawAnimatronicPath(graphicsContext, gameMap.freddyPath, smallestScale);
+        graphicsContext.setColor(Color.RED); // Foxy
         drawAnimatronicPath(graphicsContext, gameMap.foxyPath, smallestScale);
 
         // 3. Draw the Animatronics

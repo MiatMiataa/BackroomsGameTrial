@@ -16,30 +16,27 @@ public class AnimatronicManager {
     private final BonnieAndChica chica;
     private final Freddy freddy;
     private final Foxy foxy;
-    private final GoldenFreddy goldenFreddy;
     private Animatronic attacker;
     private boolean hasLost;
 
     public AnimatronicManager(GameMap gameMap, TextureSet textures) {
         bonnie = new BonnieAndChica(gameMap.bonniePath, BonnieAndChica.Side.LEFT, textures.of(AnimatronicType.BONNIE));
-        chica  = new BonnieAndChica(gameMap.chicaPath,  BonnieAndChica.Side.RIGHT, textures.of(AnimatronicType.CHICA));
+        chica = new BonnieAndChica(gameMap.chicaPath, BonnieAndChica.Side.RIGHT, textures.of(AnimatronicType.CHICA));
         freddy = new Freddy(gameMap.freddyPath, textures.of(AnimatronicType.FREDDY));
         foxy = new Foxy(gameMap.foxyPath, textures.of(AnimatronicType.FOXY));
-        goldenFreddy = new GoldenFreddy(new int[11][16], textures.of(AnimatronicType.GOLDEN_FREDDY));
-
+        
         animatronics.add(bonnie);
         animatronics.add(chica);
         animatronics.add(freddy);
         animatronics.add(foxy);
-        animatronics.add(goldenFreddy);
+        animatronics.add(new GoldenFreddy(new int[][]{{8, 22}}, textures.of(AnimatronicType.GOLDEN_FREDDY)));
     }
 
-    public void setAILevels(int newFreddyAILevel, int newBonnieAILevel, int newChicaAILevel, int newFoxyAILevel, int newGoldenFreddyAILevel) {
-        freddy.setAILevel(newFreddyAILevel);
-        bonnie.setAILevel(newBonnieAILevel);
-        chica.setAILevel(newChicaAILevel);
-        foxy.setAILevel(newFoxyAILevel);
-        goldenFreddy.setAILevel(newGoldenFreddyAILevel);
+    public void setAILevels(int freddyLevel, int bonnieLevel, int chicaLevel, int foxyLevel) {
+        freddy.setAILevel(freddyLevel);
+        bonnie.setAILevel(bonnieLevel);
+        chica.setAILevel(chicaLevel);
+        foxy.setAILevel(foxyLevel);
     }
 
     public void update(GameMap gameMap, Player player, ThreatContext threatContext) {
@@ -67,11 +64,6 @@ public class AnimatronicManager {
         return cachedSprites;
     }
 
-    public boolean hasLost() {
-        return hasLost;
-    }
-
-    public boolean isAnyAttacking() {
-        return attacker != null;
-    }
+    public boolean hasLost() { return hasLost; }
+    public boolean isAnyAttacking() { return attacker != null; }
 }

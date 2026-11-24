@@ -7,10 +7,7 @@ import GameTrial.assets.Texture;
 public abstract class Animatronic extends Sprite {
     public enum State { PATROL, APPROACH, ATTACK, RETREAT }
 
-    protected static final int TICKS_PER_WALK_FRAME   = 8;
-    protected static final int TICKS_PER_SPRINT_FRAME = 3;
-    protected static final int TICKS_PER_IDLE_FRAME = 15;
-    protected static final int TICKS_PER_ATTACK_FRAME = 4;
+    protected static final int ATTACK_DURATION_TICKS = 60;
     protected static final double ARRIVAL_RADIUS = 4.0;
     private final java.util.Random random = new java.util.Random();
 
@@ -37,7 +34,7 @@ public abstract class Animatronic extends Sprite {
                           int stepTicks, AnimatronicTextures textures, double heightScale) {
         super((path[0][0] + 0.5) * GameMap.TILE_SIZE,
               (path[0][1] + 0.5) * GameMap.TILE_SIZE,
-              textures.walk[0][0], heightScale);
+              textures.byOrientation[0], heightScale);
         this.path = path;
         this.walkSpeed = walkSpeed;
         this.sprintSpeed = sprintSpeed;
@@ -71,7 +68,7 @@ public abstract class Animatronic extends Sprite {
 
     protected void updateAttack(Player player) {
         faceToward(player.positionX, player.positionY);
-        if (animationTicks >= textures.attack.length * TICKS_PER_ATTACK_FRAME) {
+        if (animationTicks >= ATTACK_DURATION_TICKS) {
             attackFinished = true;
         }
     }
@@ -124,26 +121,9 @@ public abstract class Animatronic extends Sprite {
     // animation stuff
 
     protected Texture pickTexture(Player player) {
-        if (state == State.ATTACK) {
-            int frame = Math.min(animationTicks / TICKS_PER_ATTACK_FRAME,
-                                textures.attack.length - 1);
-            return textures.attack[frame];
-        }
-
-        if (sprinting && textures.sprint != null) {
-            return textures.sprint[(animationTicks / TICKS_PER_SPRINT_FRAME)
-                                    % textures.sprint.length];
-        }
-
-        if (isMoving) {
-            Texture[] walkFrames = textures.walk[viewSector(player)];
-            return walkFrames[(animationTicks / TICKS_PER_WALK_FRAME)
-                               % walkFrames.length];
-        }
-
-        return textures.idle[(animationTicks / TICKS_PER_IDLE_FRAME)
-                              % textures.idle.length];
-        }
+        return textures.byOrientation[viewSector(player)];
+    }
+        
 
     protected void moveToward(double goalX, double goalY, double speed) {
         double deltaX = goalX - positionX;
