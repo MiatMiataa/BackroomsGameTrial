@@ -54,61 +54,92 @@ public class GameMap {
     // Each path is {column, row} waypoints. First waypoint = spawn.
     // Last waypoint = the tile where the animatronic transitions to APPROACH.
 
-        // Bonnie: 1A -> 1B -> 5 (Backstage) -> 2A -> 2B -> Left Door
-    // Intermediate points added to route around walls at row 6.
+    // Bonnie: 1A -> 1B -> 5 -> 2A -> 2B -> Left Door
     public final int[][] bonniePath = {
-        {8, 2},     // 1A - Show Stage
-        {7, 3},     // 1B - Dining Area
-        {4, 3},     // move left (avoid wall)
-        {2, 5},     // move down (avoid wall)
-        {1, 7},     // 5 - Backstage
-        {1, 9},     // move down
-        {8, 9},     // move right to corridor
-        {9, 16},    // 2A - West Hall
-        {9, 17},    // 2B - West Hall Corner
-        {10, 16}    // Left Door
+        {8, 2},   // 1A - Show Stage
+        {8, 3},   // move down
+        {7, 3},   // 1B - Dining Area
+        {7, 4},   // move down
+        {4, 4},   // move left
+        {4, 5},   // move down
+        {1, 5},   // move left
+        {1, 7},   // 5 - Backstage
+        {1, 9},   // move down
+        {3, 9},   // move right
+        {3, 10},  // 1C - Pirate Cove
+        {4, 10},  // move right
+        {4, 14},  // move down
+        {9, 14},  // move right into West Hall
+        {9, 16},  // 2A - West Hall
+        {9, 17},  // 2B - West Hall Corner
+        {10, 16}  // Left Door
     };
 
-    // Chica: 1A -> 1B -> 7 (Restrooms) -> 4A -> 4B -> Right Door
+    // Chica: 1A -> 1B -> 7 -> 4A -> 4B -> Right Door
     public final int[][] chicaPath = {
-        {8, 2},     // 1A - Show Stage
-        {7, 3},     // 1B - Dining Area
-        {21, 3},    // move right (avoid wall)
-        {21, 4},    // 7 - Restrooms
-        {19, 4},    // move left into corridor
-        {19, 10},   // move down
-        {14, 10},   // move left to East Hall
-        {14, 16},   // move down to 4A
-        {13, 16},   // 4A - East Hall
-        {13, 17},   // 4B - East Hall Corner
-        {12, 16}    // Right Door
+        {8, 2},   // 1A - Show Stage
+        {8, 3},   // move down
+        {7, 3},   // 1B - Dining Area
+        {15, 3},  // move right
+        {20, 3},  // move right
+        {21, 4},  // 7 - Restrooms
+        {21, 5},  // move down
+        {22, 5},  // move right
+        {22, 8},  // move down
+        {21, 8},  // move left
+        {21, 9},  // move down
+        {20, 9},  // move left
+        {20, 12}, // move down
+        {19, 12}, // move left
+        {16, 12}, // move left
+        {16, 14}, // move down
+        {13, 14}, // move left to East Hall
+        {13, 16}, // 4A - East Hall
+        {13, 17}, // 4B - East Hall Corner
+        {12, 16}  // Right Door
     };
 
-    // Freddy: 1A -> 1B -> 7 (Restrooms) -> 6 (Kitchen) -> 4A -> 4B -> Right Door
+    // Freddy: 1A -> 1B -> 7 -> 6 -> 4A -> 4B -> Right Door
     public final int[][] freddyPath = {
-        {8, 2},     // 1A - Show Stage
-        {7, 3},     // 1B - Dining Area
-        {21, 3},    // move right
-        {21, 4},    // 7 - Restrooms
-        {19, 4},    // move left
-        {19, 10},   // move down
-        {6, 10},    // 6 - Kitchen
-        {6, 15},    // 3 - Supply Closet (he cuts through here on your map)
-        {9, 15},    // move right
-        {13, 15},   // move right
-        {13, 16},   // 4A - East Hall
-        {13, 17},   // 4B - East Hall Corner
-        {12, 16}    // Right Door
+        {8, 2},   // 1A - Show Stage
+        {8, 3},   // move down
+        {7, 3},   // 1B - Dining Area
+        {15, 3},  // move right
+        {20, 3},  // move right
+        {21, 4},  // 7 - Restrooms
+        {21, 5},  // move down
+        {22, 5},  // move right
+        {22, 8},  // move down
+        {21, 8},  // move left
+        {21, 9},  // move down
+        {20, 9},  // move left
+        {20, 12}, // move down
+        {19, 12}, // move left
+        {16, 12}, // move left
+        {16, 10}, // move up
+        {14, 10}, // move left
+        {14, 8},  // move up
+        {9, 8},   // move left
+        {9, 9},   // move down
+        {6, 9},   // move left
+        {6, 10},  // 6 - Kitchen
+        {5, 10},  // move left
+        {5, 14},  // move down
+        {13, 14}, // move right to East Hall
+        {13, 16}, // 4A - East Hall
+        {13, 17}, // 4B - East Hall Corner
+        {12, 16}  // Right Door
     };
 
     // Foxy: 1C -> 2A -> 2B -> Left Door
     public final int[][] foxyPath = {
-        {3, 10},    // 1C - Pirate Cove (Matches cameraTiles[2] perfectly now)
-        {3, 13},    // move down
-        {8, 13},    // move right into West Hall
-        {9, 16},    // 2A - West Hall
-        {9, 17},    // 2B - West Hall Corner
-        {10, 16}    // Left Door
+        {3, 10},  // 1C - Pirate Cove
+        {4, 10},  // move right
+        {4, 14},  // move down
+        {9, 14},  // move right into West Hall
+        {9, 16},  // 2A - West Hall
+        {9, 17},  // 2B - West Hall Corner
+        {10, 16}  // Left Door
     };
 
     /*
