@@ -9,7 +9,11 @@ public abstract class Animatronic extends Sprite {
 
     protected static final int ATTACK_DURATION_TICKS = 60;
     protected static final double ARRIVAL_RADIUS = 4.0;
-    private final java.util.Random random = new java.util.Random();
+
+    // How many ticks an animatronic may stand still on one waypoint before it gives up on it.
+    protected static final int MAX_BLOCKED_TICKS = 60;
+
+    protected final java.util.Random random = new java.util.Random();
 
     protected final AnimatronicTextures textures;
     protected final int[][] path;
@@ -19,6 +23,10 @@ public abstract class Animatronic extends Sprite {
 
     protected State state = State.PATROL;
     protected int pathIndex = 0;
+
+    // Waypoint a closed door sends the animatronic back to. FNAF 1 never sends
+    // anybody all the way home, so this is not always 0.
+    protected int retreatStopIndex = 0;
     protected int stepTimer = 0;
     protected int animationTicks = 0;
     protected boolean attackFinished = false;
@@ -27,6 +35,9 @@ public abstract class Animatronic extends Sprite {
     protected int aiLevel;
     protected int movementOpportunityIntervalInTicks;
     protected int ticksSinceLastMovementOpportunity = 0;
+
+    // Ticks spent failing to make progress toward the current waypoint.
+    protected int blockedTicks = 0;
 
     protected double facingX = 0, facingY = 1;
 
@@ -87,22 +98,91 @@ public abstract class Animatronic extends Sprite {
         double targetX = (waypoint[0] + 0.5) * GameMap.TILE_SIZE;
         double targetY = (waypoint[1] + 0.5) * GameMap.TILE_SIZE;
 
-        // wallclip guard, no noclip for animatronics
-
-        double dx = targetX - positionX;
-        double dy = targetY - positionY;
-        double length = Math.hypot(dx, dy);
-        if (length < 0.001) {
+        if (Math.hypot(targetX - positionX, targetY - positionY) < 0.001) {
+            blockedTicks = 0;
             return;
         }
+
         double step = currentSpeed();
-        double nextX = positionX + dx / length * step;
-        double nextY = positionY + dy / length * step;
-        if (map.isWall(nextX, nextY)) {
+        if (step <= 0) {
             return;
         }
 
-        moveToward(targetX, targetY, step);
+        // One axis at a time, longest axis first. A wall in front of one axis must
+        // not cancel the whole step, otherwise the animatronic can freeze forever,
+        // and never moving on both axes in the same tick keeps it from cutting a
+        // corner diagonally when it is still a few pixels off the last waypoint.
+        boolean movedOnXAxis = false;
+        boolean movedOnYAxis = false;
+        if (Math.abs(targetX - positionX) >= Math.abs(targetY - positionY)) {
+            movedOnXAxis = stepAlongAxis(map, targetX - positionX, 0, step);
+            if (!movedOnXAxis) {
+                movedOnYAxis = stepAlongAxis(map, 0, targetY - positionY, step);
+            }
+        } else {
+            movedOnYAxis = stepAlongAxis(map, 0, targetY - positionY, step);
+            if (!movedOnYAxis) {
+                movedOnXAxis = stepAlongAxis(map, targetX - positionX, 0, step);
+            }
+        }
+        isMoving = movedOnXAxis || movedOnYAxis;
+
+        if (isMoving) {
+            blockedTicks = 0;
+            faceToward(targetX, targetY);
+            return;
+        }
+
+        blockedTicks++;
+        if (blockedTicks >= MAX_BLOCKED_TICKS) {
+            skipBlockedWaypoint(map);
+        }
+    }
+
+    private boolean stepAlongAxis(GameMap map, double deltaX, double deltaY, double step) {
+        double distance = Math.abs(deltaX) + Math.abs(deltaY);
+        if (distance < 0.001) {
+            return false;
+        }
+        double movement = Math.min(step, distance);
+        double nextX = positionX + Math.signum(deltaX) * movement;
+        double nextY = positionY + Math.signum(deltaY) * movement;
+        if (map.isWall(nextX, nextY)) {
+            return false;
+        }
+        positionX = nextX;
+        positionY = nextY;
+        return true;
+    }
+
+    /**
+     * Gives up on a waypoint that can never be reached, so a bad path can only
+     * cost a few seconds instead of freezing the animatronic for the whole night.
+     * When there is no waypoint left to skip to, the animatronic restarts its
+     * route from the first waypoint instead of standing still forever.
+     */
+    protected void skipBlockedWaypoint(GameMap map) {
+        int skippedIndex = pathIndex;
+        int nextIndex = (state == State.RETREAT) ? pathIndex - 1 : pathIndex + 1;
+        if (nextIndex < 0 || nextIndex >= path.length) {
+            nextIndex = 0;
+        }
+
+        pathIndex = nextIndex;
+        double nextCentreX = (path[nextIndex][0] + 0.5) * GameMap.TILE_SIZE;
+        double nextCentreY = (path[nextIndex][1] + 0.5) * GameMap.TILE_SIZE;
+        if (!map.isWall(nextCentreX, nextCentreY)) {
+            positionX = nextCentreX;
+            positionY = nextCentreY;
+        }
+        blockedTicks = 0;
+
+        if (nextIndex != skippedIndex) {
+            System.out.println("WARN: " + getClass().getSimpleName() + " stuck on waypoint "
+                + skippedIndex + " (" + path[skippedIndex][0] + "," + path[skippedIndex][1]
+                + ") - skipping to waypoint " + nextIndex + " ("
+                + path[nextIndex][0] + "," + path[nextIndex][1] + ")");
+        }
     }
 
     protected boolean arrivedAtWaypoint() {
@@ -123,7 +203,7 @@ public abstract class Animatronic extends Sprite {
     protected Texture pickTexture(Player player) {
         return textures.byOrientation[viewSector(player)];
     }
-        
+
 
     protected void moveToward(double goalX, double goalY, double speed) {
         double deltaX = goalX - positionX;
@@ -196,7 +276,7 @@ public abstract class Animatronic extends Sprite {
         }
 
     public boolean isAttackFinished() {
-        return attackFinished; 
+        return attackFinished;
     }
 
     public boolean isVisible() {
@@ -211,6 +291,10 @@ public abstract class Animatronic extends Sprite {
         movementOpportunityIntervalInTicks = ticks;
     }
 
+    /**
+     * One FNAF 1 movement opportunity: a roll between 1 and 20, successful when
+     * the roll is at or below the AI level. Failing still costs a full interval.
+     */
     protected boolean shouldTakeMovementOpportunity() {
         ticksSinceLastMovementOpportunity++;
         if (ticksSinceLastMovementOpportunity < movementOpportunityIntervalInTicks) {
@@ -219,6 +303,26 @@ public abstract class Animatronic extends Sprite {
         ticksSinceLastMovementOpportunity = 0;
         int rolledNumber = random.nextInt(20) + 1;
         return rolledNumber <= aiLevel;
+    }
+
+    /**
+     * Called when something blocks the roll itself, such as the camera being up.
+     * The timer restarts, so the block costs one whole movement opportunity.
+     */
+    protected void postponeMovementOpportunity() {
+        ticksSinceLastMovementOpportunity = 0;
+    }
+
+    /**
+     * True when the camera on screen is pointed at the tile this animatronic is
+     * standing on. This is what makes an animatronic show up on a camera at all.
+     */
+    protected boolean isOnWatchedCamera(ThreatContext threatContext) {
+        if (!threatContext.tabletUp || threatContext.viewingCameraTile == null) {
+            return false;
+        }
+        return toTile(positionX) == threatContext.viewingCameraTile[0]
+            && toTile(positionY) == threatContext.viewingCameraTile[1];
     }
 
 }

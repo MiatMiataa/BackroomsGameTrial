@@ -8,18 +8,19 @@ import GameTrial.world.GameMap;
 
 public class Freddy extends Animatronic {
     private static final int APPROACH_TIMEOUT = 180;
-    private static final double FACING_THRESHOLD = 0.6;
+
+    private static final int EAST_HALL_CORNER_WAYPOINTS = 4;
 
     private int approachTimer;
 
-        public Freddy(int[][] path, AnimatronicTextures textures) {
+    public Freddy(int[][] path, AnimatronicTextures textures) {
         super(path, 1.0, 0, 0, textures, 0.95);
         setMovementOpportunityIntervalInTicks(181);   // about 3.02 s
     }
 
     @Override
     protected void updatePatrol(GameMap map, Player player, ThreatContext threatContext) {
-        if (isWatched(map, player) || threatContext.tabletUp) return;
+        // Walking is never interrupted: only the decision to set off again is.
         if (!arrivedAtWaypoint()) { moveAlongPath(map); return; }
         if (atLastWaypoint()) {
             state = State.APPROACH;
@@ -27,16 +28,41 @@ public class Freddy extends Animatronic {
             animationTicks = 0;
             return;
         }
+        if (pathIndex == 0 && !threatContext.showStageIsClear) {
+            postponeMovementOpportunity();
+            return;
+        }
+        if (camerasStallHisMovement(threatContext)) {
+            postponeMovementOpportunity();
+            return;
+        }
         if (!shouldTakeMovementOpportunity()) return;
         pathIndex++;
         moveAlongPath(map);
     }
-    
+
+    /**
+     * Before the East Hall Corner any camera makes Freddy fail every movement
+     * opportunity. Once he is there only his own camera does, which is why
+     * watching 4B is what keeps him out of the office.
+     */
+    private boolean camerasStallHisMovement(ThreatContext threatContext) {
+        if (!threatContext.tabletUp) {
+            return false;
+        }
+        return isInEastHallCorner() ? isOnWatchedCamera(threatContext) : true;
+    }
+
+    private boolean isInEastHallCorner() {
+        return pathIndex >= path.length - EAST_HALL_CORNER_WAYPOINTS;
+    }
+
     @Override
     protected void updateApproach(Player player, ThreatContext threatContext) {
+        // FNAF 1: a closed right door stops him at the door, it never sends him
+        // back down the hall. He waits there until the door opens again.
         if (threatContext.rightDoorClosed) {
-            state = State.RETREAT;
-            animationTicks = 0;
+            approachTimer = 0;
             return;
         }
         if (++approachTimer > APPROACH_TIMEOUT) {
@@ -47,26 +73,7 @@ public class Freddy extends Animatronic {
 
     @Override
     protected void updateRetreat(GameMap map, Player player, ThreatContext threatContext) {
-        if (arrivedAtWaypoint()) {
-            if (pathIndex == 0) {
-                state = State.PATROL;
-                stepTimer = 0;
-                animationTicks = 0;
-                return;
-            }
-            pathIndex--;
-        }
-        moveAlongPath(map);
-    }
-
-    private boolean isWatched(GameMap map, Player player) {
-        double toX = player.positionX - positionX;
-        double toY = player.positionY - positionY;
-        double length = Math.hypot(toX, toY);
-        if (length < 0.001) {
-            return false;
-        }
-        double facingPlayer = (player.directionX * toX + player.directionY * toY) / length;
-        return facingPlayer > FACING_THRESHOLD && hasLineOfSight(map, player.positionX, player.positionY);
+        state = State.PATROL;
+        animationTicks = 0;
     }
 }

@@ -40,6 +40,7 @@ public class AnimatronicManager {
     }
 
     public void update(GameMap gameMap, Player player, ThreatContext threatContext) {
+        threatContext.showStageIsClear = !isOnShowStage(bonnie) && !isOnShowStage(chica);
         if (attacker != null) {
             attacker.tick(gameMap, player, threatContext);
             if (attacker.isAttackFinished()) hasLost = true;
@@ -62,6 +63,11 @@ public class AnimatronicManager {
             }
         }
         return cachedSprites;
+    }
+
+    // The Show Stage is the top of the map: rows 1 and 2 are stage and stage front.
+    private boolean isOnShowStage(Animatronic animatronic) {
+        return Animatronic.toTile(animatronic.positionY) <= 2;
     }
 
     public boolean hasLost() { return hasLost; }
