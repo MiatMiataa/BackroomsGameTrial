@@ -11,6 +11,11 @@ public class BonnieAndChica extends Animatronic {
 
     private static final int APPROACH_TIMEOUT = 180;
 
+    // Bonnie walks back to the Dining Area, Chica only as far as the East Hall,
+    // which is why she comes back to the right door faster than Bonnie does.
+    private static final int DINING_AREA_WAYPOINT = 4;
+    private static final int EAST_HALL_CORNER_WAYPOINTS = 4;
+
     private final Side side;
     private int approachTimer;
 
@@ -18,6 +23,7 @@ public class BonnieAndChica extends Animatronic {
         super(path, 1.2, 0, 0, textures, 0.85);
         this.side = side;
         setMovementOpportunityIntervalInTicks(side == Side.LEFT ? 298 : 299);
+        retreatStopIndex = side == Side.LEFT ? DINING_AREA_WAYPOINT : path.length - EAST_HALL_CORNER_WAYPOINTS;
     }
 
     @Override
@@ -50,7 +56,7 @@ public class BonnieAndChica extends Animatronic {
     @Override
     protected void updateRetreat(GameMap map, Player player, ThreatContext threatContext) {
         if (arrivedAtWaypoint()) {
-            if (pathIndex == 0) {
+            if (pathIndex <= retreatStopIndex) {
                 state = State.PATROL;
                 stepTimer = 0;
                 animationTicks = 0;
