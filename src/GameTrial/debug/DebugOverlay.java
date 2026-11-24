@@ -130,10 +130,10 @@ public class DebugOverlay {
             int endColumn = pathWaypoints[pathIndex + 1][0];
             int endRow = pathWaypoints[pathIndex + 1][1];
 
-            int startPixelX = minimapOriginX + (int) (startColumn * tileScale);
-            int startPixelY = minimapOriginY + (int) (startRow * tileScale);
-            int endPixelX = minimapOriginX + (int) (endColumn * tileScale);
-            int endPixelY = minimapOriginY + (int) (endRow * tileScale);
+            int startPixelX = minimapOriginX + (int) ((startColumn + 0.5) * tileScale);
+            int startPixelY = minimapOriginY + (int) ((startRow + 0.5)* tileScale);
+            int endPixelX = minimapOriginX + (int) ((endColumn + 0.5) * tileScale);
+            int endPixelY = minimapOriginY + (int) ((endRow + 0.5) * tileScale);
 
             graphicsContext.drawLine(startPixelX, startPixelY, endPixelX, endPixelY);
             

@@ -16,5 +16,5 @@ public final class NightConfig {
     public static int freddyAILevel(int night) { return STARTING_AI_LEVEL[night][0]; }
     public static int bonnieAILevel(int night) { return STARTING_AI_LEVEL[night][1]; }
     public static int chicaAILevel(int night)  { return STARTING_AI_LEVEL[night][2]; }
-    public static int foxyAILevel(int night)   { return STARTING_AI_LEVEL[night][0]; }
+    public static int foxyAILevel(int night)   { return STARTING_AI_LEVEL[night][3]; }
 }
