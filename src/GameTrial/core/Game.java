@@ -34,8 +34,8 @@ public class Game {
     private enum View { OFFICE, TABLET }
     private View currentView = View.OFFICE;
 
-    private static final int TICKS_PER_HOUR  = 5340;   
-    private static final int TICKS_PER_NIGHT = TICKS_PER_HOUR * 6;   
+    private static final int TICKS_PER_HOUR  = 5340;
+    private static final int TICKS_PER_NIGHT = TICKS_PER_HOUR * 6;
 
     private final int currentNightNumber;
     private int freddyAILevel;
@@ -75,7 +75,7 @@ public class Game {
         } catch (IOException exception) {
             throw new RuntimeException("Could not load a texture: " + exception.getMessage(), exception);
         }
-        
+
         animatronics.setAILevels(freddyAILevel, bonnieAILevel, chicaAILevel, foxyAILevel);
     }
 
@@ -115,7 +115,7 @@ public class Game {
 
     public int getDisplayedClockHour() {
         int hourIndex = (int) (threatContext.tick / TICKS_PER_HOUR);
-        return hourIndex == 0 ? 12 : hourIndex; 
+        return hourIndex == 0 ? 12 : hourIndex;
     }
 
     private synchronized void update() {
@@ -147,6 +147,7 @@ public class Game {
 
         threatContext.tabletUp = currentView == View.TABLET;
         threatContext.viewingCamera = threatContext.tabletUp ? cameraAnimatronic(currentCameraIndex) : null;
+        threatContext.viewingCameraTile = threatContext.tabletUp ? gameMap.cameraTiles[currentCameraIndex] : null;
         threatContext.leftDoorClosed = inputState.leftDoorClosed;
         threatContext.rightDoorClosed = inputState.rightDoorClosed;
         threatContext.tick++;
@@ -176,7 +177,7 @@ public class Game {
         int lookX = (gameMap.getTile(column - 1, row) == 1 ? 1 : 0) - (gameMap.getTile(column + 1, row) == 1 ? 1 : 0);
         int lookY = (gameMap.getTile(column, row - 1) == 1 ? 1 : 0) - (gameMap.getTile(column, row + 1) == 1 ? 1 : 0);
         if (lookX == 0 && lookY == 0) lookY = -1;
-        
+
         double lookLength = Math.hypot(lookX, lookY);
         double wallOffsetInTiles = 0.25;
         camera.positionX = (column + 0.5 - lookX / lookLength * wallOffsetInTiles) * GameMap.TILE_SIZE;
