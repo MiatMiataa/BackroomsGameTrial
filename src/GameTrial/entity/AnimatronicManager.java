@@ -12,29 +12,34 @@ import java.util.List;
 public class AnimatronicManager {
     private final List<Animatronic> animatronics = new ArrayList<>();
     private final List<Sprite> cachedSprites = new ArrayList<>();
+    private final BonnieAndChica bonnie;
+    private final BonnieAndChica chica;
+    private final Freddy freddy;
+    private final Foxy foxy;
+    private final GoldenFreddy goldenFreddy;
     private Animatronic attacker;
     private boolean hasLost;
 
     public AnimatronicManager(GameMap gameMap, TextureSet textures) {
-        animatronics.add(new BonnieAndChica(
-            gameMap.bonniePath, BonnieAndChica.Side.LEFT, 50,
-            textures.of(AnimatronicType.BONNIE)));
-            
-        animatronics.add(new BonnieAndChica(
-            gameMap.chicaPath, BonnieAndChica.Side.RIGHT, 65,
-            textures.of(AnimatronicType.CHICA)));
+        bonnie = new BonnieAndChica(gameMap.bonniePath, BonnieAndChica.Side.LEFT, textures.of(AnimatronicType.BONNIE));
+        chica  = new BonnieAndChica(gameMap.chicaPath,  BonnieAndChica.Side.RIGHT, textures.of(AnimatronicType.CHICA));
+        freddy = new Freddy(gameMap.freddyPath, textures.of(AnimatronicType.FREDDY));
+        foxy = new Foxy(gameMap.foxyPath, textures.of(AnimatronicType.FOXY));
+        goldenFreddy = new GoldenFreddy(new int[11][16], textures.of(AnimatronicType.GOLDEN_FREDDY));
 
-        animatronics.add(new Freddy(
-            gameMap.freddyPath, 80,
-            textures.of(AnimatronicType.FREDDY)));
-        
-        animatronics.add(new Foxy(
-            gameMap.foxyPath,
-            textures.of(AnimatronicType.FOXY)));
+        animatronics.add(bonnie);
+        animatronics.add(chica);
+        animatronics.add(freddy);
+        animatronics.add(foxy);
+        animatronics.add(goldenFreddy);
+    }
 
-        animatronics.add(new GoldenFreddy(
-            new int[][]{{8, 22}}, // dummy path
-            textures.of(AnimatronicType.GOLDEN_FREDDY)));
+    public void setAILevels(int newFreddyAILevel, int newBonnieAILevel, int newChicaAILevel, int newFoxyAILevel, int newGoldenFreddyAILevel) {
+        freddy.setAILevel(newFreddyAILevel);
+        bonnie.setAILevel(newBonnieAILevel);
+        chica.setAILevel(newChicaAILevel);
+        foxy.setAILevel(newFoxyAILevel);
+        goldenFreddy.setAILevel(newGoldenFreddyAILevel);
     }
 
     public void update(GameMap gameMap, Player player, ThreatContext threatContext) {

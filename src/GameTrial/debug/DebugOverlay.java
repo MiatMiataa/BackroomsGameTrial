@@ -89,8 +89,8 @@ public class DebugOverlay {
             int animatronicColumn = (int) Math.floor(animatronicSprite.positionX / GameMap.TILE_SIZE);
             int animatronicRow = (int) Math.floor(animatronicSprite.positionY / GameMap.TILE_SIZE);
             
-            int animatronicPixelX = MINIMAP_PADDING + (int) (animatronicColumn * smallestScale);
-            int animatronicPixelY = MINIMAP_PADDING + (int) (animatronicRow * smallestScale);
+            int animatronicPixelX = minimapOriginX + (int) (animatronicColumn * smallestScale);
+            int animatronicPixelY = minimapOriginY + (int) (animatronicRow * smallestScale);
             
             // Match the class name to give each animatronic a specific color
             String animatronicClassName = animatronicSprite.getClass().getSimpleName();
@@ -113,8 +113,8 @@ public class DebugOverlay {
         int playerColumn = (int) Math.floor(player.positionX / GameMap.TILE_SIZE);
         int playerRow = (int) Math.floor(player.positionY / GameMap.TILE_SIZE);
         
-        int playerPixelX = MINIMAP_PADDING + (int) (playerColumn * smallestScale);
-        int playerPixelY = MINIMAP_PADDING + (int) (playerRow * smallestScale);
+        int playerPixelX = minimapOriginX + (int) (playerColumn * smallestScale);
+        int playerPixelY = minimapOriginY + (int) (playerRow * smallestScale);
         
         graphicsContext.setColor(Color.CYAN);
         graphicsContext.fillOval(playerPixelX - 4, playerPixelY - 4, 8, 8);
@@ -127,10 +127,10 @@ public class DebugOverlay {
             int endColumn = pathWaypoints[pathIndex + 1][0];
             int endRow = pathWaypoints[pathIndex + 1][1];
 
-            int startPixelX = MINIMAP_PADDING + (int) (startColumn * tileScale);
-            int startPixelY = MINIMAP_PADDING + (int) (startRow * tileScale);
-            int endPixelX = MINIMAP_PADDING + (int) (endColumn * tileScale);
-            int endPixelY = MINIMAP_PADDING + (int) (endRow * tileScale);
+            int startPixelX = minimapOriginX + (int) (startColumn * tileScale);
+            int startPixelY = minimapOriginY + (int) (startRow * tileScale);
+            int endPixelX = minimapOriginX + (int) (endColumn * tileScale);
+            int endPixelY = minimapOriginY + (int) (endRow * tileScale);
 
             graphicsContext.drawLine(startPixelX, startPixelY, endPixelX, endPixelY);
             

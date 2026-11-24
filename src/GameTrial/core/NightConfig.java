@@ -1,0 +1,21 @@
+package GameTrial.core;
+
+public final class NightConfig {
+    private NightConfig() {}
+
+    // Index = night number (1-5). Columns = Freddy, Bonnie, Chica, Foxy AI level at 12 AM.
+    private static final int[][] STARTING_AI_LEVEL = {
+        {0, 0, 0, 0, 0},   // index 0 unused, keeps the array 1-based
+        {0, 0, 0, 0, 3},   // night 1
+        {0, 3, 1, 1, 3},   // night 2
+        {1, 0, 5, 2, 3},   // night 3
+        {2, 2, 4, 6, 7},   // night 4
+        {3, 5, 7, 5, 9}    // night 5
+    };
+
+    public static int freddyAILevel(int night) { return STARTING_AI_LEVEL[night][0]; }
+    public static int bonnieAILevel(int night) { return STARTING_AI_LEVEL[night][1]; }
+    public static int chicaAILevel(int night)  { return STARTING_AI_LEVEL[night][2]; }
+    public static int foxyAILevel(int night)   { return STARTING_AI_LEVEL[night][0]; }
+    public static int goldenFreddyAILevel(int night) { return STARTING_AI_LEVEL[night][0]; }
+}

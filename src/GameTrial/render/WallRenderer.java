@@ -19,7 +19,7 @@ public class WallRenderer {
 
     public void render(Player player) {
         int renderWidth = screenBuffer.width;
-        int renderHeight = Renderer.VIEW_HEIGHT;
+        int renderHeight = Renderer.RENDER_HEIGHT;
         int[] screenPixels = screenBuffer.pixels;
 
         for (int screenColumn = 0; screenColumn < renderWidth; screenColumn++) {

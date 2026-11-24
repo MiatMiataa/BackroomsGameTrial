@@ -14,27 +14,22 @@ public class BonnieAndChica extends Animatronic {
     private final Side side;
     private int approachTimer;
 
-    public BonnieAndChica(int[][] path, Side side, int stepTicks, AnimatronicTextures textures) {
-        super(path, 1.2, 0, stepTicks, textures, 0.85);
+    public BonnieAndChica(int[][] path, Side side, AnimatronicTextures textures) {
+        super(path, 1.2, 0, 0, textures, 0.85);
         this.side = side;
+        setMovementOpportunityIntervalInTicks(side == Side.LEFT ? 298 : 299);
     }
 
     @Override
     protected void updatePatrol(GameMap map, Player player, ThreatContext threatContext) {
-        if (!arrivedAtWaypoint()) {
-            moveAlongPath(map);
-            return;
-        }
+        if (!arrivedAtWaypoint()) { moveAlongPath(map); return; }
         if (atLastWaypoint()) {
             state = State.APPROACH;
             approachTimer = 0;
             animationTicks = 0;
             return;
         }
-        if (++stepTimer < stepTicks) {
-            return;
-        }
-        stepTimer = 0;
+        if (!shouldTakeMovementOpportunity()) return;
         pathIndex++;
         moveAlongPath(map);
     }

@@ -6,8 +6,6 @@ public class Fog {
     private static final double FOG_START_TILES = 2.0;
     private static final double FOG_END_TILES_DARK = 7.0;
 
-    public static boolean isFlashlightOn = false;
-
     private static final int FOG_RED = 42;
     private static final int FOG_GREEN = 36;
     private static final int FOG_BLUE = 16;
@@ -17,7 +15,7 @@ public class Fog {
     public static int getFogAmount(double distanceInPixels) {
         double distanceInTiles = distanceInPixels / GameMap.TILE_SIZE;
         double currentEndTiles = FOG_END_TILES_DARK;
-        
+
         if (distanceInTiles <= FOG_START_TILES) {
             return 0; 
         }

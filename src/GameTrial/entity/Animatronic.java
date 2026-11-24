@@ -12,6 +12,7 @@ public abstract class Animatronic extends Sprite {
     protected static final int TICKS_PER_IDLE_FRAME = 15;
     protected static final int TICKS_PER_ATTACK_FRAME = 4;
     protected static final double ARRIVAL_RADIUS = 4.0;
+    private final java.util.Random random = new java.util.Random();
 
     protected final AnimatronicTextures textures;
     protected final int[][] path;
@@ -26,6 +27,9 @@ public abstract class Animatronic extends Sprite {
     protected boolean attackFinished = false;
     protected boolean sprinting = false;
     protected boolean isMoving = false;
+    protected int aiLevel;
+    protected int movementOpportunityIntervalInTicks;
+    protected int ticksSinceLastMovementOpportunity = 0;
 
     protected double facingX = 0, facingY = 1;
 
@@ -86,7 +90,7 @@ public abstract class Animatronic extends Sprite {
         double targetX = (waypoint[0] + 0.5) * GameMap.TILE_SIZE;
         double targetY = (waypoint[1] + 0.5) * GameMap.TILE_SIZE;
 
-        // wallclip guard
+        // wallclip guard, no noclip for animatronics
 
         double dx = targetX - positionX;
         double dy = targetY - positionY;
@@ -219,5 +223,22 @@ public abstract class Animatronic extends Sprite {
         return true;
     }
 
-    
+    public void setAILevel(int newAILevel) {
+        aiLevel = Math.max(0, Math.min(20, newAILevel));
+    }
+
+    public void setMovementOpportunityIntervalInTicks(int ticks) {
+        movementOpportunityIntervalInTicks = ticks;
+    }
+
+    protected boolean shouldTakeMovementOpportunity() {
+        ticksSinceLastMovementOpportunity++;
+        if (ticksSinceLastMovementOpportunity < movementOpportunityIntervalInTicks) {
+            return false;
+        }
+        ticksSinceLastMovementOpportunity = 0;
+        int rolledNumber = random.nextInt(20) + 1;
+        return rolledNumber <= aiLevel;
+    }
+
 }

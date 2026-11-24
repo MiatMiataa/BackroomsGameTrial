@@ -11,6 +11,8 @@ import GameTrial.input.MouseInput;
 import GameTrial.render.Raycaster;
 import GameTrial.render.Renderer;
 import GameTrial.world.GameMap;
+import GameTrial.core.NightConfig;
+import GameTrial.entity.Animatronic;
 import java.awt.Component;
 import java.awt.image.BufferedImage;
 import java.io.IOException;
@@ -34,7 +36,26 @@ public class Game {
     private enum View { OFFICE, TABLET }
     private View currentView = View.OFFICE;
 
-    public Game() {
+    private static final int TICKS_PER_HOUR  = 5340;   // about 89 s at 60 FPS
+    private static final int TICKS_PER_NIGHT = TICKS_PER_HOUR * 6;   // 32,040
+
+    private final int currentNightNumber;
+    private int freddyAILevel;
+    private int bonnieAILevel;
+    private int chicaAILevel;
+    private int foxyAILevel;
+    private int lastHourIndex = 0;
+
+    public Game() { this(1); }
+
+    public Game(int startNightNumber) {
+        this.currentNightNumber = Math.max(1, Math.min(5, startNightNumber));
+        freddyAILevel = NightConfig.freddyAILevel(currentNightNumber);
+        bonnieAILevel = NightConfig.bonnieAILevel(currentNightNumber);
+        chicaAILevel = NightConfig.chicaAILevel(currentNightNumber);
+        foxyAILevel = NightConfig.foxyAILevel(currentNightNumber);
+        goldenFreddyAILevel = NightConfig.goldenFreddyAILevel(currentNightNumber);
+
         gameMap = new GameMap();
         raycaster = new Raycaster(gameMap);
 
@@ -79,12 +100,41 @@ public class Game {
         gameLoop.start();
     }
 
+    private void applyHourlyAIGains(int hourIndex) {
+        boolean gainsHappened = false;
+        if (hourIndex == 2) {                 // 2 AM
+            bonnieAILevel++;
+            gainsHappened = true;
+        } else if (hourIndex == 3 || hourIndex == 4) {   // 3 AM and 4 AM
+            bonnieAILevel++;
+            chicaAILevel++;
+            foxyAILevel++;
+            gainsHappened = true;
+        }
+        if (gainsHappened) {
+            animatronics.setAILevels(freddyAILevel, bonnieAILevel, chicaAILevel, foxyAILevel);
+        }
+    }
+
+    public int getCurrentNightNumber() { return currentNightNumber; }
+
+    public int getDisplayedClockHour() {
+        int hourIndex = (int) (threatContext.tick / TICKS_PER_HOUR);
+        return hourIndex == 0 ? 12 : hourIndex;   // 12, 1, 2, 3, 4, 5, 6
+    }
+
     private synchronized void update() {
         if (hasLost || hasWon) return;
 
-        if (threatContext.tick > 3600) {
+        if (threatContext.tick >= TICKS_PER_NIGHT) {
             hasWon = true;
             return;
+        }
+
+        int currentHourIndex = (int) (threatContext.tick / TICKS_PER_HOUR);
+        while (lastHourIndex < currentHourIndex) {
+            lastHourIndex++;
+            applyHourlyAIGains(lastHourIndex);
         }
 
         if (!animatronics.isAnyAttacking()) {

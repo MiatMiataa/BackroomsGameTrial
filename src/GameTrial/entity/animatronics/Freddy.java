@@ -12,33 +12,26 @@ public class Freddy extends Animatronic {
 
     private int approachTimer;
 
-    public Freddy(int[][] path, int stepTicks, AnimatronicTextures textures) {
-        super(path, 1.0, 0, stepTicks, textures, 0.95);
+        public Freddy(int[][] path, AnimatronicTextures textures) {
+        super(path, 1.0, 0, 0, textures, 0.95);
+        setMovementOpportunityIntervalInTicks(181);   // about 3.02 s
     }
 
     @Override
     protected void updatePatrol(GameMap map, Player player, ThreatContext threatContext) {
-        if (isWatched(map, player) || threatContext.tabletUp) {
-            return;
-        }
-        if (!arrivedAtWaypoint()) {
-            moveAlongPath(map);
-            return;
-        }
+        if (isWatched(map, player) || threatContext.tabletUp) return;
+        if (!arrivedAtWaypoint()) { moveAlongPath(map); return; }
         if (atLastWaypoint()) {
             state = State.APPROACH;
             approachTimer = 0;
             animationTicks = 0;
             return;
         }
-        if (++stepTimer < stepTicks) {
-            return;
-        }
-        stepTimer = 0;
+        if (!shouldTakeMovementOpportunity()) return;
         pathIndex++;
         moveAlongPath(map);
     }
-
+    
     @Override
     protected void updateApproach(Player player, ThreatContext threatContext) {
         if (threatContext.rightDoorClosed) {
