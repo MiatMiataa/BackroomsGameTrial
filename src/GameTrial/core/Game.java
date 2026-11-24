@@ -11,7 +11,6 @@ import GameTrial.input.MouseInput;
 import GameTrial.render.Raycaster;
 import GameTrial.render.Renderer;
 import GameTrial.world.GameMap;
-import GameTrial.core.NightConfig;
 import GameTrial.entity.Animatronic;
 import java.awt.Component;
 import java.awt.image.BufferedImage;
