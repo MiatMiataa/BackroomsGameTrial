@@ -5,6 +5,7 @@ import GameTrial.entity.Player;
 import GameTrial.entity.Sprite;
 import GameTrial.entity.AnimatronicManager;
 import GameTrial.world.GameMap;
+import GameTrial.world.SlidingBarrier;
 import java.awt.Color;
 import java.awt.Graphics2D;
 import java.util.List;
@@ -77,7 +78,22 @@ public class DebugOverlay {
             }
         }
 
-         // 2. Draws the paths with different colors
+        // 2. Barriers: solid orange while closed, fading as they open
+        for (SlidingBarrier barrier : gameMap.barriers()) {
+            int barrierAlpha = (int) (220 * (1.0 - barrier.openAmount));
+            if (barrierAlpha <= 0) {
+                continue;
+            }
+            graphicsContext.setColor(new Color(255, 150, 0, barrierAlpha));
+            graphicsContext.fillRect(
+                minimapOriginX + (int) (barrier.column * smallestScale),
+                minimapOriginY + (int) (barrier.row * smallestScale),
+                (int) Math.ceil(smallestScale),
+                (int) Math.ceil(smallestScale)
+            );
+        }
+
+         // 3. Draws the paths with different colors
         graphicsContext.setColor(Color.MAGENTA); // Bonnie
         drawAnimatronicPath(graphicsContext, gameMap.bonniePath, smallestScale);
         graphicsContext.setColor(Color.YELLOW); // Chica
@@ -87,7 +103,7 @@ public class DebugOverlay {
         graphicsContext.setColor(Color.RED); // Foxy
         drawAnimatronicPath(graphicsContext, gameMap.foxyPath, smallestScale);
 
-        // 3. Draw the Animatronics
+        // 4. Draw the Animatronics
         List<Sprite> animatronicSprites = animatronicManager.sprites();
         for (Sprite animatronicSprite : animatronicSprites) {
             int animatronicColumn = (int) Math.floor(animatronicSprite.positionX / GameMap.TILE_SIZE);
@@ -113,7 +129,7 @@ public class DebugOverlay {
             graphicsContext.fillOval(animatronicPixelX - 4, animatronicPixelY - 4, 8, 8);
         }
 
-        // 4. Draw the Player
+        // 5. Draw the Player
         int playerColumn = (int) Math.floor(player.positionX / GameMap.TILE_SIZE);
         int playerRow = (int) Math.floor(player.positionY / GameMap.TILE_SIZE);
 

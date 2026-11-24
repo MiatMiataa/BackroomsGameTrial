@@ -17,7 +17,8 @@ public class Renderer {
 
     public Renderer(Raycaster raycaster, TextureSet textureSet) {
         floorCeilingRenderer = new FloorCeilingRenderer(screenBuffer, textureSet.floor, textureSet.ceiling);
-        wallRenderer = new WallRenderer(screenBuffer, raycaster, textureSet.wall);
+        wallRenderer = new WallRenderer(screenBuffer, raycaster, textureSet.wall,
+            textureSet.officeDoor, textureSet.pirateCove);
         spriteRenderer = new SpriteRenderer(screenBuffer, wallRenderer.columnWallDistances);
     }
 
