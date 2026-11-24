@@ -13,6 +13,8 @@ public class TextureSet {
     public final Texture wall;
     public final Texture floor;
     public final Texture ceiling;
+    public final Texture officeDoor;
+    public final Texture pirateCove;
 
     private final Map<AnimatronicType, AnimatronicTextures> animatronicTextures = new EnumMap<>(AnimatronicType.class);
 
@@ -20,6 +22,8 @@ public class TextureSet {
         wall = loadOrFail(TEXTURE_FOLDER + "wall.png");
         floor = loadOrFail(TEXTURE_FOLDER + "floor.png");
         ceiling = loadOrFail(TEXTURE_FOLDER + "ceiling.png");
+        officeDoor = loadOrFail(TEXTURE_FOLDER + "office_door.png");
+        pirateCove = loadOrFail(TEXTURE_FOLDER + "pirate_cove.png");
 
         for (AnimatronicType type : AnimatronicType.values()) {
             animatronicTextures.put(type, new AnimatronicTextures(ANIMATRONIC_FOLDER + type.folder() + "/", type.folder()));
