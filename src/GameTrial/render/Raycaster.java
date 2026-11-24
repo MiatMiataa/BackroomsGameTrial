@@ -1,6 +1,7 @@
 package GameTrial.render;
 
 import GameTrial.world.GameMap;
+import GameTrial.world.SlidingBarrier;
 
 public class Raycaster {
     private final GameMap gameMap;
@@ -43,6 +44,15 @@ public class Raycaster {
         int wallOrientation = 0;
         int stepCount = 0;
 
+        // The nearest barrier this ray crosses, if any. The ray does not stop there:
+        // it walks on to the wall behind, so a half-open door still shows the hallway.
+        SlidingBarrier nearestBarrier = null;
+        int barrierTileColumn = 0;
+        int barrierTileRow = 0;
+        int barrierOrientation = 0;
+        double barrierDistance = 0;
+        double barrierHitFraction = 0;
+
         while (!hasHitWall && stepCount < MAX_RAY_STEPS) {
             stepCount++;
             if (distanceToNextTileEdgeX < distanceToNextTileEdgeY) {
@@ -56,24 +66,63 @@ public class Raycaster {
             }
             if (gameMap.getTile(currentTileColumn, currentTileRow) == 1) {
                 hasHitWall = true;
+                break;
             }
-
+            if (nearestBarrier == null) {
+                SlidingBarrier barrier = gameMap.getBarrierAt(currentTileColumn, currentTileRow);
+                if (barrier != null && barrier.isBlockingView()) {
+                    nearestBarrier = barrier;
+                    barrierTileColumn = currentTileColumn;
+                    barrierTileRow = currentTileRow;
+                    barrierOrientation = wallOrientation;
+                    barrierDistance = distanceAlongRay(wallOrientation,
+                        distanceToNextTileEdgeX, distanceToCrossOneTileX,
+                        distanceToNextTileEdgeY, distanceToCrossOneTileY);
+                    barrierHitFraction = hitFractionAlongWall(barrierOrientation, barrierDistance,
+                        rayStartX, rayStartY, rayDirectionX, rayDirectionY);
+                }
+            }
         }
 
-        double perpendicularWallDistance = (wallOrientation == 0)
-                ? (distanceToNextTileEdgeX - distanceToCrossOneTileX)
-                : (distanceToNextTileEdgeY - distanceToCrossOneTileY);
+        double perpendicularWallDistance = distanceAlongRay(wallOrientation,
+            distanceToNextTileEdgeX, distanceToCrossOneTileX,
+            distanceToNextTileEdgeY, distanceToCrossOneTileY);
+        double wallHitFraction = hitFractionAlongWall(wallOrientation, perpendicularWallDistance,
+            rayStartX, rayStartY, rayDirectionX, rayDirectionY);
 
-        double wallHitPixelX = rayStartX + rayDirectionX * perpendicularWallDistance;
-        double wallHitPixelY = rayStartY + rayDirectionY * perpendicularWallDistance;
+        RayHit wallHit = new RayHit(currentTileColumn, currentTileRow, wallOrientation,
+            perpendicularWallDistance, wallHitFraction, hasHitWall);
+        if (nearestBarrier == null) {
+            return wallHit;
+        }
+
+        RayHit barrierHit = new RayHit(barrierTileColumn, barrierTileRow, barrierOrientation,
+            barrierDistance, barrierHitFraction, true);
+        barrierHit.hitBarrier = nearestBarrier;
+        barrierHit.wallBehindBarrier = wallHit;
+        return barrierHit;
+    }
+
+    private static double distanceAlongRay(int wallOrientation,
+        double distanceToNextTileEdgeX, double distanceToCrossOneTileX,
+        double distanceToNextTileEdgeY, double distanceToCrossOneTileY) {
+
+        return (wallOrientation == 0)
+            ? (distanceToNextTileEdgeX - distanceToCrossOneTileX)
+            : (distanceToNextTileEdgeY - distanceToCrossOneTileY);
+    }
+
+    private static double hitFractionAlongWall(int wallOrientation, double distanceAlongTheRay,
+        double rayStartX, double rayStartY, double rayDirectionX, double rayDirectionY) {
+
+        double wallHitPixelX = rayStartX + rayDirectionX * distanceAlongTheRay;
+        double wallHitPixelY = rayStartY + rayDirectionY * distanceAlongTheRay;
         double wallHitFraction = (wallOrientation == 0) ? wallHitPixelY : wallHitPixelX;
 
         wallHitFraction = wallHitFraction % GameMap.TILE_SIZE;
         if (wallHitFraction < 0) {
             wallHitFraction += GameMap.TILE_SIZE;
         }
-        wallHitFraction /= GameMap.TILE_SIZE;
-
-        return new RayHit(currentTileColumn, currentTileRow, wallOrientation, perpendicularWallDistance, wallHitFraction, hasHitWall);
+        return wallHitFraction / GameMap.TILE_SIZE;
     }
 }
