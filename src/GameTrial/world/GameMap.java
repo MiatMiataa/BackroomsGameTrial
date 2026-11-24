@@ -14,7 +14,7 @@ public class GameMap {
         {1,0,0,1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1,0,0,1,0,0,0,1},  //6
         {1,2,0,1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1,0,0,1,1,1,1,1},  //7
         {1,1,1,1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1,0,0,1,1,1,1,1},  //8
-        {1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1,0,0,0,0,0,0,1},  //9
+        {1,0,0,3,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1,0,0,0,0,0,0,1},  //9
         {1,0,0,3,0,0,2,0,0,0,0,0,0,0,0,0,0,0,0,0,1,0,0,1,0,0,0,1},  //10
         {1,1,1,1,1,1,1,1,0,0,1,1,1,0,0,1,1,0,1,1,1,1,1,1,1,1,1,1},  //11
         {1,1,1,1,1,1,1,1,0,0,1,1,1,0,0,1,0,0,0,0,0,0,0,1,1,1,1,1},  //12
@@ -49,7 +49,7 @@ public class GameMap {
     public final int[] freddySpawn = {11, 1};
     public final int[] bonnieSpawn = {10, 1};
     public final int[] chicaSpawn = {12, 1};
-    public final int[] foxySpawn = {14, 9};
+    public final int[] foxySpawn = {2, 9};
 
     // Each path is {column, row} waypoints. First waypoint = spawn.
     // Last waypoint = the tile where the animatronic transitions to APPROACH.
@@ -154,9 +154,9 @@ public class GameMap {
     // Foxy: 1C -> West Hall -> 2A -> 2B -> Left Door
     // Foxy's first waypoint is Pirate Cove, and Game.cameraAnimatronic() relies on that.
     public final int[][] foxyPath = {
-        {3, 10},  // 1C - Pirate Cove
-        {4, 10},  // move right
-        {8, 10},  // move right
+        {2, 9},  // 1C - Pirate Cove
+        {3, 9},  // move right
+        {8, 9},  // move right
         {8, 14},  // move down
         {9, 14},  // move right into West Hall
         {9, 16},  // 2A - West Hall
