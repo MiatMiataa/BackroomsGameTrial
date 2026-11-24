@@ -1,5 +1,8 @@
 package GameTrial.world;
 
+import java.util.Arrays;
+import java.util.List;
+
 public class GameMap {
     public static final int TILE_SIZE = 64;  //each tile is 64px
 
@@ -14,7 +17,7 @@ public class GameMap {
         {1,0,0,1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1,0,0,1,0,0,0,1},  //6
         {1,2,0,1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1,0,0,1,1,1,1,1},  //7
         {1,1,1,1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1,0,0,1,1,1,1,1},  //8
-        {1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1,0,0,0,0,0,0,1},  //9
+        {1,0,0,3,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1,0,0,0,0,0,0,1},  //9
         {1,0,0,3,0,0,2,0,0,0,0,0,0,0,0,0,0,0,0,0,1,0,0,1,0,0,0,1},  //10
         {1,1,1,1,1,1,1,1,0,0,1,1,1,0,0,1,1,0,1,1,1,1,1,1,1,1,1,1},  //11
         {1,1,1,1,1,1,1,1,0,0,1,1,1,0,0,1,0,0,0,0,0,0,0,1,1,1,1,1},  //12
@@ -45,6 +48,12 @@ public class GameMap {
     public final int[][] PirateCoveCurtain = {
         {3, 9}
     };
+
+    // Doors and curtain. They are not tiles: entity movement keeps using tileGrid,
+    // so the animatronic routes never get blocked by a closed door.
+    public final SlidingBarrier leftDoorBarrier;
+    public final SlidingBarrier rightDoorBarrier;
+    public final SlidingBarrier pirateCoveCurtain;
 
     public final int[] freddySpawn = {11, 1};
     public final int[] bonnieSpawn = {10, 1};
@@ -166,7 +175,37 @@ public class GameMap {
     };
 
     public GameMap() {
+        // Both doors start open, the curtain starts closed.
+        leftDoorBarrier = new SlidingBarrier(doorTiles[0][0], doorTiles[0][1],
+            SlidingBarrier.BarrierType.OFFICE_DOOR, 1.0);
+        rightDoorBarrier = new SlidingBarrier(doorTiles[1][0], doorTiles[1][1],
+            SlidingBarrier.BarrierType.OFFICE_DOOR, 1.0);
+        pirateCoveCurtain = new SlidingBarrier(PirateCoveCurtain[0][0], PirateCoveCurtain[0][1],
+            SlidingBarrier.BarrierType.PIRATE_COVE_CURTAIN, 0.0);
         validatePaths();
+    }
+
+    public SlidingBarrier getBarrierAt(int column, int row) {
+        if (leftDoorBarrier.isAt(column, row)) {
+            return leftDoorBarrier;
+        }
+        if (rightDoorBarrier.isAt(column, row)) {
+            return rightDoorBarrier;
+        }
+        if (pirateCoveCurtain.isAt(column, row)) {
+            return pirateCoveCurtain;
+        }
+        return null;
+    }
+
+    public List<SlidingBarrier> barriers() {
+        return Arrays.asList(leftDoorBarrier, rightDoorBarrier, pirateCoveCurtain);
+    }
+
+    public void updateBarriers() {
+        leftDoorBarrier.update();
+        rightDoorBarrier.update();
+        pirateCoveCurtain.update();
     }
 
     /**
