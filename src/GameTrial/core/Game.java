@@ -27,6 +27,13 @@ public class Game {
     private final ThreatContext threatContext = new ThreatContext();
     private final Player tabletCamera;
 
+    // FNAF 1 feeds sway side to side: 25 degrees each way (50 total) over 2 seconds.
+    private static final double CAMERA_PAN_RADIANS = Math.toRadians(25);
+    private static final int CAMERA_PAN_HALF_TICKS = 60;
+    private double cameraBaseDirectionX = 0;
+    private double cameraBaseDirectionY = -1;
+    private int cameraPanTick = 0;
+
     private int currentCameraIndex = 0;
     private volatile boolean hasWon = false;
     private volatile boolean hasLost = false;
@@ -142,7 +149,11 @@ public class Game {
                 inputState.requestedCamera = -1;
                 placeCamera(tabletCamera, gameMap.cameraTiles[currentCameraIndex]);
             }
-            getActiveCamera().update(inputState);
+            if (currentView == View.TABLET) {
+                updateCameraPan();
+            } else {
+                player.update(inputState);
+            }
         }
 
         threatContext.tabletUp = currentView == View.TABLET;
@@ -171,11 +182,25 @@ public class Game {
         return null;
     }
 
+    private void updateCameraPan() {
+        cameraPanTick = (cameraPanTick + 1) % (CAMERA_PAN_HALF_TICKS * 2);
+        double halfSweep = (double) cameraPanTick / CAMERA_PAN_HALF_TICKS;
+        double sweepProgress = halfSweep <= 1.0 ? halfSweep : 2.0 - halfSweep;
+        double panAngle = CAMERA_PAN_RADIANS * (2.0 * sweepProgress - 1.0);
+
+        double panDirectionX = cameraBaseDirectionX * Math.cos(panAngle) - cameraBaseDirectionY * Math.sin(panAngle);
+        double panDirectionY = cameraBaseDirectionX * Math.sin(panAngle) + cameraBaseDirectionY * Math.cos(panAngle);
+        tabletCamera.faceTowards(
+            tabletCamera.positionX + panDirectionX * GameMap.TILE_SIZE,
+            tabletCamera.positionY + panDirectionY * GameMap.TILE_SIZE);
+    }
+
     private void placeCamera(Player camera, int[] tile) {
         int column = tile[0];
         int row = tile[1];
-        int lookX = (gameMap.getTile(column - 1, row) == 1 ? 1 : 0) - (gameMap.getTile(column + 1, row) == 1 ? 1 : 0);
-        int lookY = (gameMap.getTile(column, row - 1) == 1 ? 1 : 0) - (gameMap.getTile(column, row + 1) == 1 ? 1 : 0);
+        // Walls around the camera tile guess the look direction; decimals are fine once the per-camera list exists.
+        double lookX = (gameMap.getTile(column - 1, row) == 1 ? 1 : 0) - (gameMap.getTile(column + 1, row) == 1 ? 1 : 0);
+        double lookY = (gameMap.getTile(column, row - 1) == 1 ? 1 : 0) - (gameMap.getTile(column, row + 1) == 1 ? 1 : 0);
         if (lookX == 0 && lookY == 0) lookY = -1;
 
         double lookLength = Math.hypot(lookX, lookY);
@@ -184,6 +209,10 @@ public class Game {
         camera.positionY = (row + 0.5 - lookY / lookLength * wallOffsetInTiles) * GameMap.TILE_SIZE;
         camera.faceTowards(camera.positionX + lookX * GameMap.TILE_SIZE, camera.positionY + lookY * GameMap.TILE_SIZE);
         camera.setMaxYawRadians(Math.toRadians((lookX != 0 && lookY != 0) ? 45 : 90));
+
+        cameraBaseDirectionX = lookX / lookLength;
+        cameraBaseDirectionY = lookY / lookLength;
+        cameraPanTick = 0;
     }
 
     private Player getActiveCamera() {
