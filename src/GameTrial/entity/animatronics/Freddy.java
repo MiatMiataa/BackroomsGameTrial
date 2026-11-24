@@ -9,7 +9,6 @@ import GameTrial.world.GameMap;
 public class Freddy extends Animatronic {
     private static final int APPROACH_TIMEOUT = 180;
 
-    // Freddy never walks back further than the East Hall corner once he is at your door.
     private static final int EAST_HALL_CORNER_WAYPOINTS = 4;
 
     private int approachTimer;
@@ -17,7 +16,6 @@ public class Freddy extends Animatronic {
     public Freddy(int[][] path, AnimatronicTextures textures) {
         super(path, 1.0, 0, 0, textures, 0.95);
         setMovementOpportunityIntervalInTicks(181);   // about 3.02 s
-        retreatStopIndex = path.length - EAST_HALL_CORNER_WAYPOINTS;
     }
 
     @Override
@@ -61,9 +59,10 @@ public class Freddy extends Animatronic {
 
     @Override
     protected void updateApproach(Player player, ThreatContext threatContext) {
+        // FNAF 1: a closed right door stops him at the door, it never sends him
+        // back down the hall. He waits there until the door opens again.
         if (threatContext.rightDoorClosed) {
-            state = State.RETREAT;
-            animationTicks = 0;
+            approachTimer = 0;
             return;
         }
         if (++approachTimer > APPROACH_TIMEOUT) {
@@ -74,15 +73,7 @@ public class Freddy extends Animatronic {
 
     @Override
     protected void updateRetreat(GameMap map, Player player, ThreatContext threatContext) {
-        if (arrivedAtWaypoint()) {
-            if (pathIndex <= retreatStopIndex) {
-                state = State.PATROL;
-                stepTimer = 0;
-                animationTicks = 0;
-                return;
-            }
-            pathIndex--;
-        }
-        moveAlongPath(map);
+        state = State.PATROL;
+        animationTicks = 0;
     }
 }
