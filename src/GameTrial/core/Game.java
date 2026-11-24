@@ -152,7 +152,12 @@ public class Game {
         threatContext.rightDoorClosed = inputState.rightDoorClosed;
         threatContext.tick++;
 
+        // The doors follow the guard's switches; Foxy sets the curtain target himself.
+        gameMap.leftDoorBarrier.targetOpenAmount = inputState.leftDoorClosed ? 0.0 : 1.0;
+        gameMap.rightDoorBarrier.targetOpenAmount = inputState.rightDoorClosed ? 0.0 : 1.0;
+
         animatronics.update(gameMap, player, threatContext);
+        gameMap.updateBarriers();
         if (animatronics.hasLost()) {
             hasLost = true;
         }
