@@ -1,10 +1,13 @@
 package GameTrial.core;
 
+import GameTrial.assets.JumpscareFrames;
+import GameTrial.assets.Texture;
 import GameTrial.assets.TextureSet;
 import GameTrial.audio.AudioPlayer;
 import GameTrial.entity.AnimatronicManager;
 import GameTrial.entity.AnimatronicType;
 import GameTrial.entity.Player;
+import GameTrial.entity.Sprite;
 import GameTrial.entity.ThreatContext;
 import GameTrial.input.InputState;
 import GameTrial.input.KeyboardInput;
@@ -15,10 +18,14 @@ import GameTrial.world.GameMap;
 import java.awt.Component;
 import java.awt.image.BufferedImage;
 import java.io.IOException;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Random;
 
 public class Game {
-    // PLAYING is the night itself; the other phases are the win and death screens.
-    public enum Phase { PLAYING, WIN_SEQUENCE, JUMPSCARE, STATIC, DEAD }
+    // NIGHT_INTRO is the "NIGHT 1" card; PLAYING is the night itself; the other
+    // phases are the win and death screens.
+    public enum Phase { NIGHT_INTRO, PLAYING, WIN_SEQUENCE, JUMPSCARE, STATIC, DEAD }
 
     // FNAF 1 feeds sway side to side: 25 degrees each way (50 total) over 2 seconds.
     private static final double CAMERA_PAN_RADIANS = Math.toRadians(25);
@@ -28,11 +35,37 @@ public class Game {
     private int cameraPanTick = 0;
 
     // 60 ticks per second.
+    private static final int NIGHT_INTRO_FADE_TICKS = 100;          // black to the office, 1.7 s
+    private static final int NIGHT_INTRO_TOTAL_TICKS = 200;         // fade plus hold, 3.3 s
     private static final int WIN_SEQUENCE_CLOCK_FLIP_TICKS = 120;   // 5 AM held for 2 s
-    private static final int WIN_SEQUENCE_TOTAL_TICKS = 300;        // 6 AM held for 3 s
-    private static final int JUMPSCARE_TICKS = 120;                 // 2 s
+    private static final int WIN_CHEER_DELAY_TICKS = 9 * 60;        // cheer starts 9 s after the chimes
+    private static final int WIN_CHEER_TAIL_TICKS = 210;            // the cheer is 3.4 s long
+    private static final int WIN_SEQUENCE_TOTAL_TICKS =
+        WIN_SEQUENCE_CLOCK_FLIP_TICKS + WIN_CHEER_DELAY_TICKS + WIN_CHEER_TAIL_TICKS;
     private static final int STATIC_TICKS = 120;                    // 2 s
-    private static final int DEAD_TICKS = 240;                      // 4 s
+    private static final int FALLBACK_DEAD_TICKS = 240;             // 4 s, only without the robot sound
+
+    // The desk fan sits two tiles in front of the guard, at column 11 row 15.
+    private static final int[] DESK_TILE = {11, 15};
+    private static final int DESK_FRAME_TICKS = 10;
+    private static final double DESK_HEIGHT_SCALE = 0.9;
+
+    private static final String FAN_SOUND = "11. Office ~ Fan.wav";
+    private static final String COMPUTER_ACTIVATION_SOUND = "12. Office ~ Computer Activation.wav";
+    private static final String COMPUTER_BLIP_SOUND = "13. Office ~ Computer Blip.wav";
+    private static final String CLOCK_CHIMES_SOUND = "18. Office ~ Clock Chimes.wav";
+    private static final String CHILDREN_CHEER_SOUND = "26. Children ~ Cheer.wav";
+    private static final String DEATH_SCREEN_SOUND = "61. Miscellaneous SFX ~ Robot.wav";
+    private static final String JUMPSCARE_SOUND = "AnimatronicScream.wav";
+    private static final String[] MUSIC_TRACKS = {
+        "01. Music Track ~ The Sand Temple.wav",
+        "02. Music Track ~ In the Depths.wav",
+        "03. Music Track ~ Scary Space.wav"
+    };
+
+    // The fan and the music are background noise, not the main sound of the night.
+    private static final double FAN_VOLUME = 0.35;
+    private static final double MUSIC_VOLUME = 0.22;
 
     private int currentCameraIndex = 0;
     private boolean showMinimapDebug = false;
@@ -54,13 +87,20 @@ public class Game {
     private final AudioPlayer audio = new AudioPlayer();
     private final ThreatContext threatContext = new ThreatContext();
     private final Player tabletCamera;
+    private final Random musicRandom = new Random();
+    private String currentMusicTrack = null;
 
     private GameLoop gameLoop;
     private Runnable exitToMenuAction;
-    private Phase phase = Phase.PLAYING;
+    private Runnable nextNightAction;
+    private Phase phase = Phase.NIGHT_INTRO;
     private int phaseTick = 0;
     private AnimatronicType jumpscareType = AnimatronicType.FREDDY;
+    private volatile JumpscareFrames jumpscareFrames = null;
+    private int jumpscareTickLimit = 0;
+    private int deathTickLimit = FALLBACK_DEAD_TICKS;
     private boolean nightHasFinished = false;
+    private boolean nightWasWon = false;
 
     private final GameMap gameMap;
     private final Raycaster raycaster;
@@ -70,6 +110,8 @@ public class Game {
     private final KeyboardInput keyboardInput;
     private final MouseInput mouseInput;
     private final AnimatronicManager animatronics;
+    private final Texture[] deskFrames;
+    private final Sprite deskFan;
 
     public Game() { this(1); }
 
@@ -98,7 +140,10 @@ public class Game {
         try {
             TextureSet textureSet = new TextureSet();
             renderer = new Renderer(raycaster, textureSet);
-            animatronics = new AnimatronicManager(gameMap, textureSet);
+            animatronics = new AnimatronicManager(gameMap, textureSet, audio);
+            deskFrames = textureSet.deskFrames;
+            deskFan = new Sprite((DESK_TILE[0] + 0.5) * GameMap.TILE_SIZE,
+                (DESK_TILE[1] + 0.5) * GameMap.TILE_SIZE, deskFrames[0], DESK_HEIGHT_SCALE);
         } catch (IOException exception) {
             throw new RuntimeException("Could not load a texture: " + exception.getMessage(), exception);
         }
@@ -107,13 +152,24 @@ public class Game {
     }
 
     public boolean hasWon() { return phase == Phase.WIN_SEQUENCE; }
-    public boolean hasLost() { return phase == Phase.JUMPSCARE || phase == Phase.STATIC || phase == Phase.DEAD; }
+    public boolean hasLost() {
+        if (nightWasWon) {
+            return false;
+        }
+        return phase == Phase.JUMPSCARE || phase == Phase.STATIC || phase == Phase.DEAD;
+    }
     public Phase getPhase() { return phase; }
     public AnimatronicType getJumpscareType() { return jumpscareType; }
+    public JumpscareFrames getJumpscareFrames() { return jumpscareFrames; }
 
-    /** Called when the night win screen or the death screen has finished. */
+    /** Called when the death screen has finished. */
     public void setExitToMenuAction(Runnable exitToMenuAction) {
         this.exitToMenuAction = exitToMenuAction;
+    }
+
+    /** Called when a won night has finished, so the next night can start. */
+    public void setNextNightAction(Runnable nextNightAction) {
+        this.nextNightAction = nextNightAction;
     }
 
     public void attachInput(Component screenComponent) {
@@ -163,8 +219,19 @@ public class Game {
         return hourIndex == 0 ? 12 : Math.min(hourIndex, 6);
     }
 
+    /** 0 is black, 1 is fully lit: the fade of the "NIGHT 1" card. */
+    public float getNightIntroBrightness() {
+        float fadeProgress = (float) phaseTick / NIGHT_INTRO_FADE_TICKS;
+        return Math.max(0.0f, Math.min(1.0f, fadeProgress));
+    }
+
+    public synchronized int getPhaseTick() { return phaseTick; }
+
     private synchronized void update() {
         switch (phase) {
+            case NIGHT_INTRO:
+                updateNightIntro();
+                break;
             case PLAYING:
                 updatePlaying();
                 break;
@@ -181,6 +248,30 @@ public class Game {
                 updateDead();
                 break;
         }
+    }
+
+    private void updateNightIntro() {
+        phaseTick++;
+        if (phaseTick >= NIGHT_INTRO_TOTAL_TICKS) {
+            phase = Phase.PLAYING;
+            phaseTick = 0;
+            startNightAudio();
+        }
+    }
+
+    private void startNightAudio() {
+        audio.playLooping(FAN_SOUND, FAN_VOLUME);
+        playRandomMusicTrack();
+    }
+
+    /** Picks a different track each time, so the three tracks keep the night company. */
+    private void playRandomMusicTrack() {
+        String nextTrack;
+        do {
+            nextTrack = MUSIC_TRACKS[musicRandom.nextInt(MUSIC_TRACKS.length)];
+        } while (MUSIC_TRACKS.length > 1 && nextTrack.equals(currentMusicTrack));
+        currentMusicTrack = nextTrack;
+        audio.playOnce(nextTrack, MUSIC_VOLUME);
     }
 
     private void updatePlaying() {
@@ -203,13 +294,24 @@ public class Game {
         if (!animatronics.isAnyAttacking()) {
             if (inputState.tabletTogglePressed) {
                 inputState.tabletTogglePressed = false;
-                currentView = (currentView == View.OFFICE) ? View.TABLET : View.OFFICE;
+                if (currentView == View.OFFICE) {
+                    currentView = View.TABLET;
+                    audio.stop(FAN_SOUND);
+                    audio.playOnce(COMPUTER_ACTIVATION_SOUND);
+                } else {
+                    currentView = View.OFFICE;
+                    audio.playLooping(FAN_SOUND, FAN_VOLUME);
+                }
             }
             if (currentView == View.TABLET && inputState.requestedCamera >= 0) {
-                currentCameraIndex = Math.min(inputState.requestedCamera, gameMap.cameraTiles.length - 1);
+                int requestedCameraIndex = Math.min(inputState.requestedCamera, gameMap.cameraTiles.length - 1);
                 inputState.requestedCamera = -1;
-                placeCamera(tabletCamera, gameMap.cameraTiles[currentCameraIndex],
-                    gameMap.cameraLookDirections[currentCameraIndex]);
+                if (requestedCameraIndex != currentCameraIndex) {
+                    currentCameraIndex = requestedCameraIndex;
+                    placeCamera(tabletCamera, gameMap.cameraTiles[currentCameraIndex],
+                        gameMap.cameraLookDirections[currentCameraIndex]);
+                    audio.playOnce(COMPUTER_BLIP_SOUND);
+                }
             }
             if (currentView == View.TABLET) {
                 updateCameraPan();
@@ -225,9 +327,17 @@ public class Game {
         threatContext.rightDoorClosed = inputState.rightDoorClosed;
         threatContext.tick++;
 
+        // The desk fan only turns while it is actually running.
+        int deskFrameIndex = (int) (threatContext.tick / DESK_FRAME_TICKS) % deskFrames.length;
+        deskFan.texture = deskFrames[deskFrameIndex];
+
         // The doors follow the guard's switches; Foxy sets the curtain target himself.
         gameMap.leftDoorBarrier.targetOpenAmount = inputState.leftDoorClosed ? 0.0 : 1.0;
         gameMap.rightDoorBarrier.targetOpenAmount = inputState.rightDoorClosed ? 0.0 : 1.0;
+
+        if (!audio.isPlaying(currentMusicTrack)) {
+            playRandomMusicTrack();
+        }
 
         animatronics.update(gameMap, player, threatContext);
         gameMap.updateBarriers();
@@ -239,6 +349,7 @@ public class Game {
     private void beginWinSequence() {
         phase = Phase.WIN_SEQUENCE;
         phaseTick = 0;
+        nightWasWon = true;
         audio.stopAll();
     }
 
@@ -248,40 +359,59 @@ public class Game {
         }
         phaseTick++;
         if (phaseTick == WIN_SEQUENCE_CLOCK_FLIP_TICKS) {
-            audio.playOnce("bell.wav");
-            audio.playOnce("yay.wav");
+            audio.playOnce(CLOCK_CHIMES_SOUND);
             saveManager.unlockNight(currentNightNumber + 1);
         }
+        if (phaseTick == WIN_SEQUENCE_CLOCK_FLIP_TICKS + WIN_CHEER_DELAY_TICKS) {
+            audio.playOnce(CHILDREN_CHEER_SOUND);
+        }
         if (phaseTick >= WIN_SEQUENCE_TOTAL_TICKS) {
-            finishNight();
+            phase = Phase.STATIC;
+            phaseTick = 0;
         }
     }
 
     private void beginJumpscare() {
         AnimatronicType attackerType = animatronics.getAttackerType();
         jumpscareType = (attackerType != null) ? attackerType : AnimatronicType.FREDDY;
+        jumpscareFrames = new JumpscareFrames(jumpscareType);
+        jumpscareTickLimit = jumpscareFrames.getTotalDurationInTicks();
         phase = Phase.JUMPSCARE;
         phaseTick = 0;
         audio.stopAll();
-        audio.playOnce(jumpscareType.folder() + "_jumpscare.wav");
+        audio.playOnce(JUMPSCARE_SOUND);
     }
 
     private void updateJumpscare() {
         phaseTick++;
-        if (phaseTick >= JUMPSCARE_TICKS) {
+        if (phaseTick >= jumpscareTickLimit) {
             phase = Phase.STATIC;
             phaseTick = 0;
-            audio.playOnce("static.wav");
+            audio.stop(JUMPSCARE_SOUND);
         }
     }
 
     private void updateStatic() {
         phaseTick++;
         if (phaseTick >= STATIC_TICKS) {
-            phase = Phase.DEAD;
-            phaseTick = 0;
-            audio.stop("static.wav");
+            if (nightWasWon) {
+                finishNight();
+            } else {
+                beginDeath();
+            }
         }
+    }
+
+    private void beginDeath() {
+        phase = Phase.DEAD;
+        phaseTick = 0;
+        audio.playOnce(DEATH_SCREEN_SOUND);
+        long deathScreenMillis = audio.getDurationMillis(DEATH_SCREEN_SOUND);
+        if (deathScreenMillis <= 0) {
+            deathTickLimit = FALLBACK_DEAD_TICKS;
+            return;
+        }
+        deathTickLimit = (int) Math.max(60, deathScreenMillis * 60 / 1000);
     }
 
     private void updateDead() {
@@ -289,7 +419,7 @@ public class Game {
             return;
         }
         phaseTick++;
-        if (phaseTick >= DEAD_TICKS) {
+        if (phaseTick >= deathTickLimit) {
             finishNight();
         }
     }
@@ -297,15 +427,20 @@ public class Game {
     private void finishNight() {
         nightHasFinished = true;
         stop();
-        if (exitToMenuAction != null) {
+        if (nightWasWon && nextNightAction != null) {
+            nextNightAction.run();
+        } else if (exitToMenuAction != null) {
             exitToMenuAction.run();
         }
     }
 
     public synchronized void render() {
-        if (phase == Phase.PLAYING || phase == Phase.WIN_SEQUENCE) {
-            renderer.render(getActiveCamera(), animatronics.sprites());
+        if (phase != Phase.PLAYING && phase != Phase.WIN_SEQUENCE && phase != Phase.NIGHT_INTRO) {
+            return;
         }
+        List<Sprite> sprites = new ArrayList<>(animatronics.sprites());
+        sprites.add(deskFan);
+        renderer.render(getActiveCamera(), sprites);
     }
 
     private AnimatronicType cameraAnimatronic(int cameraIndex) {

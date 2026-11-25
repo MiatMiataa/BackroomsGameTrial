@@ -1,8 +1,8 @@
 package GameTrial.view;
 
+import GameTrial.assets.JumpscareFrames;
 import GameTrial.core.Game;
 import GameTrial.debug.DebugOverlay;
-import GameTrial.entity.AnimatronicType;
 import GameTrial.render.Renderer;
 import java.awt.Color;
 import java.awt.Cursor;
@@ -17,15 +17,10 @@ import java.awt.Toolkit;
 import java.awt.event.KeyAdapter;
 import java.awt.event.KeyEvent;
 import java.awt.image.BufferedImage;
-import java.io.File;
-import java.util.EnumMap;
-import java.util.Map;
 import java.util.Random;
-import javax.imageio.ImageIO;
 import javax.swing.JPanel;
 
 public class GamePanel extends JPanel {
-    private static final String JUMPSCARE_FOLDER = "src/jumpscare/";
     private static final String[] CAMERA_NAMES = {
         "CAM 1A - Show Stage", "CAM 1B - Dining Area", "CAM 1C - Pirate Cove",
         "CAM 2A - West Hall", "CAM 2B - West Hall Corner", "CAM 3 - Supply Closet",
@@ -35,8 +30,6 @@ public class GamePanel extends JPanel {
 
     private final Game game;
     private final DebugOverlay debugOverlay;
-    private final Map<AnimatronicType, BufferedImage> jumpscareImages =
-        new EnumMap<>(AnimatronicType.class);
     private final Random staticRandom = new Random();
 
     private int framesDrawnThisSecond = 0;
@@ -46,7 +39,6 @@ public class GamePanel extends JPanel {
     public GamePanel(Game game, Runnable exitToMenu) {
         this.game = game;
         debugOverlay = new DebugOverlay(game);
-        loadJumpscareImages();
 
         setBackground(Color.BLACK);
         setFocusable(true);
@@ -181,6 +173,20 @@ public class GamePanel extends JPanel {
 
     private void drawPhaseOverlay(Graphics2D graphics, int panelWidth, int panelHeight) {
         switch (game.getPhase()) {
+            case NIGHT_INTRO: {
+                float brightness = game.getNightIntroBrightness();
+                graphics.setColor(new Color(0, 0, 0, (int) (255 * (1.0f - brightness))));
+                graphics.fillRect(0, 0, panelWidth, panelHeight);
+
+                String nightMessage = "NIGHT " + game.getCurrentNightNumber();
+                graphics.setFont(graphics.getFont().deriveFont(Font.BOLD, 72f));
+                FontMetrics nightMetrics = graphics.getFontMetrics();
+                graphics.setColor(new Color(255, 255, 255, (int) (255 * brightness)));
+                graphics.drawString(nightMessage,
+                    (panelWidth - nightMetrics.stringWidth(nightMessage)) / 2,
+                    panelHeight / 2 + nightMetrics.getAscent() / 2);
+                break;
+            }
             case PLAYING:
                 break;
             case WIN_SEQUENCE: {
@@ -198,9 +204,12 @@ public class GamePanel extends JPanel {
             case JUMPSCARE: {
                 graphics.setColor(Color.BLACK);
                 graphics.fillRect(0, 0, panelWidth, panelHeight);
-                BufferedImage jumpscareImage = jumpscareImages.get(game.getJumpscareType());
-                if (jumpscareImage != null) {
-                    drawScaledToFit(graphics, jumpscareImage, 0, 0, panelWidth, panelHeight);
+                JumpscareFrames jumpscareFrames = game.getJumpscareFrames();
+                if (jumpscareFrames != null) {
+                    BufferedImage jumpscareImage = jumpscareFrames.getFrameForTick(game.getPhaseTick());
+                    if (jumpscareImage != null) {
+                        drawScaledToFit(graphics, jumpscareImage, 0, 0, panelWidth, panelHeight);
+                    }
                 }
                 break;
             }
@@ -248,22 +257,5 @@ public class GamePanel extends JPanel {
         graphics.drawImage(image,
             boxX + (boxWidth - drawWidth) / 2, boxY + (boxHeight - drawHeight) / 2,
             drawWidth, drawHeight, null);
-    }
-
-    private void loadJumpscareImages() {
-        for (AnimatronicType type : AnimatronicType.values()) {
-            File imageFile = new File(JUMPSCARE_FOLDER + type.folder() + ".png");
-            if (!imageFile.exists()) {
-                continue;
-            }
-            try {
-                BufferedImage image = ImageIO.read(imageFile);
-                if (image != null) {
-                    jumpscareImages.put(type, image);
-                }
-            } catch (Exception exception) {
-                System.out.println("WARN: could not load " + imageFile.getPath() + ": " + exception.getMessage());
-            }
-        }
     }
 }
