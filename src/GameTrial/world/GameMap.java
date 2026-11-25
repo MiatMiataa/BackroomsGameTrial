@@ -45,6 +45,23 @@ public class GameMap {
         //   1A     1B      1C      2A      2B      3       4A        4B      5       6       7
     };
 
+    // Direction each camera looks in, in tile units. Decimals are allowed, so a
+    // camera turned off an axis is {0.5, 1} and not a rounded guess.
+    // A {0, 0} entry means "work it out from the walls around the camera tile".
+    public final double[][] cameraLookDirections = {
+            {0, 1},   // 1A - Show Stage
+            {0, 1},   // 1B - Dining Area
+            {0, -1},  // 1C - Pirate Cove (looks up at the curtain)
+            {0, 1},   // 2A - West Hall
+            {0, 1},   // 2B - West Hall Corner
+            {0, 1},   // 3 - Supply Closet
+            {0, 1},   // 4A - East Hall
+            {0, 1},   // 4B - East Hall Corner
+            {1, 0},   // 5 - Backstage
+            {1, 0},   // 6 - Kitchen
+            {-1, 0}   // 7 - Restrooms
+    };
+
     public final int[][] PirateCoveCurtain = {
         {3, 9}
     };
@@ -58,7 +75,7 @@ public class GameMap {
     public final int[] freddySpawn = {11, 1};
     public final int[] bonnieSpawn = {10, 1};
     public final int[] chicaSpawn = {12, 1};
-    public final int[] foxySpawn = {2, 9};
+    public final int[] foxySpawn = {14, 9};
 
     // Each path is {column, row} waypoints. First waypoint = spawn.
     // Last waypoint = the tile where the animatronic transitions to APPROACH.
@@ -163,9 +180,9 @@ public class GameMap {
     // Foxy: 1C -> West Hall -> 2A -> 2B -> Left Door
     // Foxy's first waypoint is Pirate Cove, and Game.cameraAnimatronic() relies on that.
     public final int[][] foxyPath = {
-        {2, 9},  // 1C - Pirate Cove
-        {3, 9},  // move right
-        {8, 9},  // move right
+        {3, 10},  // 1C - Pirate Cove
+        {4, 10},  // move right
+        {8, 10},  // move right
         {8, 14},  // move down
         {9, 14},  // move right into West Hall
         {9, 16},  // 2A - West Hall

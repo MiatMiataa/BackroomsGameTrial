@@ -1,9 +1,10 @@
 package GameTrial.debug;
 
-import GameTrial.render.Renderer;
+import GameTrial.core.Game;
+import GameTrial.entity.AnimatronicManager;
 import GameTrial.entity.Player;
 import GameTrial.entity.Sprite;
-import GameTrial.entity.AnimatronicManager;
+import GameTrial.render.Renderer;
 import GameTrial.world.GameMap;
 import GameTrial.world.SlidingBarrier;
 import java.awt.Color;
@@ -20,18 +21,22 @@ public class DebugOverlay {
     private static final Color EXIT_COLOR = Color.GREEN;
     private static final Color BACKGROUND_COLOR = new Color(0, 0, 0, 180);
     private static final Color BLOCKED_SEGMENT_COLOR = Color.RED;
+    private static final Color CAMERA_COLOR = new Color(220, 220, 220, 150);
+    private static final Color ACTIVE_CAMERA_COLOR = Color.YELLOW;
 
     private int minimapOriginX;
     private int minimapOriginY;
 
+    private final Game game;
     private final Player player;
     private final GameMap gameMap;
     private final AnimatronicManager animatronicManager;
 
-    public DebugOverlay(Player player, GameMap gameMap, AnimatronicManager animatronicManager) {
-        this.player = player;
-        this.gameMap = gameMap;
-        this.animatronicManager = animatronicManager;
+    public DebugOverlay(Game game) {
+        this.game = game;
+        this.player = game.getPlayer();
+        this.gameMap = game.getGameMap();
+        this.animatronicManager = game.getAnimatronicManager();
     }
 
     public void drawMinimapOverlay(Graphics2D graphicsContext) {
@@ -93,24 +98,62 @@ public class DebugOverlay {
             );
         }
 
-         // 3. Draws the paths with different colors
-        graphicsContext.setColor(Color.MAGENTA); // Bonnie
-        drawAnimatronicPath(graphicsContext, gameMap.bonniePath, smallestScale);
-        graphicsContext.setColor(Color.YELLOW); // Chica
-        drawAnimatronicPath(graphicsContext, gameMap.chicaPath, smallestScale);
-        graphicsContext.setColor(new Color(139, 69, 19)); // Freddy (Brown)
-        drawAnimatronicPath(graphicsContext, gameMap.freddyPath, smallestScale);
-        graphicsContext.setColor(Color.RED); // Foxy
-        drawAnimatronicPath(graphicsContext, gameMap.foxyPath, smallestScale);
+        // 3. Camera tiles: yellow for the camera on the tablet, grey for the rest
+        drawCameraTiles(graphicsContext, smallestScale);
 
-        // 4. Draw the Animatronics
+        // 4. Paths and animatronic dots are debug information, so they stay hidden
+        //    until the player presses M.
+        if (game.isShowingMinimapDebug()) {
+            drawPaths(graphicsContext, smallestScale);
+            drawAnimatronics(graphicsContext, smallestScale);
+        }
+
+        // 5. Draw the Player
+        int playerColumn = (int) Math.floor(player.positionX / GameMap.TILE_SIZE);
+        int playerRow = (int) Math.floor(player.positionY / GameMap.TILE_SIZE);
+
+        int playerPixelX = minimapOriginX + (int) ((playerColumn + 0.5) * smallestScale);
+        int playerPixelY = minimapOriginY + (int) ((playerRow + 0.5) * smallestScale);
+
+        graphicsContext.setColor(Color.CYAN);
+        graphicsContext.fillOval(playerPixelX - 4, playerPixelY - 4, 8, 8);
+    }
+
+    private void drawCameraTiles(Graphics2D graphicsContext, double tileScale) {
+        for (int cameraIndex = 0; cameraIndex < gameMap.cameraTiles.length; cameraIndex++) {
+            int[] cameraTile = gameMap.cameraTiles[cameraIndex];
+            boolean isCameraOnScreen = game.isTablet() && game.getCurrentCameraIndex() == cameraIndex;
+
+            graphicsContext.setColor(isCameraOnScreen ? ACTIVE_CAMERA_COLOR : CAMERA_COLOR);
+            graphicsContext.fillRect(
+                minimapOriginX + (int) (cameraTile[0] * tileScale),
+                minimapOriginY + (int) (cameraTile[1] * tileScale),
+                (int) Math.ceil(tileScale),
+                (int) Math.ceil(tileScale)
+            );
+        }
+    }
+
+    private void drawPaths(Graphics2D graphicsContext, double tileScale) {
+        // Draws the paths with different colors
+        graphicsContext.setColor(Color.MAGENTA); // Bonnie
+        drawAnimatronicPath(graphicsContext, gameMap.bonniePath, tileScale);
+        graphicsContext.setColor(Color.YELLOW); // Chica
+        drawAnimatronicPath(graphicsContext, gameMap.chicaPath, tileScale);
+        graphicsContext.setColor(new Color(139, 69, 19)); // Freddy (Brown)
+        drawAnimatronicPath(graphicsContext, gameMap.freddyPath, tileScale);
+        graphicsContext.setColor(Color.RED); // Foxy
+        drawAnimatronicPath(graphicsContext, gameMap.foxyPath, tileScale);
+    }
+
+    private void drawAnimatronics(Graphics2D graphicsContext, double tileScale) {
         List<Sprite> animatronicSprites = animatronicManager.sprites();
         for (Sprite animatronicSprite : animatronicSprites) {
             int animatronicColumn = (int) Math.floor(animatronicSprite.positionX / GameMap.TILE_SIZE);
             int animatronicRow = (int) Math.floor(animatronicSprite.positionY / GameMap.TILE_SIZE);
 
-            int animatronicPixelX = minimapOriginX + (int) ((animatronicColumn + 0.5) * smallestScale);
-            int animatronicPixelY = minimapOriginY + (int) ((animatronicRow + 0.5) * smallestScale);
+            int animatronicPixelX = minimapOriginX + (int) ((animatronicColumn + 0.5) * tileScale);
+            int animatronicPixelY = minimapOriginY + (int) ((animatronicRow + 0.5) * tileScale);
 
             // Match the class name to give each animatronic a specific color
             String animatronicClassName = animatronicSprite.getClass().getSimpleName();
@@ -128,16 +171,6 @@ public class DebugOverlay {
 
             graphicsContext.fillOval(animatronicPixelX - 4, animatronicPixelY - 4, 8, 8);
         }
-
-        // 5. Draw the Player
-        int playerColumn = (int) Math.floor(player.positionX / GameMap.TILE_SIZE);
-        int playerRow = (int) Math.floor(player.positionY / GameMap.TILE_SIZE);
-
-        int playerPixelX = minimapOriginX + (int) ((playerColumn + 0.5) * smallestScale);
-        int playerPixelY = minimapOriginY + (int) ((playerRow + 0.5) * smallestScale);
-
-        graphicsContext.setColor(Color.CYAN);
-        graphicsContext.fillOval(playerPixelX - 4, playerPixelY - 4, 8, 8);
     }
 
     private void drawAnimatronicPath(Graphics2D graphicsContext, int[][] pathWaypoints, double tileScale) {
