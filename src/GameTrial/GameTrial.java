@@ -1,6 +1,7 @@
 package GameTrial;
 
 import GameTrial.core.Game;
+import GameTrial.core.NightConfig;
 import GameTrial.core.SaveManager;
 import GameTrial.view.GamePanel;
 import GameTrial.view.MainMenuPanel;
@@ -42,8 +43,17 @@ public class GameTrial {
             game.stop();
             showMainMenu();
         };
+        Runnable nextNight = () -> {
+            game.stop();
+            if (nightNumber < NightConfig.nightCount()) {
+                startNight(nightNumber + 1);
+            } else {
+                showMainMenu();
+            }
+        };
         GamePanel gamePanel = new GamePanel(game, exitToMenu);
         game.setExitToMenuAction(exitToMenu);
+        game.setNextNightAction(nextNight);
 
         gameWindow.setContentPane(gamePanel);
         gameWindow.revalidate();
