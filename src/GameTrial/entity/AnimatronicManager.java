@@ -16,7 +16,9 @@ public class AnimatronicManager {
     private final BonnieAndChica chica;
     private final Freddy freddy;
     private final Foxy foxy;
+    private final GoldenFreddy goldenFreddy;
     private Animatronic attacker;
+    private AnimatronicType attackerType;
     private boolean hasLost;
 
     public AnimatronicManager(GameMap gameMap, TextureSet textures) {
@@ -29,7 +31,9 @@ public class AnimatronicManager {
         animatronics.add(chica);
         animatronics.add(freddy);
         animatronics.add(foxy);
-        animatronics.add(new GoldenFreddy(new int[][]{{8, 22}}, textures.of(AnimatronicType.GOLDEN_FREDDY)));
+        // He never walks, so his only waypoint is the CAM 2B poster he spawns at.
+        goldenFreddy = new GoldenFreddy(new int[][]{{9, 17}}, textures.of(AnimatronicType.GOLDEN_FREDDY));
+        animatronics.add(goldenFreddy);
     }
 
     public void setAILevels(int freddyLevel, int bonnieLevel, int chicaLevel, int foxyLevel) {
@@ -50,9 +54,34 @@ public class AnimatronicManager {
             animatronic.tick(gameMap, player, threatContext);
             if (animatronic.isAttacking()) {
                 attacker = animatronic;
+                attackerType = typeOf(animatronic);
                 break;
             }
         }
+    }
+
+    /** Which animatronic is killing the guard, so the jumpscare can match it. */
+    public AnimatronicType getAttackerType() {
+        return attackerType;
+    }
+
+    private AnimatronicType typeOf(Animatronic animatronic) {
+        if (animatronic == bonnie) {
+            return AnimatronicType.BONNIE;
+        }
+        if (animatronic == chica) {
+            return AnimatronicType.CHICA;
+        }
+        if (animatronic == freddy) {
+            return AnimatronicType.FREDDY;
+        }
+        if (animatronic == foxy) {
+            return AnimatronicType.FOXY;
+        }
+        if (animatronic == goldenFreddy) {
+            return AnimatronicType.GOLDEN_FREDDY;
+        }
+        return null;
     }
 
     public List<Sprite> sprites() {

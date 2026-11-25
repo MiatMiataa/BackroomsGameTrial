@@ -11,6 +11,7 @@ public class KeyboardInput extends KeyAdapter implements FocusListener {
     private boolean isTurningLeft, isTurningRight;
     private boolean isSpaceDown;
     private boolean wasLeftDoorDown, wasRightDoorDown;
+    private boolean wasMinimapToggleDown;
 
     public KeyboardInput(InputState inputState) {
         this.inputState = inputState;
@@ -43,6 +44,13 @@ public class KeyboardInput extends KeyAdapter implements FocusListener {
             inputState.rightDoorClosed = !inputState.rightDoorClosed;
         }
         wasRightDoorDown = isDown;
+    }
+
+    if (keyCode == KeyEvent.VK_M) {
+        if (isDown && !wasMinimapToggleDown) {
+            inputState.toggleMinimapDebug = true;
+        }
+        wasMinimapToggleDown = isDown;
     }
 
     if (isDown) {
@@ -84,6 +92,7 @@ public class KeyboardInput extends KeyAdapter implements FocusListener {
         isSpaceDown = false;
         wasLeftDoorDown = false;
         wasRightDoorDown = false;
+        wasMinimapToggleDown = false;
         inputState.leftDoorClosed = false;
         inputState.rightDoorClosed = false;
         inputState.turn = 0;
