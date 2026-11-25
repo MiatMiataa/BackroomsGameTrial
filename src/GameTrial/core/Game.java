@@ -1,6 +1,7 @@
 package GameTrial.core;
 
 import GameTrial.assets.TextureSet;
+import GameTrial.audio.AudioPlayer;
 import GameTrial.entity.AnimatronicManager;
 import GameTrial.entity.AnimatronicType;
 import GameTrial.entity.Player;
@@ -16,16 +17,8 @@ import java.awt.image.BufferedImage;
 import java.io.IOException;
 
 public class Game {
-    private final GameMap gameMap;
-    private final Raycaster raycaster;
-    private final Player player;
-    private final Renderer renderer;
-    private final InputState inputState;
-    private final KeyboardInput keyboardInput;
-    private final MouseInput mouseInput;
-    private final AnimatronicManager animatronics;
-    private final ThreatContext threatContext = new ThreatContext();
-    private final Player tabletCamera;
+    // PLAYING is the night itself; the other phases are the win and death screens.
+    public enum Phase { PLAYING, WIN_SEQUENCE, JUMPSCARE, STATIC, DEAD }
 
     // FNAF 1 feeds sway side to side: 25 degrees each way (50 total) over 2 seconds.
     private static final double CAMERA_PAN_RADIANS = Math.toRadians(25);
@@ -34,9 +27,15 @@ public class Game {
     private double cameraBaseDirectionY = -1;
     private int cameraPanTick = 0;
 
+    // 60 ticks per second.
+    private static final int WIN_SEQUENCE_CLOCK_FLIP_TICKS = 120;   // 5 AM held for 2 s
+    private static final int WIN_SEQUENCE_TOTAL_TICKS = 300;        // 6 AM held for 3 s
+    private static final int JUMPSCARE_TICKS = 120;                 // 2 s
+    private static final int STATIC_TICKS = 120;                    // 2 s
+    private static final int DEAD_TICKS = 240;                      // 4 s
+
     private int currentCameraIndex = 0;
-    private volatile boolean hasWon = false;
-    private volatile boolean hasLost = false;
+    private boolean showMinimapDebug = false;
 
     private enum View { OFFICE, TABLET }
     private View currentView = View.OFFICE;
@@ -50,6 +49,27 @@ public class Game {
     private int chicaAILevel;
     private int foxyAILevel;
     private int lastHourIndex = 0;
+
+    private final SaveManager saveManager = new SaveManager();
+    private final AudioPlayer audio = new AudioPlayer();
+    private final ThreatContext threatContext = new ThreatContext();
+    private final Player tabletCamera;
+
+    private GameLoop gameLoop;
+    private Runnable exitToMenuAction;
+    private Phase phase = Phase.PLAYING;
+    private int phaseTick = 0;
+    private AnimatronicType jumpscareType = AnimatronicType.FREDDY;
+    private boolean nightHasFinished = false;
+
+    private final GameMap gameMap;
+    private final Raycaster raycaster;
+    private final Player player;
+    private final Renderer renderer;
+    private final InputState inputState;
+    private final KeyboardInput keyboardInput;
+    private final MouseInput mouseInput;
+    private final AnimatronicManager animatronics;
 
     public Game() { this(1); }
 
@@ -69,7 +89,7 @@ public class Game {
         player.faceTowards(player.positionX, player.positionY - GameMap.TILE_SIZE);
 
         tabletCamera = new Player();
-        placeCamera(tabletCamera, gameMap.cameraTiles[0]);
+        placeCamera(tabletCamera, gameMap.cameraTiles[0], gameMap.cameraLookDirections[0]);
 
         inputState = new InputState();
         keyboardInput = new KeyboardInput(inputState);
@@ -86,8 +106,15 @@ public class Game {
         animatronics.setAILevels(freddyAILevel, bonnieAILevel, chicaAILevel, foxyAILevel);
     }
 
-    public boolean hasWon() { return hasWon; }
-    public boolean hasLost() { return hasLost; }
+    public boolean hasWon() { return phase == Phase.WIN_SEQUENCE; }
+    public boolean hasLost() { return phase == Phase.JUMPSCARE || phase == Phase.STATIC || phase == Phase.DEAD; }
+    public Phase getPhase() { return phase; }
+    public AnimatronicType getJumpscareType() { return jumpscareType; }
+
+    /** Called when the night win screen or the death screen has finished. */
+    public void setExitToMenuAction(Runnable exitToMenuAction) {
+        this.exitToMenuAction = exitToMenuAction;
+    }
 
     public void attachInput(Component screenComponent) {
         screenComponent.addKeyListener(keyboardInput);
@@ -98,8 +125,16 @@ public class Game {
     }
 
     public void start(Runnable repaintAction) {
-        GameLoop gameLoop = new GameLoop(() -> { update(); repaintAction.run(); });
+        gameLoop = new GameLoop(() -> { update(); repaintAction.run(); });
         gameLoop.start();
+    }
+
+    /** Stops the night. Called when the player goes back to the menu. */
+    public void stop() {
+        if (gameLoop != null) {
+            gameLoop.stop();
+        }
+        audio.close();
     }
 
     private void applyHourlyAIGains(int hourIndex) {
@@ -121,16 +156,42 @@ public class Game {
     public int getCurrentNightNumber() { return currentNightNumber; }
 
     public int getDisplayedClockHour() {
+        if (phase == Phase.WIN_SEQUENCE) {
+            return phaseTick < WIN_SEQUENCE_CLOCK_FLIP_TICKS ? 5 : 6;
+        }
         int hourIndex = (int) (threatContext.tick / TICKS_PER_HOUR);
-        return hourIndex == 0 ? 12 : hourIndex;
+        return hourIndex == 0 ? 12 : Math.min(hourIndex, 6);
     }
 
     private synchronized void update() {
-        if (hasLost || hasWon) return;
+        switch (phase) {
+            case PLAYING:
+                updatePlaying();
+                break;
+            case WIN_SEQUENCE:
+                updateWinSequence();
+                break;
+            case JUMPSCARE:
+                updateJumpscare();
+                break;
+            case STATIC:
+                updateStatic();
+                break;
+            case DEAD:
+                updateDead();
+                break;
+        }
+    }
 
-        if (threatContext.tick >= TICKS_PER_NIGHT) {
-            hasWon = true;
+    private void updatePlaying() {
+        if (threatContext.tick >= TICKS_PER_NIGHT - 1) {
+            beginWinSequence();
             return;
+        }
+
+        if (inputState.toggleMinimapDebug) {
+            inputState.toggleMinimapDebug = false;
+            showMinimapDebug = !showMinimapDebug;
         }
 
         int currentHourIndex = (int) (threatContext.tick / TICKS_PER_HOUR);
@@ -147,7 +208,8 @@ public class Game {
             if (currentView == View.TABLET && inputState.requestedCamera >= 0) {
                 currentCameraIndex = Math.min(inputState.requestedCamera, gameMap.cameraTiles.length - 1);
                 inputState.requestedCamera = -1;
-                placeCamera(tabletCamera, gameMap.cameraTiles[currentCameraIndex]);
+                placeCamera(tabletCamera, gameMap.cameraTiles[currentCameraIndex],
+                    gameMap.cameraLookDirections[currentCameraIndex]);
             }
             if (currentView == View.TABLET) {
                 updateCameraPan();
@@ -170,21 +232,88 @@ public class Game {
         animatronics.update(gameMap, player, threatContext);
         gameMap.updateBarriers();
         if (animatronics.hasLost()) {
-            hasLost = true;
+            beginJumpscare();
+        }
+    }
+
+    private void beginWinSequence() {
+        phase = Phase.WIN_SEQUENCE;
+        phaseTick = 0;
+        audio.stopAll();
+    }
+
+    private void updateWinSequence() {
+        if (nightHasFinished) {
+            return;
+        }
+        phaseTick++;
+        if (phaseTick == WIN_SEQUENCE_CLOCK_FLIP_TICKS) {
+            audio.playOnce("bell.wav");
+            audio.playOnce("yay.wav");
+            saveManager.unlockNight(currentNightNumber + 1);
+        }
+        if (phaseTick >= WIN_SEQUENCE_TOTAL_TICKS) {
+            finishNight();
+        }
+    }
+
+    private void beginJumpscare() {
+        AnimatronicType attackerType = animatronics.getAttackerType();
+        jumpscareType = (attackerType != null) ? attackerType : AnimatronicType.FREDDY;
+        phase = Phase.JUMPSCARE;
+        phaseTick = 0;
+        audio.stopAll();
+        audio.playOnce(jumpscareType.folder() + "_jumpscare.wav");
+    }
+
+    private void updateJumpscare() {
+        phaseTick++;
+        if (phaseTick >= JUMPSCARE_TICKS) {
+            phase = Phase.STATIC;
+            phaseTick = 0;
+            audio.playOnce("static.wav");
+        }
+    }
+
+    private void updateStatic() {
+        phaseTick++;
+        if (phaseTick >= STATIC_TICKS) {
+            phase = Phase.DEAD;
+            phaseTick = 0;
+            audio.stop("static.wav");
+        }
+    }
+
+    private void updateDead() {
+        if (nightHasFinished) {
+            return;
+        }
+        phaseTick++;
+        if (phaseTick >= DEAD_TICKS) {
+            finishNight();
+        }
+    }
+
+    private void finishNight() {
+        nightHasFinished = true;
+        stop();
+        if (exitToMenuAction != null) {
+            exitToMenuAction.run();
         }
     }
 
     public synchronized void render() {
-        renderer.render(getActiveCamera(), animatronics.sprites());
+        if (phase == Phase.PLAYING || phase == Phase.WIN_SEQUENCE) {
+            renderer.render(getActiveCamera(), animatronics.sprites());
+        }
     }
 
     private AnimatronicType cameraAnimatronic(int cameraIndex) {
-        int[] tile = gameMap.cameraTiles[cameraIndex];
-        int[] cove = gameMap.foxyPath[0];
-        if (tile[0] == cove[0] && tile[1] == cove[1]) {
-            return AnimatronicType.FOXY;
-        }
-        return null;
+        int[] cameraTile = gameMap.cameraTiles[cameraIndex];
+        int[] curtainTile = gameMap.PirateCoveCurtain[0];
+        boolean looksAtPirateCove = cameraTile[0] == curtainTile[0]
+            && cameraTile[1] == curtainTile[1] + 1;
+        return looksAtPirateCove ? AnimatronicType.FOXY : null;
     }
 
     private void updateCameraPan() {
@@ -200,20 +329,28 @@ public class Game {
             tabletCamera.positionY + panDirectionY * GameMap.TILE_SIZE);
     }
 
-    private void placeCamera(Player camera, int[] tile) {
+    private void placeCamera(Player camera, int[] tile, double[] lookDirection) {
         int column = tile[0];
         int row = tile[1];
-        // Walls around the camera tile guess the look direction; decimals are fine once the per-camera list exists.
-        double lookX = (gameMap.getTile(column - 1, row) == 1 ? 1 : 0) - (gameMap.getTile(column + 1, row) == 1 ? 1 : 0);
-        double lookY = (gameMap.getTile(column, row - 1) == 1 ? 1 : 0) - (gameMap.getTile(column, row + 1) == 1 ? 1 : 0);
-        if (lookX == 0 && lookY == 0) lookY = -1;
-
+        double lookX = lookDirection[0];
+        double lookY = lookDirection[1];
         double lookLength = Math.hypot(lookX, lookY);
+
+        // No direction given for this camera: fall back to the walls around its tile.
+        if (lookLength < 1e-6) {
+            lookX = (gameMap.getTile(column - 1, row) == 1 ? 1 : 0) - (gameMap.getTile(column + 1, row) == 1 ? 1 : 0);
+            lookY = (gameMap.getTile(column, row - 1) == 1 ? 1 : 0) - (gameMap.getTile(column, row + 1) == 1 ? 1 : 0);
+            if (lookX == 0 && lookY == 0) {
+                lookY = -1;
+            }
+            lookLength = Math.hypot(lookX, lookY);
+        }
+
         double wallOffsetInTiles = 0.25;
         camera.positionX = (column + 0.5 - lookX / lookLength * wallOffsetInTiles) * GameMap.TILE_SIZE;
         camera.positionY = (row + 0.5 - lookY / lookLength * wallOffsetInTiles) * GameMap.TILE_SIZE;
         camera.faceTowards(camera.positionX + lookX * GameMap.TILE_SIZE, camera.positionY + lookY * GameMap.TILE_SIZE);
-        camera.setMaxYawRadians(Math.toRadians((lookX != 0 && lookY != 0) ? 45 : 90));
+        camera.setMaxYawRadians(Math.toRadians(90));
 
         cameraBaseDirectionX = lookX / lookLength;
         cameraBaseDirectionY = lookY / lookLength;
@@ -225,6 +362,7 @@ public class Game {
     }
 
     public boolean isTablet() { return currentView == View.TABLET; }
+    public boolean isShowingMinimapDebug() { return showMinimapDebug; }
     public int getCurrentCameraIndex() { return currentCameraIndex; }
     public boolean isLeftDoorClosed() { return inputState.leftDoorClosed; }
     public boolean isRightDoorClosed() { return inputState.rightDoorClosed; }
