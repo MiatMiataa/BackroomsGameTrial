@@ -1,15 +1,15 @@
-package GameTrial;
+package fnaf;
 
-import GameTrial.core.Game;
-import GameTrial.core.NightConfig;
-import GameTrial.core.SaveManager;
-import GameTrial.view.GamePanel;
-import GameTrial.view.MainMenuPanel;
+import fnaf.game.Game;
+import fnaf.game.NightSettings;
+import fnaf.game.SaveManager;
+import fnaf.ui.GamePanel;
+import fnaf.ui.MainMenuPanel;
 import java.awt.GraphicsEnvironment;
 import java.awt.Rectangle;
 import javax.swing.JFrame;
 
-public class GameTrial {
+public class Main {
     private static final SaveManager SAVE_MANAGER = new SaveManager();
 
     private static JFrame gameWindow;
@@ -45,7 +45,7 @@ public class GameTrial {
         };
         Runnable nextNight = () -> {
             game.stop();
-            if (nightNumber < NightConfig.nightCount()) {
+            if (nightNumber < NightSettings.nightCount()) {
                 startNight(nightNumber + 1);
             } else {
                 showMainMenu();

@@ -1,9 +1,9 @@
-package GameTrial.view;
+package fnaf.ui;
 
-import GameTrial.assets.JumpscareFrames;
-import GameTrial.core.Game;
-import GameTrial.debug.DebugOverlay;
-import GameTrial.render.Renderer;
+import fnaf.assets.JumpscareAnimation;
+import fnaf.game.Game;
+import fnaf.debug.DebugOverlay;
+import fnaf.render.Renderer;
 import java.awt.Color;
 import java.awt.Cursor;
 import java.awt.Font;
@@ -45,9 +45,9 @@ public class GamePanel extends JPanel {
         requestFocus();
 
         // Hide the mouse cursor
-        BufferedImage blankCursorImg = new BufferedImage(16, 16, BufferedImage.TYPE_INT_ARGB);
+        BufferedImage blankCursorImage = new BufferedImage(16, 16, BufferedImage.TYPE_INT_ARGB);
         Cursor blankCursor = Toolkit.getDefaultToolkit().createCustomCursor(
-            blankCursorImg, new Point(0, 0), "blank cursor");
+            blankCursorImage, new Point(0, 0), "blank cursor");
         setCursor(blankCursor);
 
         addKeyListener(new KeyAdapter() {
@@ -105,7 +105,7 @@ public class GamePanel extends JPanel {
         int centerY = letterboxOffsetY + scaledImageHeight / 2;
 
         float radius = scaledImageWidth * 1.2f;
-        float[] dist = new float[] {0.0f, 0.5f, 1.0f};
+        float[] colorStops = new float[] {0.0f, 0.5f, 1.0f};
         Color[] colors = new Color[] {
             new Color(0, 0, 0, 60),
             new Color(0, 0, 0, 120),
@@ -113,7 +113,7 @@ public class GamePanel extends JPanel {
         };
 
         RadialGradientPaint paint = new RadialGradientPaint(
-            new Point(centerX, centerY), radius, dist, colors);
+            new Point(centerX, centerY), radius, colorStops, colors);
 
         lightLayer.setPaint(paint);
         lightLayer.fillRect(letterboxOffsetX, letterboxOffsetY, scaledImageWidth, scaledImageHeight);
@@ -127,7 +127,7 @@ public class GamePanel extends JPanel {
         hudGraphics.translate(letterboxOffsetX, letterboxOffsetY);
         hudGraphics.scale(hudScale, hudScale);
 
-        debugOverlay.drawMinimapOverlay(hudGraphics);
+        debugOverlay.drawMinimap(hudGraphics);
 
         framesDrawnThisSecond++;
         long now = System.nanoTime();
@@ -149,10 +149,10 @@ public class GamePanel extends JPanel {
             (Renderer.RENDER_WIDTH - clockMetrics.stringWidth(clockText)) / 2, 40);
 
         // FNAF HUD (Camera Name, Doors, Flashlight)
-        if (game.isTablet()) {
+        if (game.isTabletUp()) {
             hudGraphics.setColor(Color.WHITE);
             hudGraphics.setFont(new Font("Monospaced", Font.BOLD, 24));
-            hudGraphics.drawString(CAMERA_NAMES[game.getCurrentCameraIndex()],
+            hudGraphics.drawString(CAMERA_NAMES[game.getCameraIndex()],
                 20, Renderer.RENDER_HEIGHT - 20);
         } else {
             int barWidth = 12;
@@ -204,9 +204,9 @@ public class GamePanel extends JPanel {
             case JUMPSCARE: {
                 graphics.setColor(Color.BLACK);
                 graphics.fillRect(0, 0, panelWidth, panelHeight);
-                JumpscareFrames jumpscareFrames = game.getJumpscareFrames();
-                if (jumpscareFrames != null) {
-                    BufferedImage jumpscareImage = jumpscareFrames.getFrameForTick(game.getPhaseTick());
+                JumpscareAnimation jumpscareAnimation = game.getJumpscareAnimation();
+                if (jumpscareAnimation != null) {
+                    BufferedImage jumpscareImage = jumpscareAnimation.getFrameForTick(game.getPhaseTick());
                     if (jumpscareImage != null) {
                         drawScaledToFit(graphics, jumpscareImage, 0, 0, panelWidth, panelHeight);
                     }

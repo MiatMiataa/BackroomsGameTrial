@@ -1,4 +1,4 @@
-package GameTrial.view;
+package fnaf.ui;
 
 import java.awt.Color;
 import java.awt.Font;

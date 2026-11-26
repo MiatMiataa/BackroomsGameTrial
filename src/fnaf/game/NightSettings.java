@@ -1,7 +1,7 @@
-package GameTrial.core;
+package fnaf.game;
 
-public final class NightConfig {
-    private NightConfig() {}
+public final class NightSettings {
+    private NightSettings() {}
 
     // Index = night number (1-5). Columns = Freddy, Bonnie, Chica, Foxy AI level at 12 AM.
     private static final int[][] STARTING_AI_LEVEL = {

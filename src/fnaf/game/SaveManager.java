@@ -1,4 +1,4 @@
-package GameTrial.core;
+package fnaf.game;
 
 import java.io.File;
 import java.io.FileInputStream;

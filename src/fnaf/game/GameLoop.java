@@ -1,9 +1,9 @@
-package GameTrial.core;
+package fnaf.game;
 
 public class GameLoop implements Runnable {
     private static final int MAX_CATCH_UP_TICKS = 5;
 
-    private final int FPS = 60;
+    private static final int TICKS_PER_SECOND = 60;
 
     private final Runnable tickAction;
     private Thread gameThread;
@@ -26,23 +26,23 @@ public class GameLoop implements Runnable {
 
     @Override
     public void run() {
-        double nanosecondsPerFrame = 1000000000.0 / FPS;
-        double frameTimeAccumulator = 0;
-        long lastFrameTimestamp = System.nanoTime();
-        long currentFrameTimestamp;
+        double nanosecondsPerTick = 1000000000.0 / TICKS_PER_SECOND;
+        double tickTimeAccumulator = 0;
+        long lastTickTimestamp = System.nanoTime();
+        long currentTickTimestamp;
 
         while (isRunning) {
-            currentFrameTimestamp = System.nanoTime();
-            frameTimeAccumulator += (currentFrameTimestamp - lastFrameTimestamp) / nanosecondsPerFrame;
-            lastFrameTimestamp = currentFrameTimestamp;
+            currentTickTimestamp = System.nanoTime();
+            tickTimeAccumulator += (currentTickTimestamp - lastTickTimestamp) / nanosecondsPerTick;
+            lastTickTimestamp = currentTickTimestamp;
 
-            if (frameTimeAccumulator > MAX_CATCH_UP_TICKS) {
-                frameTimeAccumulator = MAX_CATCH_UP_TICKS;
+            if (tickTimeAccumulator > MAX_CATCH_UP_TICKS) {
+                tickTimeAccumulator = MAX_CATCH_UP_TICKS;
             }
             
-            if (frameTimeAccumulator >= 1) {
+            if (tickTimeAccumulator >= 1) {
                 tickAction.run();
-                frameTimeAccumulator--;
+                tickTimeAccumulator--;
             } else {
                 try {
                     Thread.sleep(1);
