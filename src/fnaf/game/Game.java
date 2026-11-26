@@ -57,7 +57,7 @@ public class Game {
     private static final String CHILDREN_CHEER_SOUND = "26. Children ~ Cheer.wav";
     private static final String DEATH_SCREEN_SOUND = "61. Miscellaneous SFX ~ Robot.wav";
     private static final String JUMPSCARE_SOUND = "AnimatronicScream.wav";
-    private static final String STATIC_SOUND = "Static.wav";
+    private static final String STATIC_SOUND = "static.wav";
     private static final String DOOR_SOUND = "SFXBible_12478.wav";
     private static final String[] MUSIC_TRACKS = {
         "01. Music Track ~ The Sand Temple.wav",
@@ -423,7 +423,7 @@ public class Game {
 
         if (phaseTick >= STATIC_TICKS) {
             audio.stop(STATIC_SOUND);
-            
+
             if (nightWon) {
                 finishNight();
             } else {
