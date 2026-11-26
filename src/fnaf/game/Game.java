@@ -28,8 +28,8 @@ public class Game {
     public enum Phase { NIGHT_INTRO, PLAYING, WIN_SEQUENCE, JUMPSCARE, STATIC, DEAD }
 
     // FNAF 1 feeds sway side to side: 25 degrees each way (50 total) over 2 seconds.
-    private static final double CAMERA_PAN_RADIANS = Math.toRadians(25);
-    private static final int CAMERA_PAN_HALF_TICKS = 60;
+    private static final double CAMERA_PAN_RADIANS = Math.toRadians(12.5); 
+    private static final int CAMERA_PAN_HALF_TICKS = 180;
     private double cameraBaseDirectionX = 0;
     private double cameraBaseDirectionY = -1;
     private int cameraPanTick = 0;
@@ -45,7 +45,7 @@ public class Game {
     private static final int STATIC_TICKS = 120;                    // 2 s
     private static final int FALLBACK_DEAD_TICKS = 240;             // 4 s, only without the robot sound
 
-    // The desk fan sits two tiles in front of the guard, at column 11 row 15.
+    // The desk fan two tiles in front of the guard, at column 11 row 15 {11,15}.
     private static final int[] DESK_TILE = {11, 15};
     private static final int DESK_FRAME_TICKS = 10;
     private static final double DESK_HEIGHT_SCALE = 0.9;
@@ -179,13 +179,16 @@ public class Game {
         screenComponent.addMouseMotionListener(mouseInput);
         screenComponent.addFocusListener(mouseInput);
     }
-
+    
     public void start(Runnable repaintAction) {
-        gameLoop = new GameLoop(() -> { update(); repaintAction.run(); });
+        gameLoop = new GameLoop(() -> {
+            update();
+            repaintAction.run();
+        });
         gameLoop.start();
     }
 
-    /** Stops the night. Called when the player goes back to the menu. */
+    // Stops the night. Called when the player goes back to the menu.
     public void stop() {
         if (gameLoop != null) {
             gameLoop.stop();

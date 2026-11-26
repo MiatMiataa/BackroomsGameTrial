@@ -7,8 +7,8 @@ import fnaf.entity.Player;
 import java.awt.image.BufferedImage;
 
 public class Renderer {
-    public static final int RENDER_WIDTH = 960;
-    public static final int RENDER_HEIGHT = 540;
+    public static final int RENDER_WIDTH = 480;
+    public static final int RENDER_HEIGHT = 270;
     
     private final ScreenBuffer screenBuffer = new ScreenBuffer(RENDER_WIDTH, RENDER_HEIGHT);
     private final FloorAndCeilingRenderer floorAndCeilingRenderer;

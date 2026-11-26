@@ -49,9 +49,9 @@ public class GameMap {
     // camera turned off an axis is {0.5, 1} and not a rounded guess.
     // A {0, 0} entry means "work it out from the walls around the camera tile".
     public final double[][] cameraLookDirections = {
-            {0, 1},   // 1A - Show Stage
+            {5, -1},   // 1A - Show Stage
             {0, 1},   // 1B - Dining Area
-            {0, -1},  // 1C - Pirate Cove (looks up at the curtain)
+            {-1, 0},  // 1C - Pirate Cove (looks up at the curtain)
             {0, 1},   // 2A - West Hall
             {0, 1},   // 2B - West Hall Corner
             {0, 1},   // 3 - Supply Closet
@@ -63,7 +63,7 @@ public class GameMap {
     };
 
     public final int[][] pirateCoveCurtainTile = {
-        {3, 9}
+        {3, 10}
     };
 
     // Doors and curtain. They are not tiles: entity movement keeps using tileGrid,
@@ -180,9 +180,10 @@ public class GameMap {
     // Foxy: 1C -> West Hall -> 2A -> 2B -> Left Door
     // Foxy's first waypoint is Pirate Cove, and Game.animatronicOnCamera() relies on that.
     public final int[][] foxyPath = {
-        {3, 10},  // 1C - Pirate Cove
-        {4, 10},  // move right
-        {8, 10},  // move right
+        {2, 9},  // 1C - Pirate Cove
+        {3, 9},  // move right, peeking behind the curtain
+        {4, 9},  // move right about to move
+        {8, 9},  // move right to position
         {8, 14},  // move down
         {9, 14},  // move right into West Hall
         {9, 16},  // 2A - West Hall

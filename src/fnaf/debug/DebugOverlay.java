@@ -12,9 +12,9 @@ import java.awt.Graphics2D;
 import java.util.List;
 
 public class DebugOverlay {
-    private static final int MINIMAP_BOX_WIDTH = 300;
-    private static final int MINIMAP_BOX_HEIGHT = 200;
-    private static final int MINIMAP_PADDING = 10;
+    private static final int MINIMAP_BOX_WIDTH = 150;
+    private static final int MINIMAP_BOX_HEIGHT = 100;
+    private static final int MINIMAP_PADDING = 5;
 
     private static final Color WALL_COLOR = Color.DARK_GRAY;
     private static final Color FLOOR_COLOR = Color.LIGHT_GRAY;
@@ -116,7 +116,7 @@ public class DebugOverlay {
         int playerPixelY = minimapOriginY + (int) ((playerRow + 0.5) * tileScale);
 
         graphics.setColor(Color.CYAN);
-        graphics.fillOval(playerPixelX - 4, playerPixelY - 4, 8, 8);
+        graphics.fillOval(playerPixelX - 2, playerPixelY - 4, 4, 4);
     }
 
     private void drawCameraTiles(Graphics2D graphics, double tileScale) {

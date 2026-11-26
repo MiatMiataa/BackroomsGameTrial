@@ -35,6 +35,7 @@ public class GamePanel extends JPanel {
     private int framesDrawnThisSecond = 0;
     private int displayedFps = 0;
     private long lastFpsUpdateTimestamp = System.nanoTime();
+    private long lastRenderTimingPrint = System.nanoTime();
 
     public GamePanel(Game game, Runnable exitToMenu) {
         this.game = game;
@@ -71,6 +72,7 @@ public class GamePanel extends JPanel {
         graphics.setRenderingHint(RenderingHints.KEY_INTERPOLATION, RenderingHints.VALUE_INTERPOLATION_NEAREST_NEIGHBOR);
 
         game.render();
+
         BufferedImage renderedImage = game.getRenderedImage();
         int renderWidth = renderedImage.getWidth();
         int renderHeight = renderedImage.getHeight();
@@ -96,7 +98,7 @@ public class GamePanel extends JPanel {
             letterboxOffsetX, letterboxOffsetY,
             letterboxOffsetX + scaledImageWidth, letterboxOffsetY + scaledImageHeight,
             0, 0, renderWidth, renderHeight, null);
-
+/* 
         // --- FLASHLIGHT / VIGNETTE EFFECT ---
         Graphics2D lightLayer = (Graphics2D) graphics.create();
         lightLayer.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
@@ -118,7 +120,7 @@ public class GamePanel extends JPanel {
         lightLayer.setPaint(paint);
         lightLayer.fillRect(letterboxOffsetX, letterboxOffsetY, scaledImageWidth, scaledImageHeight);
         lightLayer.dispose();
-
+*/
         // --- HUD SCALING ---
         // Scale the HUD and Minimap so they aren't tiny on a 1080p monitor
         double hudScale = (double) scaledImageWidth / Renderer.RENDER_WIDTH;
