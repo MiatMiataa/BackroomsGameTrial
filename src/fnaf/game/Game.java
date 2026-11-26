@@ -57,6 +57,8 @@ public class Game {
     private static final String CHILDREN_CHEER_SOUND = "26. Children ~ Cheer.wav";
     private static final String DEATH_SCREEN_SOUND = "61. Miscellaneous SFX ~ Robot.wav";
     private static final String JUMPSCARE_SOUND = "AnimatronicScream.wav";
+    private static final String STATIC_SOUND = "Static.wav";
+    private static final String DOOR_SOUND = "SFXBible_12478.wav";
     private static final String[] MUSIC_TRACKS = {
         "01. Music Track ~ The Sand Temple.wav",
         "02. Music Track ~ In the Depths.wav",
@@ -101,6 +103,8 @@ public class Game {
     private int deathTickLimit = FALLBACK_DEAD_TICKS;
     private boolean nightFinished = false;
     private boolean nightWon = false;
+    private boolean lastRightDoorClosed = false;
+    private boolean lastLeftDoorClosed = false;
 
     private final GameMap gameMap;
     private final Raycaster raycaster;
@@ -258,6 +262,8 @@ public class Game {
         if (phaseTick >= NIGHT_INTRO_TOTAL_TICKS) {
             phase = Phase.PLAYING;
             phaseTick = 0;
+            lastLeftDoorClosed = playerInput.leftDoorClosed;
+            lastRightDoorClosed = playerInput.rightDoorClosed;
             startNightAudio();
         }
     }
@@ -282,6 +288,8 @@ public class Game {
             beginWinSequence();
             return;
         }
+
+        playDoorSoundIfStateChanged();
 
         if (playerInput.toggleMinimapDebug) {
             playerInput.toggleMinimapDebug = false;
@@ -349,6 +357,18 @@ public class Game {
         }
     }
 
+    private void playDoorSoundIfStateChanged() {
+        boolean leftChanged = playerInput.leftDoorClosed != lastLeftDoorClosed;
+        boolean rightChanged = playerInput.rightDoorClosed != lastRightDoorClosed;
+
+        if (leftChanged || rightChanged) {
+            audio.playOnce(DOOR_SOUND);
+        }
+
+        lastLeftDoorClosed = playerInput.leftDoorClosed;
+        lastRightDoorClosed = playerInput.rightDoorClosed;
+    }
+
     private void beginWinSequence() {
         phase = Phase.WIN_SEQUENCE;
         phaseTick = 0;
@@ -369,8 +389,7 @@ public class Game {
             audio.playOnce(CHILDREN_CHEER_SOUND);
         }
         if (phaseTick >= WIN_SEQUENCE_TOTAL_TICKS) {
-            phase = Phase.STATIC;
-            phaseTick = 0;
+            beginStatic();
         }
     }
 
@@ -384,19 +403,27 @@ public class Game {
         audio.stopAll();
         audio.playOnce(JUMPSCARE_SOUND);
     }
-
+    
     private void updateJumpscare() {
         phaseTick++;
         if (phaseTick >= jumpscareTickLimit) {
-            phase = Phase.STATIC;
-            phaseTick = 0;
             audio.stop(JUMPSCARE_SOUND);
+            beginStatic();
         }
+    }
+
+    private void beginStatic() {
+        phase = Phase.STATIC;
+        phaseTick = 0;
+        audio.playOnce(STATIC_SOUND);
     }
 
     private void updateStatic() {
         phaseTick++;
+
         if (phaseTick >= STATIC_TICKS) {
+            audio.stop(STATIC_SOUND);
+            
             if (nightWon) {
                 finishNight();
             } else {
