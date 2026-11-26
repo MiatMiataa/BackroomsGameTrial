@@ -20,7 +20,7 @@ public class GameMap {
         {1,0,0,3,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1,0,0,0,0,0,0,1},  //9
         {1,0,0,3,0,0,2,0,0,0,0,0,0,0,0,0,0,0,0,0,1,0,0,1,0,0,0,1},  //10
         {1,1,1,1,1,1,1,1,0,0,1,1,1,0,0,1,1,0,1,1,1,1,1,1,1,1,1,1},  //11
-        {1,1,1,1,1,1,1,1,0,0,1,1,1,0,0,1,0,0,0,0,0,0,0,1,1,1,1,1},  //12
+        {1,1,1,1,1,1,1,1,0,0,1,1,1,0,0,1,0,0,0,0,0,0,2,1,1,1,1,1},  //12
         {1,1,1,1,0,0,0,1,0,0,1,1,1,0,0,1,0,0,0,0,0,0,0,1,1,1,1,1},  //13
         {1,1,1,1,0,0,0,0,0,0,1,1,1,0,0,1,0,0,0,0,0,0,0,1,1,1,1,1},  //14
         {1,1,1,1,0,0,2,1,0,0,1,0,1,0,0,1,1,1,1,1,1,1,1,1,1,1,1,1},  //15
@@ -41,7 +41,7 @@ public class GameMap {
     };
 
     public final int[][] cameraTiles = {
-            {8,2}, {7,3}, {3,10}, {9,16}, {9,17}, {6,15}, {13,16}, {13,17}, {1,7}, {6,10}, {21,4}
+            {8,2}, {7,3}, {6,10}, {9,16}, {9,17}, {6,15}, {13,16}, {13,17}, {1,7}, {22,12}, {21,4}
         //   1A     1B      1C      2A      2B      3       4A        4B      5       6       7
     };
 
@@ -85,8 +85,8 @@ public class GameMap {
     //   - every segment runs along a single axis (no diagonals, they cut wall corners)
     //   - every tile a segment crosses is a non-wall tile
 
-    // Bonnie: 1A (Show Stage) -> 1B (Dining) -> 5 (Backstage) -> back -> 1C (Pirate Cove)
-    //         -> West Hall -> 2A -> 2B -> Left Door
+    // Bonnie: 1A (Show Stage) then 1B (Dining) then 5 (Backstage) then back then 1C (Pirate Cove)
+    //         then West Hall then 2A then 2B tthen Left Door
     public final int[][] bonniePath = {
         {10, 1},  // spawn - Show Stage
         {10, 2},  // move down
@@ -100,9 +100,9 @@ public class GameMap {
         {1, 5},   // move left
         {1, 7},   // 5 - Backstage
         {1, 5},   // walk the route back out
-        {2, 5},
-        {2, 4},
-        {4, 4},
+        {2, 5},   //
+        {2, 4},   //
+        {4, 4},   //
         {4, 5},   // move down
         {8, 5},   // move right
         {8, 10},  // move down
@@ -134,9 +134,9 @@ public class GameMap {
         {21, 9},  // move down
         {22, 9},  // move right
         {22, 4},  // walk the route back out
-        {20, 4},
-        {19, 4},
-        {19, 3},
+        {20, 4},  //
+        {19, 4},  //
+        {19, 3},  //
         {13, 3},  // move left into the East Hall corridor
         {13, 14}, // move down
         {13, 16}, // 4A - East Hall
@@ -163,9 +163,9 @@ public class GameMap {
         {21, 9},  // move down
         {22, 9},  // move right
         {22, 4},  // walk the route back out
-        {20, 4},
-        {19, 4},
-        {19, 3},
+        {20, 4},  //
+        {19, 4},  //
+        {19, 3},  //
         {13, 3},  // move left
         {13, 10}, // move down
         {6, 10},  // 6 - Kitchen
@@ -225,7 +225,7 @@ public class GameMap {
         pirateCoveCurtain.update();
     }
 
-    /**
+    /*
      * True when a straight waypoint-to-waypoint move stays on open tiles.
      * Segments have to run along one axis; a diagonal segment cuts wall corners
      * even when both of its end tiles happen to be open.
@@ -326,7 +326,6 @@ public class GameMap {
         {16, 11}
     };
     wait for now because golden freddy is not implemented yet, but this is where he would spawn and attack from
-    esmeringhoy
 
     */
 

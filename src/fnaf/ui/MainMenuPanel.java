@@ -27,7 +27,7 @@ public class MainMenuPanel extends JPanel {
         constraints.gridy = 0;
         constraints.insets = new Insets(0, 0, 40, 0);
 
-        JLabel titleLabel = new JLabel("BackroomsGameTrial", SwingConstants.CENTER);
+        JLabel titleLabel = new JLabel("Five Nights At Freddy's", SwingConstants.CENTER);
         titleLabel.setForeground(Color.WHITE);
         titleLabel.setFont(new Font("Monospaced", Font.BOLD, 40));
         add(titleLabel, constraints);
