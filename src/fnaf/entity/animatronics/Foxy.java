@@ -1,10 +1,10 @@
-package GameTrial.entity.animatronics;
+package fnaf.entity.animatronics;
 
-import GameTrial.assets.AnimatronicTextures;
-import GameTrial.entity.Animatronic;
-import GameTrial.entity.Player;
-import GameTrial.entity.ThreatContext;
-import GameTrial.world.GameMap;
+import fnaf.assets.AnimatronicTextures;
+import fnaf.entity.Animatronic;
+import fnaf.entity.Player;
+import fnaf.entity.AnimatronicContext;
+import fnaf.world.GameMap;
 
 public class Foxy extends Animatronic {
     private static final int APPROACH_TIMEOUT = 30;
@@ -29,10 +29,10 @@ public class Foxy extends Animatronic {
     }
 
     @Override
-    protected void updatePatrol(GameMap map, Player player, ThreatContext threatContext) {
+    protected void updatePatrol(GameMap map, Player player, AnimatronicContext animatronicContext) {
         map.pirateCoveCurtain.targetOpenAmount = Math.min(1.0, stage / (double) CURTAIN_STAGE_COUNT);
         if (!sprinting) {
-            if (threatContext.tabletUp) {
+            if (animatronicContext.tabletUp) {
                 if (!tabletWasUp) {
                     tabletWasUp = true;
                     cameraStallTicksLeft = MINIMUM_CAMERA_STALL_TICKS
@@ -67,8 +67,8 @@ public class Foxy extends Animatronic {
     }
 
     @Override
-    protected void updateApproach(Player player, ThreatContext threatContext) {
-        if (threatContext.leftDoorClosed) {
+    protected void updateApproach(Player player, AnimatronicContext animatronicContext) {
+        if (animatronicContext.leftDoorClosed) {
             state = State.RETREAT;
             sprinting = false;   // he runs out, but walks home
             animationTicks = 0;
@@ -81,7 +81,7 @@ public class Foxy extends Animatronic {
     }
 
     @Override
-    protected void updateRetreat(GameMap map, Player player, ThreatContext threatContext) {
+    protected void updateRetreat(GameMap map, Player player, AnimatronicContext animatronicContext) {
         if (!arrivedAtWaypoint()) { moveAlongPath(map); return; }
         if (pathIndex == retreatStopIndex) {
             // Half the time he is behind the curtain again, half the time still peeking.

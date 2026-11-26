@@ -1,4 +1,4 @@
-package GameTrial.entity;
+package fnaf.entity;
 
 public enum AnimatronicType {
     FREDDY("freddy", "FreddyJumpscareFrames"),
@@ -7,16 +7,17 @@ public enum AnimatronicType {
     GOLDEN_FREDDY("golden_freddy", "Golden FreddyJumpscareFrames"),
     FOXY("foxy", "FoxyJumpscareFrames");
 
-    private final String folder;
+    private final String textureFolder;
     private final String jumpscareFolder;
 
-    AnimatronicType(String folder, String jumpscareFolder) {
-        this.folder = folder;
+    AnimatronicType(String textureFolder, String jumpscareFolder) {
+        this.textureFolder = textureFolder;
         this.jumpscareFolder = jumpscareFolder;
     }
 
-    public String folder() {
-        return folder;
+    /** The folder of the walking textures, inside src/textures/. */
+    public String textureFolder() {
+        return textureFolder;
     }
 
     /** The folder of frame files, which does not follow the texture folder names. */

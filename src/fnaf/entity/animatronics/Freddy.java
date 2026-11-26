@@ -1,10 +1,10 @@
-package GameTrial.entity.animatronics;
+package fnaf.entity.animatronics;
 
-import GameTrial.assets.AnimatronicTextures;
-import GameTrial.entity.Animatronic;
-import GameTrial.entity.Player;
-import GameTrial.entity.ThreatContext;
-import GameTrial.world.GameMap;
+import fnaf.assets.AnimatronicTextures;
+import fnaf.entity.Animatronic;
+import fnaf.entity.Player;
+import fnaf.entity.AnimatronicContext;
+import fnaf.world.GameMap;
 
 public class Freddy extends Animatronic {
     private static final int APPROACH_TIMEOUT = 180;
@@ -19,7 +19,7 @@ public class Freddy extends Animatronic {
     }
 
     @Override
-    protected void updatePatrol(GameMap map, Player player, ThreatContext threatContext) {
+    protected void updatePatrol(GameMap map, Player player, AnimatronicContext animatronicContext) {
         // Walking is never interrupted: only the decision to set off again is.
         if (!arrivedAtWaypoint()) { moveAlongPath(map); return; }
         if (atLastWaypoint()) {
@@ -28,11 +28,11 @@ public class Freddy extends Animatronic {
             animationTicks = 0;
             return;
         }
-        if (pathIndex == 0 && !threatContext.showStageIsClear) {
+        if (pathIndex == 0 && !animatronicContext.showStageIsClear) {
             postponeMovementOpportunity();
             return;
         }
-        if (camerasStallHisMovement(threatContext)) {
+        if (camerasStallHisMovement(animatronicContext)) {
             postponeMovementOpportunity();
             return;
         }
@@ -46,11 +46,11 @@ public class Freddy extends Animatronic {
      * opportunity. Once he is there only his own camera does, which is why
      * watching 4B is what keeps him out of the office.
      */
-    private boolean camerasStallHisMovement(ThreatContext threatContext) {
-        if (!threatContext.tabletUp) {
+    private boolean camerasStallHisMovement(AnimatronicContext animatronicContext) {
+        if (!animatronicContext.tabletUp) {
             return false;
         }
-        return isInEastHallCorner() ? isOnWatchedCamera(threatContext) : true;
+        return isInEastHallCorner() ? isOnWatchedCamera(animatronicContext) : true;
     }
 
     private boolean isInEastHallCorner() {
@@ -58,10 +58,10 @@ public class Freddy extends Animatronic {
     }
 
     @Override
-    protected void updateApproach(Player player, ThreatContext threatContext) {
+    protected void updateApproach(Player player, AnimatronicContext animatronicContext) {
         // FNAF 1: a closed right door stops him at the door, it never sends him
         // back down the hall. He waits there until the door opens again.
-        if (threatContext.rightDoorClosed) {
+        if (animatronicContext.rightDoorClosed) {
             approachTimer = 0;
             return;
         }
@@ -72,7 +72,7 @@ public class Freddy extends Animatronic {
     }
 
     @Override
-    protected void updateRetreat(GameMap map, Player player, ThreatContext threatContext) {
+    protected void updateRetreat(GameMap map, Player player, AnimatronicContext animatronicContext) {
         state = State.PATROL;
         animationTicks = 0;
     }

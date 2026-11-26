@@ -1,6 +1,6 @@
-package GameTrial.entity;
+package fnaf.entity;
 
-import GameTrial.assets.Texture;
+import fnaf.assets.Texture;
 
 public class Sprite {
     public double positionX;

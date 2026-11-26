@@ -1,8 +1,8 @@
-package GameTrial.entity;
+package fnaf.entity;
 
-import GameTrial.assets.AnimatronicTextures;
-import GameTrial.world.GameMap;
-import GameTrial.assets.Texture;
+import fnaf.assets.AnimatronicTextures;
+import fnaf.world.GameMap;
+import fnaf.assets.Texture;
 
 public abstract class Animatronic extends Sprite {
     public enum State { PATROL, APPROACH, ATTACK, RETREAT }
@@ -45,7 +45,7 @@ public abstract class Animatronic extends Sprite {
                           int stepTicks, AnimatronicTextures textures, double heightScale) {
         super((path[0][0] + 0.5) * GameMap.TILE_SIZE,
               (path[0][1] + 0.5) * GameMap.TILE_SIZE,
-              textures.byOrientation[0], heightScale);
+              textures.framesByOrientation[0], heightScale);
         this.path = path;
         this.walkSpeed = walkSpeed;
         this.sprintSpeed = sprintSpeed;
@@ -53,29 +53,29 @@ public abstract class Animatronic extends Sprite {
         this.textures = textures;
     }
 
-    public final void tick(GameMap map, Player player, ThreatContext threatContext) {
+    public final void tick(GameMap map, Player player, AnimatronicContext animatronicContext) {
         animationTicks++;
         isMoving = false;
         switch (state) {
             case PATROL:
-                updatePatrol(map, player, threatContext);
+                updatePatrol(map, player, animatronicContext);
                 break;
             case APPROACH:
-                updateApproach(player, threatContext);
+                updateApproach(player, animatronicContext);
                 break;
             case ATTACK:
                 updateAttack(player);
                 break;
             case RETREAT:
-                updateRetreat(map, player, threatContext);
+                updateRetreat(map, player, animatronicContext);
                 break;
         }
         texture = pickTexture(player);
     }
 
-    protected abstract void updatePatrol(GameMap map, Player player, ThreatContext threatContext);
-    protected abstract void updateApproach(Player player, ThreatContext threatContext);
-    protected abstract void updateRetreat(GameMap map, Player player, ThreatContext threatContext);
+    protected abstract void updatePatrol(GameMap map, Player player, AnimatronicContext animatronicContext);
+    protected abstract void updateApproach(Player player, AnimatronicContext animatronicContext);
+    protected abstract void updateRetreat(GameMap map, Player player, AnimatronicContext animatronicContext);
 
     protected void updateAttack(Player player) {
         faceToward(player.positionX, player.positionY);
@@ -201,7 +201,7 @@ public abstract class Animatronic extends Sprite {
     // animation stuff
 
     protected Texture pickTexture(Player player) {
-        return textures.byOrientation[viewSector(player)];
+        return textures.framesByOrientation[viewSector(player)];
     }
 
 
@@ -317,12 +317,12 @@ public abstract class Animatronic extends Sprite {
      * True when the camera on screen is pointed at the tile this animatronic is
      * standing on. This is what makes an animatronic show up on a camera at all.
      */
-    protected boolean isOnWatchedCamera(ThreatContext threatContext) {
-        if (!threatContext.tabletUp || threatContext.viewingCameraTile == null) {
+    protected boolean isOnWatchedCamera(AnimatronicContext animatronicContext) {
+        if (!animatronicContext.tabletUp || animatronicContext.viewingCameraTile == null) {
             return false;
         }
-        return toTile(positionX) == threatContext.viewingCameraTile[0]
-            && toTile(positionY) == threatContext.viewingCameraTile[1];
+        return toTile(positionX) == animatronicContext.viewingCameraTile[0]
+            && toTile(positionY) == animatronicContext.viewingCameraTile[1];
     }
 
 }

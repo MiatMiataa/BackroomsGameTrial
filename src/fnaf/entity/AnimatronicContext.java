@@ -1,6 +1,6 @@
-package GameTrial.entity;
+package fnaf.entity;
 
-public class ThreatContext {
+public class AnimatronicContext {
     public boolean tabletUp;
     public boolean leftDoorClosed;
     public boolean rightDoorClosed;

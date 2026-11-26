@@ -1,6 +1,6 @@
-package GameTrial.assets;
+package fnaf.assets;
 
-import GameTrial.entity.AnimatronicType;
+import fnaf.entity.AnimatronicType;
 import java.awt.Graphics2D;
 import java.awt.RenderingHints;
 import java.awt.image.BufferedImage;
@@ -21,7 +21,7 @@ import javax.imageio.ImageIO;
  * "frame_00_delay-0.05s.gif", and that delay is what decides how long the
  * jumpscare lasts and how fast it plays.
  */
-public class JumpscareFrames {
+public class JumpscareAnimation {
     private static final String JUMPSCARE_FOLDER = "src/jumpscare/";
     private static final String DEFAULT_FRAME_DELAY_SECONDS = "0.05";
     private static final Pattern FRAME_DELAY_PATTERN =
@@ -34,7 +34,7 @@ public class JumpscareFrames {
     private final BufferedImage[] decodedFrames;
     private final int totalDurationInTicks;
 
-    public JumpscareFrames(AnimatronicType type) {
+    public JumpscareAnimation(AnimatronicType type) {
         File folder = new File(JUMPSCARE_FOLDER + type.jumpscareFolder());
         frameFiles = listFrameFiles(folder);
         frameDurationsInTicks = new int[frameFiles.length];

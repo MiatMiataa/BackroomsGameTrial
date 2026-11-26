@@ -1,6 +1,6 @@
-package GameTrial.assets;
+package fnaf.assets;
 
-import GameTrial.entity.AnimatronicType;
+import fnaf.entity.AnimatronicType;
 import java.io.File;
 import java.io.IOException;
 import java.util.EnumMap;
@@ -30,7 +30,8 @@ public class TextureSet {
         deskFrames = loadDeskFrames();
 
         for (AnimatronicType type : AnimatronicType.values()) {
-            animatronicTextures.put(type, new AnimatronicTextures(ANIMATRONIC_FOLDER + type.folder() + "/", type.folder()));
+            animatronicTextures.put(type, new AnimatronicTextures(
+                ANIMATRONIC_FOLDER + type.textureFolder() + "/", type.textureFolder()));
         }
     }
 
@@ -50,7 +51,7 @@ public class TextureSet {
         return new Texture(path);
     }
 
-    public AnimatronicTextures of(AnimatronicType type) {
+    public AnimatronicTextures getAnimatronicTextures(AnimatronicType type) {
         return animatronicTextures.get(type);
     }
 }

@@ -1,11 +1,11 @@
-package GameTrial.entity.animatronics;
+package fnaf.entity.animatronics;
 
-import GameTrial.assets.AnimatronicTextures;
-import GameTrial.audio.AudioPlayer;
-import GameTrial.entity.Animatronic;
-import GameTrial.entity.Player;
-import GameTrial.entity.ThreatContext;
-import GameTrial.world.GameMap;
+import fnaf.assets.AnimatronicTextures;
+import fnaf.audio.AudioPlayer;
+import fnaf.entity.Animatronic;
+import fnaf.entity.Player;
+import fnaf.entity.AnimatronicContext;
+import fnaf.world.GameMap;
 
 /**
  * Golden Freddy, following the FNAF 1 rules: he never walks and never picks a
@@ -48,17 +48,17 @@ public class GoldenFreddy extends Animatronic {
     }
 
     @Override
-    protected void updatePatrol(GameMap map, Player player, ThreatContext threatContext) {
+    protected void updatePatrol(GameMap map, Player player, AnimatronicContext animatronicContext) {
         // The poster has been seen: he is in the office the moment the monitor drops.
         if (appearancePending) {
-            if (threatContext.tabletUp) {
+            if (animatronicContext.tabletUp) {
                 return;
             }
             appearInFrontOfPlayer(map, player);
             return;
         }
-        if (threatContext.tabletUp
-            && isViewingPoster(threatContext)
+        if (animatronicContext.tabletUp
+            && isViewingPoster(animatronicContext)
             && random.nextInt(POSTER_ROLL) == 0) {
             appearancePending = true;
             audio.playOnce(OUTSIDE_SOUND);
@@ -66,9 +66,9 @@ public class GoldenFreddy extends Animatronic {
     }
 
     @Override
-    protected void updateApproach(Player player, ThreatContext threatContext) {
+    protected void updateApproach(Player player, AnimatronicContext animatronicContext) {
         faceToward(player.positionX, player.positionY);
-        if (threatContext.tabletUp) {
+        if (animatronicContext.tabletUp) {
             audio.stop(OFFICE_SOUND);
             state = State.RETREAT;
             animationTicks = 0;
@@ -81,7 +81,7 @@ public class GoldenFreddy extends Animatronic {
     }
 
     @Override
-    protected void updateRetreat(GameMap map, Player player, ThreatContext threatContext) {
+    protected void updateRetreat(GameMap map, Player player, AnimatronicContext animatronicContext) {
         audio.stop(OFFICE_SOUND);
         appearancePending = false;
         reactionTimer = 0;
@@ -95,8 +95,8 @@ public class GoldenFreddy extends Animatronic {
         return state == State.APPROACH || state == State.ATTACK;
     }
 
-    private boolean isViewingPoster(ThreatContext threatContext) {
-        int[] watchedTile = threatContext.viewingCameraTile;
+    private boolean isViewingPoster(AnimatronicContext animatronicContext) {
+        int[] watchedTile = animatronicContext.viewingCameraTile;
         return watchedTile != null
             && watchedTile[0] == POSTER_TILE[0]
             && watchedTile[1] == POSTER_TILE[1];

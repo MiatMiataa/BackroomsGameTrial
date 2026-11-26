@@ -1,12 +1,12 @@
-package GameTrial.entity.animatronics;
+package fnaf.entity.animatronics;
 
-import GameTrial.assets.AnimatronicTextures;
-import GameTrial.entity.Animatronic;
-import GameTrial.entity.Player;
-import GameTrial.entity.ThreatContext;
-import GameTrial.world.GameMap;
+import fnaf.assets.AnimatronicTextures;
+import fnaf.entity.Animatronic;
+import fnaf.entity.Player;
+import fnaf.entity.AnimatronicContext;
+import fnaf.world.GameMap;
 
-public class BonnieAndChica extends Animatronic {
+public class BonnieAndChicaAI extends Animatronic {
     public enum Side { LEFT, RIGHT }
 
     private static final int APPROACH_TIMEOUT = 180;
@@ -19,7 +19,7 @@ public class BonnieAndChica extends Animatronic {
     private final Side side;
     private int approachTimer;
 
-    public BonnieAndChica(int[][] path, Side side, AnimatronicTextures textures) {
+    public BonnieAndChicaAI(int[][] path, Side side, AnimatronicTextures textures) {
         super(path, 1.2, 0, 0, textures, 0.85);
         this.side = side;
         setMovementOpportunityIntervalInTicks(side == Side.LEFT ? 298 : 299);
@@ -27,7 +27,7 @@ public class BonnieAndChica extends Animatronic {
     }
 
     @Override
-    protected void updatePatrol(GameMap map, Player player, ThreatContext threatContext) {
+    protected void updatePatrol(GameMap map, Player player, AnimatronicContext animatronicContext) {
         if (!arrivedAtWaypoint()) { moveAlongPath(map); return; }
         if (atLastWaypoint()) {
             state = State.APPROACH;
@@ -41,8 +41,8 @@ public class BonnieAndChica extends Animatronic {
     }
 
     @Override
-    protected void updateApproach(Player player, ThreatContext threatContext) {
-        if (isDefended(threatContext)) {
+    protected void updateApproach(Player player, AnimatronicContext animatronicContext) {
+        if (isDefended(animatronicContext)) {
             state = State.RETREAT;
             animationTicks = 0;
             return;
@@ -54,7 +54,7 @@ public class BonnieAndChica extends Animatronic {
     }
 
     @Override
-    protected void updateRetreat(GameMap map, Player player, ThreatContext threatContext) {
+    protected void updateRetreat(GameMap map, Player player, AnimatronicContext animatronicContext) {
         if (arrivedAtWaypoint()) {
             if (pathIndex <= retreatStopIndex) {
                 state = State.PATROL;
@@ -67,7 +67,7 @@ public class BonnieAndChica extends Animatronic {
         moveAlongPath(map);
     }
 
-    private boolean isDefended(ThreatContext threatContext) {
-        return side == Side.LEFT ? threatContext.leftDoorClosed : threatContext.rightDoorClosed;
+    private boolean isDefended(AnimatronicContext animatronicContext) {
+        return side == Side.LEFT ? animatronicContext.leftDoorClosed : animatronicContext.rightDoorClosed;
     }
 }

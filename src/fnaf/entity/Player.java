@@ -1,6 +1,6 @@
-package GameTrial.entity;
+package fnaf.entity;
 
-import GameTrial.input.InputState;
+import fnaf.input.PlayerInput;
 
 public class Player {
     public double positionX = 0;
@@ -34,8 +34,8 @@ public class Player {
         currentYawRadians = 0;
     }
 
-    public void update(InputState inputState) {
-        double totalTurn = inputState.getTotalTurn();
+    public void update(PlayerInput playerInput) {
+        double totalTurn = playerInput.getTotalTurn();
         if (totalTurn == 0) {
             return;
         }

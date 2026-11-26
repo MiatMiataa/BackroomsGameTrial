@@ -1,4 +1,4 @@
-package GameTrial.assets;
+package fnaf.assets;
 
 import javax.imageio.ImageIO;
 import java.awt.image.BufferedImage;
