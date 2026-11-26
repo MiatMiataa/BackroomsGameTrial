@@ -1,6 +1,7 @@
 package GameTrial.entity;
 
 import GameTrial.assets.TextureSet;
+import GameTrial.audio.AudioPlayer;
 import GameTrial.entity.animatronics.BonnieAndChica;
 import GameTrial.entity.animatronics.Foxy;
 import GameTrial.entity.animatronics.Freddy;
@@ -21,7 +22,7 @@ public class AnimatronicManager {
     private AnimatronicType attackerType;
     private boolean hasLost;
 
-    public AnimatronicManager(GameMap gameMap, TextureSet textures) {
+    public AnimatronicManager(GameMap gameMap, TextureSet textures, AudioPlayer audio) {
         bonnie = new BonnieAndChica(gameMap.bonniePath, BonnieAndChica.Side.LEFT, textures.of(AnimatronicType.BONNIE));
         chica = new BonnieAndChica(gameMap.chicaPath, BonnieAndChica.Side.RIGHT, textures.of(AnimatronicType.CHICA));
         freddy = new Freddy(gameMap.freddyPath, textures.of(AnimatronicType.FREDDY));
@@ -32,7 +33,7 @@ public class AnimatronicManager {
         animatronics.add(freddy);
         animatronics.add(foxy);
         // He never walks, so his only waypoint is the CAM 2B poster he spawns at.
-        goldenFreddy = new GoldenFreddy(new int[][]{{9, 17}}, textures.of(AnimatronicType.GOLDEN_FREDDY));
+        goldenFreddy = new GoldenFreddy(new int[][]{{9, 17}}, textures.of(AnimatronicType.GOLDEN_FREDDY), audio);
         animatronics.add(goldenFreddy);
     }
 
