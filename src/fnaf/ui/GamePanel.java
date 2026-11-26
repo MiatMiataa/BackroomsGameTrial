@@ -35,7 +35,6 @@ public class GamePanel extends JPanel {
     private int framesDrawnThisSecond = 0;
     private int displayedFps = 0;
     private long lastFpsUpdateTimestamp = System.nanoTime();
-    private long lastRenderTimingPrint = System.nanoTime();
 
     public GamePanel(Game game, Runnable exitToMenu) {
         this.game = game;

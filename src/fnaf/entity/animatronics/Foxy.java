@@ -15,13 +15,11 @@ public class Foxy extends Animatronic {
     private static final int MAXIMUM_CAMERA_STALL_TICKS = 1000;   // 16.67 s
     private static final int SPRINT_STAGE = 4;
 
-    // Each stage pulls the Pirate Cove curtain further back: 0 = closed, 3 = wide open.
-    private static final int CURTAIN_STAGE_COUNT = 3;
-
     private int stage = 0;
     private int approachTimer = 0;
     private int cameraStallTicksLeft = 0;
     private boolean tabletWasUp = false;
+    private boolean retreatPeek = false;
 
     public Foxy(int[][] path, AnimatronicTextures textures) {
         super(path, 1.2, 3.35, 0, textures, 0.9);
@@ -30,7 +28,14 @@ public class Foxy extends Animatronic {
 
     @Override
     protected void updatePatrol(GameMap map, Player player, AnimatronicContext animatronicContext) {
-        map.pirateCoveCurtain.targetOpenAmount = Math.min(1.0, stage / (double) CURTAIN_STAGE_COUNT);
+        if (!sprinting || pathIndex == 0) {
+            map.pirateCoveCurtain.targetOpenAmount = 0.0;
+        } else if (map.pirateCoveCurtain.targetOpenAmount < 0.5) {
+            map.pirateCoveCurtain.targetOpenAmount = 0.5;
+        } else {
+            map.pirateCoveCurtain.targetOpenAmount = 1.0;
+        }
+        
         if (!sprinting) {
             if (animatronicContext.tabletUp) {
                 if (!tabletWasUp) {
@@ -82,11 +87,18 @@ public class Foxy extends Animatronic {
 
     @Override
     protected void updateRetreat(GameMap map, Player player, AnimatronicContext animatronicContext) {
-        if (!arrivedAtWaypoint()) { moveAlongPath(map); return; }
+        if (!arrivedAtWaypoint()) {
+            moveAlongPath(map);
+            return;
+        }
+
         if (pathIndex == retreatStopIndex) {
-            // Half the time he is behind the curtain again, half the time still peeking.
-            stage = random.nextBoolean() ? 0 : 1;
-            map.pirateCoveCurtain.targetOpenAmount = stage / (double) CURTAIN_STAGE_COUNT;
+            retreatPeek = random.nextBoolean();
+
+            stage = retreatPeek ? 1 : 0;
+
+            map.pirateCoveCurtain.targetOpenAmount = retreatPeek ? 0.5 : 0.0;
+
             sprinting = false;
             cameraStallTicksLeft = 0;
             tabletWasUp = false;

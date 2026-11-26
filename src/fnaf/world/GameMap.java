@@ -17,7 +17,7 @@ public class GameMap {
         {1,0,0,1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1,0,0,1,0,0,0,1},  //6
         {1,2,0,1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1,0,0,1,1,1,1,1},  //7
         {1,1,1,1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1,0,0,1,1,1,1,1},  //8
-        {1,0,0,3,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1,0,0,0,0,0,0,1},  //9
+        {1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1,0,0,0,0,0,0,1},  //9
         {1,0,0,3,0,0,2,0,0,0,0,0,0,0,0,0,0,0,0,0,1,0,0,1,0,0,0,1},  //10
         {1,1,1,1,1,1,1,1,0,0,1,1,1,0,0,1,1,0,1,1,1,1,1,1,1,1,1,1},  //11
         {1,1,1,1,1,1,1,1,0,0,1,1,1,0,0,1,0,0,0,0,0,0,2,1,1,1,1,1},  //12
@@ -53,17 +53,18 @@ public class GameMap {
             {0, 1},   // 1B - Dining Area
             {-1, 0},  // 1C - Pirate Cove (looks up at the curtain)
             {0, 1},   // 2A - West Hall
-            {0, 1},   // 2B - West Hall Corner
-            {0, 1},   // 3 - Supply Closet
+            {-1, 1},   // 2B - West Hall Corner
+            {-2, -2},   // 3 - Supply Closet
             {0, 1},   // 4A - East Hall
-            {0, 1},   // 4B - East Hall Corner
-            {1, 0},   // 5 - Backstage
-            {1, 0},   // 6 - Kitchen
-            {-1, 0}   // 7 - Restrooms
+            {1, -1},   // 4B - East Hall Corner
+            {1, -2},   // 5 - Backstage
+            {-3, 1},   // 6 - Kitchen
+            {2, 5}   // 7 - Restrooms
     };
 
     public final int[][] pirateCoveCurtainTile = {
-        {3, 10}
+        {3, 10},
+        {3, 9}
     };
 
     // Doors and curtain. They are not tiles: entity movement keeps using tileGrid,

@@ -11,7 +11,7 @@ public class Player {
     public double cameraPlaneX = 0, cameraPlaneY = 0.66;
 
     // guard can look this far left or right of the start direction (90 = both office doors)
-    private double maxYawRadians = Math.toRadians(90);
+    private double maxYawRadians = Math.toRadians(30);
 
     public void setMaxYawRadians(double newMaxYawRadians) {
         maxYawRadians = newMaxYawRadians;
