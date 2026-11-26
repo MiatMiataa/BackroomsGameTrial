@@ -6,10 +6,9 @@
     "configurations": [
         {
             "type": "java",
-            "name": "GameTrial",
+            "name": "Main",
             "request": "launch",
-            "mainClass": "GameTrial.GameTrial",
-            "projectName": "GameTrial_8d65ac6f"
+            "mainClass": "fnaf.Main"
         },
         {
             "type": "java",
